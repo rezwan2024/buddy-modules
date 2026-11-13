@@ -48,6 +48,16 @@ abstract class Module {
 	abstract public function boot(): void;
 
 	/**
+	 * Register settings panels, sections, and fields for this module.
+	 *
+	 * Called on every request (regardless of active state) so the REST
+	 * controller can always serve and save settings. Override in subclasses.
+	 *
+	 * @since 2.0.0
+	 */
+	public function register_settings(): void {}
+
+	/**
 	 * Called once when the module is activated through the registry.
 	 *
 	 * @since 2.0.0

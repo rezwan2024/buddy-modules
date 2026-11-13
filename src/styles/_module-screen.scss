@@ -1,0 +1,220 @@
+// Module screen: SideNavigation + main area.
+
+.bdm-admin-module-screen {
+	display: flex;
+	align-items: flex-start;
+	gap: 0;
+	min-height: 400px;
+
+	&__loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 60px;
+		width: 100%;
+	}
+
+	&__main {
+		flex: 1;
+		min-width: 0;
+		padding: 32px 36px;
+		background: $bdm-bg-base;
+		border-left: 1px solid $bdm-border;
+	}
+
+	&__panel-title {
+		margin: 0 0 24px;
+		font-size: 18px;
+		font-weight: 600;
+		color: $bdm-text;
+		line-height: 1.3;
+	}
+}
+
+// ── SideNavigation ───────────────────────────────────────────────────────────
+
+.bdm-admin-sidenav {
+	flex-shrink: 0;
+	width: 200px;
+	padding: 20px 0;
+	background: $bdm-bg-secondary;
+	border-right: 1px solid $bdm-border;
+	min-height: 400px;
+
+	&__back {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: 8px 16px 16px;
+		margin-bottom: 12px;
+		background: none;
+		border: none;
+		border-bottom: 1px solid $bdm-border;
+		font-size: 13px;
+		color: $bdm-text-tertiary;
+		cursor: pointer;
+		text-align: left;
+		transition: color 0.15s ease;
+
+		&:hover {
+			color: $bdm-brand;
+		}
+	}
+
+	&__list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	&__item {
+		margin: 0;
+	}
+
+	&__link {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		width: 100%;
+		padding: 9px 16px;
+		background: none;
+		border: none;
+		border-left: 3px solid transparent;
+		font-size: 13px;
+		color: $bdm-text-secondary;
+		cursor: pointer;
+		text-align: left;
+		transition: $bdm-transition;
+
+		&:hover {
+			color: $bdm-text;
+			background: $bdm-bg-hover;
+		}
+	}
+
+	&__item--active > &__link {
+		color: $bdm-brand;
+		background: rgba($bdm-brand, 0.06);
+		font-weight: 600;
+	}
+
+	&__icon {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+		color: $bdm-text-tertiary;
+		flex-shrink: 0;
+	}
+
+	&__item--active > &__link &__icon {
+		color: $bdm-brand;
+	}
+
+	&__label {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+// ── SettingsForm ─────────────────────────────────────────────────────────────
+
+.bdm-admin-settings-form {
+
+	&__section {
+		margin-bottom: 32px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__section-title {
+		margin: 0 0 4px;
+		font-size: 14px;
+		font-weight: 600;
+		color: $bdm-text;
+	}
+
+	&__section-desc {
+		margin: 0 0 16px;
+		font-size: 13px;
+		color: $bdm-text-tertiary;
+	}
+
+	&__fields {
+		border: 1px solid $bdm-border;
+		border-radius: $bdm-radius-md;
+		overflow: hidden;
+	}
+
+	&__row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 24px;
+		padding: 16px 20px;
+		background: $bdm-bg-base;
+		border-bottom: 1px solid $bdm-border;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	// Wide controls stack vertically.
+	&__row--textarea,
+	&__row--checkbox_list,
+	&__row--radio {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	&__meta {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__label {
+		display: block;
+		font-size: 13px;
+		font-weight: 500;
+		color: $bdm-text;
+		margin-bottom: 2px;
+	}
+
+	&__desc {
+		margin: 4px 0 0;
+		font-size: 12px;
+		color: $bdm-text-tertiary;
+		line-height: 1.5;
+	}
+
+	&__control {
+		flex-shrink: 0;
+	}
+
+	&__row--textarea &__control,
+	&__row--checkbox_list &__control,
+	&__row--radio &__control {
+		width: 100%;
+		margin-top: 8px;
+	}
+
+	&__checkbox-list {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+}
+
+// ── Placeholder ──────────────────────────────────────────────────────────────
+
+.bdm-admin-placeholder {
+	margin-top: 24px;
+	padding: 32px;
+	border: 2px dashed $bdm-border-dark;
+	border-radius: $bdm-radius-md;
+	text-align: center;
+	color: $bdm-text-tertiary;
+	font-size: 13px;
+}

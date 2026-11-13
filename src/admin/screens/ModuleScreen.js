@@ -1,0 +1,132 @@
+/**
+ * Module settings screen.
+ *
+ * Layout: SideNavigation (left) + main area (right).
+ * The main area always renders the SettingsForm for schema-driven fields.
+ * If CUSTOM_PANEL_SCREENS has an entry for the active panel, it is rendered
+ * below the form as a Suspense-wrapped custom section.
+ *
+ * @since 2.0.0
+ */
+
+import { useState, useEffect, Suspense } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
+import { apiRequest } from '../../common/utils/api';
+import { SideNavigation } from '../../common/components/SideNavigation';
+import { SettingsForm } from '../../common/components/SettingsForm';
+import { useAutosave } from '../../common/hooks/useAutosave';
+import { CUSTOM_PANEL_SCREENS } from '../modules';
+
+/**
+ * @since 2.0.0
+ *
+ * @param {Object}   props
+ * @param {{ module: string, panel: string|null }} props.route
+ * @param {Function} props.navigate
+ * @returns {JSX.Element}
+ */
+export function ModuleScreen( { route, navigate } ) {
+	var module = route.module;
+
+	var [ loading, setLoading ]     = useState( true );
+	var [ schema, setSchema ]       = useState( [] );
+	var [ values, setValues ]       = useState( {} );
+	var [ activePanel, setPanel ]   = useState( route.panel || null );
+
+	// Sync route.panel → activePanel when user navigates via back/forward.
+	useEffect( function() {
+		if ( route.panel ) {
+			setPanel( route.panel );
+		}
+	}, [ route.panel ] );
+
+	// Fetch schema + values when the module changes.
+	useEffect( function() {
+		setLoading( true );
+
+		apiRequest( { path: '/settings/' + module } )
+			.then( function( data ) {
+				var panels = data.panels || [];
+				setSchema( panels );
+				setValues( data.values || {} );
+
+				// Default to the first panel if none is set in the URL.
+				if ( ! route.panel && panels.length ) {
+					setPanel( panels[ 0 ].id );
+					navigate( { module: module, panel: panels[ 0 ].id } );
+				}
+			} )
+			.finally( function() { setLoading( false ); } );
+	}, [ module ] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	var save = useAutosave( module, activePanel );
+
+	function handleFieldChange( fieldId, newValue ) {
+		var nextPanelValues = Object.assign(
+			{},
+			values[ activePanel ] || {},
+			{ [ fieldId ]: newValue }
+		);
+		setValues( Object.assign( {}, values, { [ activePanel ]: nextPanelValues } ) );
+		save( nextPanelValues );
+	}
+
+	function handlePanelSelect( panelId ) {
+		setPanel( panelId );
+		navigate( { module: module, panel: panelId } );
+	}
+
+	function handleBack() {
+		navigate( {} );
+	}
+
+	if ( loading ) {
+		return (
+			<div className="bdm-admin-module-screen__loading">
+				<Spinner />
+			</div>
+		);
+	}
+
+	var activePanelSchema = schema.find( function( p ) { return p.id === activePanel; } );
+	var customKey         = module + '/' + activePanel;
+	var CustomScreen      = CUSTOM_PANEL_SCREENS[ customKey ] || null;
+	var panelValues       = values[ activePanel ] || {};
+
+	return (
+		<div className="bdm-admin-module-screen">
+			<SideNavigation
+				panels={ schema }
+				activePanel={ activePanel }
+				onSelect={ handlePanelSelect }
+				onBack={ handleBack }
+			/>
+
+			<main className="bdm-admin-module-screen__main">
+				{ activePanelSchema && activePanelSchema.label && (
+					<h2 className="bdm-admin-module-screen__panel-title">
+						{ activePanelSchema.label }
+					</h2>
+				) }
+
+				<SettingsForm
+					sections={ activePanelSchema ? activePanelSchema.sections : [] }
+					values={ panelValues }
+					onChange={ handleFieldChange }
+				/>
+
+				{ CustomScreen && (
+					<Suspense fallback={ <Spinner /> }>
+						<CustomScreen
+							route={ route }
+							navigate={ navigate }
+							values={ panelValues }
+							onChange={ handleFieldChange }
+						/>
+					</Suspense>
+				) }
+			</main>
+		</div>
+	);
+}

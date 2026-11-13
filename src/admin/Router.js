@@ -8,6 +8,7 @@
  */
 
 import Dashboard from './screens/Dashboard';
+import { ModuleScreen } from './screens/ModuleScreen';
 
 /**
  * Renders the screen that matches the current route.
@@ -25,10 +26,5 @@ export function Router( { route, navigate } ) {
 		return <Dashboard route={ route } navigate={ navigate } />;
 	}
 
-	// Module screens are added in P3. Render a placeholder for now.
-	return (
-		<div className="bdm-admin-placeholder">
-			<p>{ route.module }</p>
-		</div>
-	);
+	return <ModuleScreen route={ route } navigate={ navigate } />;
 }
