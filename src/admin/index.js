@@ -3,13 +3,17 @@
  *
  * @since 2.0.0
  */
+
 import { createRoot } from '@wordpress/element';
+import { ErrorBoundary } from '../common/components/ErrorBoundary';
+import { App } from './App';
+import '../styles/admin.scss';
 
 const root = document.getElementById( 'bdm-admin-root' );
 if ( root ) {
 	createRoot( root ).render(
-		<div className="bdm-admin-wrap">
-			<h1>Buddy Modules</h1>
-		</div>
+		<ErrorBoundary>
+			<App />
+		</ErrorBoundary>
 	);
 }

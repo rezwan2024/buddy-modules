@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P2** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P1 session, Sonnet 4.6)
+**Current phase: P3** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P2 session, Sonnet 4.6)
 
 ---
 
@@ -31,12 +31,12 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Tab Creator registered as module stub
 - [x] Done-when check: menu right after BuddyBoss ✅, GET /modules returns tab-creator ✅, POST toggle persists ✅, #bdm-admin-root renders ✅
 
-## P2 — React shell + dashboard
-- [ ] SCSS tokens + base styles ported from Platform
-- [ ] Header, ErrorBoundary, Toast/useToast, utils/api.js
-- [ ] App + Router (query params, pushState/popstate, menu highlight)
-- [ ] Dashboard: filter pills, category heading, ModuleCard, optimistic toggle
-- [ ] Done-when check: matches screenshot 01, toggle persists, back/forward work
+## P2 — React shell + dashboard ✅
+- [x] SCSS tokens + base styles ported from Platform
+- [x] Header, ErrorBoundary, Toast/useToast, utils/api.js
+- [x] App + Router (query params, pushState/popstate, menu highlight)
+- [x] Dashboard: filter pills, category heading, ModuleCard, optimistic toggle
+- [x] Done-when check: matches screenshot 01 ✅, toggle persists ✅, back/forward work ✅
 
 ## P3 — Module screen + generic settings form
 - [ ] ModuleScreen + SideNavigation
@@ -114,7 +114,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - (none)
 
 ## Handoff note for next session
-Start **P2** with Sonnet 4.6. Plugin at `plugins/buddy-modules/`, both `buddy-modules.php` (new) and `buddyboss-tab-creator.php` (legacy) are active. P2 builds the React shell: SCSS tokens from Platform, Header, ErrorBoundary, Toast/useToast, utils/api.js, App+Router (query-param routing, pushState/popstate, menu highlight), Dashboard with filter pills, category heading, ModuleCard with optimistic toggle. Done-when: dashboard matches bm-study/01-bb-settings-home.png in look, toggle persists, back/forward work.
+Start **P3** with Sonnet 4.6. P3 builds ModuleScreen + SideNavigation, PHP Settings\Fields + REST\Settings_Controller, SettingsForm with field types + useAutosave (1s debounce, single-flight), and CUSTOM_PANEL_SCREENS + lazy loading. Done-when: a demo field registered in PHP renders, autosaves and shows a toast. The Tab Creator side-nav shows Profile Tabs / Group Tabs placeholder panels (actual list screens are P5).
+
+Note: `apiRequest()` in `src/common/utils/api.js` manually builds the absolute URL (`restRoot + path`) instead of using `createRootURLMiddleware`, because WP's own api-fetch middleware (registered globally) would otherwise strip the namespace.
 
 ## Found bugs (not in scope)
 - (none yet)
@@ -125,4 +127,5 @@ Start **P2** with Sonnet 4.6. Plugin at `plugins/buddy-modules/`, both `buddy-mo
 | 2026-11-13 | Planning | Opus 5.5 | Studied legacy + Platform 3.0. Decisions D1–D16. Wrote PLAN/CLAUDE/PROGRESS. |
 | 2026-11-13 | P0 | Sonnet 4.6 | Backup, folder rename → buddy-modules, git init, scaffold (package.json/webpack/phpcs), src/admin/index.js, npm build green, first GPG-signed commit f445960 Verified, repo rezwan2024/buddy-modules created + dev pushed. |
 | 2026-11-13 | P1 | Sonnet 4.6 | buddy-modules.php + constants, Autoloader (PSR-4-ish), Plugin singleton, Module abstract, Registry (bdm_active_modules), External_Module, Admin\Menu (menu_order after BuddyBoss) + Page + Assets, REST\Controller + Modules_Controller (GET/POST /modules). Tab Creator stub module. npm build green, php -l clean, all done-when checks passed: menu after BuddyBoss ✅, GET /modules ✅, POST toggle ✅, page renders ✅. |
+| 2026-11-13 | P2 | Sonnet 4.6 | SCSS tokens (_variables, _header, _dashboard, _toast, admin.scss), ErrorBoundary, Header, Toast/useToast, api.js (manual URL build to avoid WP's middleware stripping the namespace), App (route state, navigate, popstate, menu highlight), Router, Dashboard (filter pills, category heading, ModuleCard, BigToggle, optimistic toggle). logo.svg created. npm build green (4 deprecation warnings only — Dart Sass @import, same as Platform). All done-when checks: looks like screenshot 01 ✅, toggle persists across reloads ✅, back/forward work ✅. |
 

@@ -1,0 +1,67 @@
+// Buddy Modules fixed admin header.
+
+.bdm-admin-header {
+	position: fixed;
+	top: $bdm-wp-adminbar;
+	left: $bdm-sidebar-width;
+	right: 0;
+	height: $bdm-header-height;
+	z-index: 100;
+	background: $bdm-bg-base;
+	border-bottom: 1px solid $bdm-border;
+	display: flex;
+	align-items: center;
+	padding: 0 24px;
+	gap: 16px;
+
+	// WP folds the sidebar to 36px when ".folded" is on body.
+	body.folded & {
+		left: $bdm-sidebar-collapsed;
+	}
+
+	// WP hides the sidebar on small screens.
+	@media ( max-width: 782px ) {
+		left: 0;
+		top: 46px; // Mobile WP adminbar height.
+	}
+
+	&__logo {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		text-decoration: none;
+		cursor: pointer;
+		flex-shrink: 0;
+
+		img {
+			width: 36px;
+			height: 36px;
+			display: block;
+		}
+
+		span {
+			font-size: 16px;
+			font-weight: 600;
+			color: $bdm-text;
+			white-space: nowrap;
+		}
+	}
+
+	&__spacer {
+		flex: 1;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+}
+
+// Push page content below the fixed header.
+.bdm-admin-content {
+	margin-top: $bdm-header-height;
+	padding: 24px;
+	background: $bdm-bg-page;
+	min-height: calc( 100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height} );
+}

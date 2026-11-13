@@ -1,0 +1,42 @@
+/**
+ * Buddy Modules admin stylesheet.
+ *
+ * All rules are scoped to .bdm-admin-wrap or body.toplevel_page_buddy-modules
+ * so they cannot bleed into other WP admin pages.
+ *
+ * @since 2.0.0
+ */
+
+@import 'variables';
+
+// Override WP admin theme accent so @wordpress/components picks up the brand colour.
+body.toplevel_page_buddy-modules {
+	--wp-admin-theme-color: #ef5d33;
+	--wp-admin-theme-color-darker-10: #d7542e;
+	--wp-admin-theme-color-darker-20: #c04c29;
+	--wp-components-color-accent: #ef5d33;
+	--wp-components-color-accent-darker-10: #d7542e;
+	--wp-components-color-accent-darker-20: #c04c29;
+}
+
+// Hide the native WP .wrap H2 that appears above admin notices.
+.bdm-admin-wrap > h2:empty {
+	display: none;
+}
+
+// Loading spinner shown before React mounts.
+.bdm-admin-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 200px;
+
+	.spinner {
+		float: none;
+		margin: 0;
+	}
+}
+
+@import 'header';
+@import 'dashboard';
+@import 'toast';

@@ -1,0 +1,52 @@
+// Buddy Modules design tokens — ported from BuddyBoss Platform 3.0.
+// All new code uses these variables. Never hardcode colour values.
+
+// Brand
+$bdm-brand:              #ef5d33;
+$bdm-brand-hover:        #d7542e;
+$bdm-brand-light:        #f7ae99;
+
+// Text
+$bdm-text:               #1e1e1e;
+$bdm-text-secondary:     #2f2f2f;
+$bdm-text-tertiary:      #666666;
+$bdm-text-disabled:      #999999;
+$bdm-text-inverse:       #ffffff;
+
+// Backgrounds
+$bdm-bg-page:            #f6f6f6;
+$bdm-bg-base:            #ffffff;
+$bdm-bg-secondary:       #f0f0f0;
+$bdm-bg-hover:           #f0f0f0;
+$bdm-bg-danger:          #fee9e7;
+$bdm-bg-success:         #ebffee;
+
+// Borders
+$bdm-border:             #e5e5e5;
+$bdm-border-dark:        #ddd;
+$bdm-border-brand:       #ef5d33;
+
+// Status
+$bdm-success:            #00a32a;
+$bdm-error:              #d63638;
+$bdm-warning:            #df7d05;
+
+// Radius
+$bdm-radius-sm:          4px;
+$bdm-radius-md:          6px;
+$bdm-radius-lg:          8px;
+$bdm-radius-xl:          12px;
+$bdm-radius-2xl:         16px;
+
+// Transition
+$bdm-transition:         all 0.2s ease;
+
+// Layout
+$bdm-header-height:      60px;
+$bdm-sidebar-width:      160px;
+$bdm-sidebar-collapsed:  36px;
+$bdm-wp-adminbar:        32px;
+
+// Shadow
+$bdm-shadow-card:        0 1px 3px rgba(0, 0, 0, 0.08);
+$bdm-shadow-card-hover:  0 2px 8px rgba(0, 0, 0, 0.12);

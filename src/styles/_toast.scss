@@ -1,0 +1,80 @@
+// Buddy Modules toast notifications.
+
+.bdm-admin-toast-list {
+	position: fixed;
+	bottom: 24px;
+	right: 24px;
+	z-index: 999999;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	pointer-events: none;
+}
+
+.bdm-admin-toast {
+	pointer-events: all;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px 16px;
+	border-radius: $bdm-radius-md;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	max-width: 360px;
+	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.15 );
+	animation: bdm-toast-in 0.2s ease;
+	background: $bdm-bg-base;
+	border: 1px solid $bdm-border;
+	color: $bdm-text;
+
+	&--success {
+		border-color: $bdm-success;
+		background: $bdm-bg-success;
+		color: #008a23; // darken( $bdm-success, 5% )
+	}
+
+	&--error {
+		border-color: $bdm-error;
+		background: $bdm-bg-danger;
+		color: #c22a2c; // darken( $bdm-error, 5% )
+	}
+
+	&--saving {
+		border-color: $bdm-brand;
+		background: rgba( $bdm-brand, 0.06 );
+		color: $bdm-brand;
+	}
+
+	&__message {
+		flex: 1;
+	}
+
+	&__dismiss {
+		appearance: none;
+		border: none;
+		background: none;
+		padding: 0;
+		cursor: pointer;
+		color: inherit;
+		opacity: 0.6;
+		font-size: 18px;
+		line-height: 1;
+		flex-shrink: 0;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+}
+
+@keyframes bdm-toast-in {
+	from {
+		opacity: 0;
+		transform: translateY( 8px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+	}
+}
