@@ -160,6 +160,16 @@ phpcs: don't `composer install` inside the plugin. Install WPCS once into the sc
 - Never commit `node_modules/`, `build/`, `*.zip`, or anything secret. `.distignore` keeps `src/`, md files, configs and `node_modules` out of the dist.
 - Push / create repo / create releases / tags only when Rezwan asks.
 
+## Debugging with subagents
+
+**When a bug requires investigation or time to debug, spawn a subagent instead of doing it in the main session. This keeps the main context lean.**
+
+- Spawn with `Agent({ subagent_type: "fork", ... })` for bugs where the full conversation context is useful.
+- For fresh investigations (file search, grep, isolated testing), spawn `Agent({ subagent_type: "general-purpose", ... })`.
+- Give the subagent: the exact symptom, relevant file paths, the REST route or function to investigate, and what to report back.
+- The subagent reports findings; the main session applies the fix.
+- Never debug interactively in the main session when investigation would take more than 2–3 tool calls.
+
 ## Don'ts
 
 - Don't rebuild features from scratch that exist in the legacy code. Move them.

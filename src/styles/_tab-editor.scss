@@ -1,0 +1,331 @@
+// Tab Creator editor screens — TabEditor, ExistingTabEditor, SearchSelect.
+// Scoped to .bdm-admin-tab-editor and .bdm-admin-search-select.
+
+.bdm-admin-tab-editor {
+	max-width: 860px;
+
+	// Loading state
+	&__loading {
+		display: flex;
+		justify-content: center;
+		padding: 60px 0;
+	}
+
+	// Header bar
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 24px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid $bdm-border;
+		gap: 12px;
+		flex-wrap: wrap;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 600;
+		color: $bdm-text;
+	}
+
+	&__header-actions {
+		display: flex;
+		gap: 8px;
+	}
+
+	// Server error banner
+	&__server-error {
+		margin-bottom: 16px;
+		padding: 10px 14px;
+		background: $bdm-bg-danger;
+		border: 1px solid #f5a7a8;
+		border-radius: $bdm-radius-md;
+		color: $bdm-error;
+		font-size: 13px;
+	}
+
+	// Sections
+	&__section {
+		margin-bottom: 28px;
+		padding: 20px;
+		background: $bdm-bg-base;
+		border: 1px solid $bdm-border;
+		border-radius: $bdm-radius-md;
+		box-shadow: $bdm-shadow-card;
+	}
+
+	&__section-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+	}
+
+	&__section-title {
+		margin: 0 0 12px;
+		font-size: 14px;
+		font-weight: 600;
+		color: $bdm-text-secondary;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	// Needed when section-header is used (removes margin from title).
+	&__section-header &__section-title {
+		margin-bottom: 0;
+	}
+
+	&__section-desc {
+		margin: -6px 0 12px;
+		font-size: 12px;
+		color: $bdm-text-tertiary;
+	}
+
+	// Field wrappers
+	&__field {
+		margin-bottom: 16px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__row {
+		display: flex;
+		gap: 20px;
+		flex-wrap: wrap;
+		margin-bottom: 16px;
+
+		.bdm-admin-tab-editor__field {
+			flex: 1;
+			min-width: 180px;
+			margin-bottom: 0;
+		}
+	}
+
+	&__label {
+		display: block;
+		margin-bottom: 6px;
+		font-size: 13px;
+		font-weight: 600;
+		color: $bdm-text;
+	}
+
+	&__textarea {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 8px 10px;
+		border: 1px solid $bdm-border-dark;
+		border-radius: $bdm-radius-sm;
+		font-size: 13px;
+		color: $bdm-text;
+		line-height: 1.6;
+		resize: vertical;
+
+		&:focus {
+			border-color: $bdm-brand;
+			outline: none;
+			box-shadow: 0 0 0 1px $bdm-brand;
+		}
+	}
+
+	&__field-error {
+		margin: 4px 0 0;
+		font-size: 12px;
+		color: $bdm-error;
+	}
+
+	// Checkboxes group
+	&__checkboxes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px 20px;
+	}
+
+	&__checkbox-label {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
+		color: $bdm-text;
+		cursor: pointer;
+
+		input[type="checkbox"] {
+			margin: 0;
+			cursor: pointer;
+		}
+	}
+
+	// Empty state
+	&__empty {
+		color: $bdm-text-tertiary;
+		font-size: 13px;
+		margin: 0;
+	}
+
+	// Sub-tabs
+	&__subtab {
+		border: 1px solid $bdm-border;
+		border-radius: $bdm-radius-sm;
+		margin-bottom: 8px;
+		overflow: hidden;
+
+		&--new {
+			border-color: $bdm-brand-light;
+		}
+	}
+
+	&__subtab-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 14px;
+		gap: 10px;
+		font-size: 13px;
+		background: $bdm-bg-base;
+	}
+
+	&__subtab-actions {
+		display: flex;
+		gap: 6px;
+		flex-shrink: 0;
+	}
+
+	&__subtab-form {
+		padding: 14px;
+		background: $bdm-bg-secondary;
+	}
+
+	&__subtab-form-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 12px;
+	}
+
+	// Footer
+	&__footer {
+		display: flex;
+		gap: 8px;
+		margin-top: 8px;
+		padding-top: 16px;
+		border-top: 1px solid $bdm-border;
+	}
+}
+
+// SearchSelect component
+.bdm-admin-search-select {
+	position: relative;
+
+	&__chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-bottom: 8px;
+	}
+
+	&__chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 3px 8px;
+		background: #e6f3f9;
+		border: 1px solid #b8d9ec;
+		border-radius: $bdm-radius-sm;
+		font-size: 12px;
+		color: #0073aa;
+	}
+
+	&__chip-remove {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 16px;
+		height: 16px;
+		padding: 0;
+		margin: 0;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: #0073aa;
+		font-size: 14px;
+		line-height: 1;
+		border-radius: 50%;
+		transition: background-color 0.1s ease;
+
+		&:hover {
+			background: rgba(0, 0, 0, 0.1);
+		}
+	}
+
+	&__input-wrap {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+
+		.components-spinner {
+			margin: 0;
+		}
+	}
+
+	&__input {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 6px 10px;
+		border: 1px solid $bdm-border-dark;
+		border-radius: $bdm-radius-sm;
+		font-size: 13px;
+		color: $bdm-text;
+
+		&:focus {
+			border-color: $bdm-brand;
+			outline: none;
+			box-shadow: 0 0 0 1px $bdm-brand;
+		}
+	}
+
+	&__dropdown {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		z-index: 100;
+		margin-top: 2px;
+		padding: 4px 0;
+		background: $bdm-bg-base;
+		border: 1px solid $bdm-border-dark;
+		border-radius: $bdm-radius-sm;
+		box-shadow: $bdm-shadow-card-hover;
+		list-style: none;
+		max-height: 220px;
+		overflow-y: auto;
+	}
+
+	&__option {
+		display: block;
+		width: 100%;
+		padding: 7px 12px;
+		text-align: left;
+		background: none;
+		border: none;
+		font-size: 13px;
+		color: $bdm-text;
+		cursor: pointer;
+		transition: background-color 0.1s ease;
+
+		&:hover {
+			background: $bdm-bg-hover;
+		}
+	}
+
+	&__empty {
+		padding: 8px 12px;
+		font-size: 12px;
+		color: $bdm-text-tertiary;
+		background: $bdm-bg-base;
+		border: 1px solid $bdm-border-dark;
+		border-top: none;
+		border-radius: 0 0 $bdm-radius-sm $bdm-radius-sm;
+	}
+}

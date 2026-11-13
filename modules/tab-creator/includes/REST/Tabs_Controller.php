@@ -304,6 +304,7 @@ class Tabs_Controller extends \BuddyModules\REST\Controller {
 		$body = $request->get_json_params() ?? [];
 
 		return [
+			'parent_id'           => absint( $body['parent_id'] ?? 0 ),
 			'label'               => sanitize_text_field( $body['label'] ?? '' ),
 			'slug'                => sanitize_title( $body['slug'] ?? '' ),
 			'is_enabled'          => (int) ( $body['is_enabled'] ?? 1 ),
@@ -326,7 +327,7 @@ class Tabs_Controller extends \BuddyModules\REST\Controller {
 	}
 
 	/**
-	 * Prepare a tab row (plus its rules) for the REST response.
+	 * Prepare a tab row (plus its rules and sub-tab count) for the REST response.
 	 *
 	 * @since 2.0.0
 	 *
@@ -337,7 +338,11 @@ class Tabs_Controller extends \BuddyModules\REST\Controller {
 		$data  = (array) $tab;
 		$rules = \BuddyModules\TabCreator\DB::get_rules_for_tab( (int) $tab->id );
 
-		$data['rules'] = array_map( fn( $r ) => (array) $r, $rules );
+		$data['rules']        = array_map( fn( $r ) => (array) $r, $rules );
+		$data['subtab_count'] = \BuddyModules\TabCreator\DB::get_tabs_count(
+			$tab->tab_type,
+			[ 'parent_id' => (int) $tab->id ]
+		);
 
 		return $data;
 	}

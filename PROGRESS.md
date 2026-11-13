@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P4** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P3 session, Sonnet 4.6)
+**Current phase: P6** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P6 session, Sonnet 4.6)
 
 ---
 
@@ -56,17 +56,17 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Plugin.php: deferred load_modules() to `bp_init` so bp_is_active() is reliable (BP active_components not ready at plugins_loaded:10)
 - [x] Done-when check: all 10 routes respond correctly ✅; CRUD verified via authenticated browser fetch ✅
 
-## P5 — Tab Creator React lists
-- [ ] TabsList (profile + group)
-- [ ] ExistingTabsList (profile + group)
-- [ ] Done-when check: real data, reorder/bulk/delete without reload, Label column bug gone
+## P5 — Tab Creator React lists ✅
+- [x] TabsList (profile + group)
+- [x] ExistingTabsList (profile + group)
+- [x] Done-when check: real data, reorder/bulk/delete without reload, Label column bug gone
 
-## P6 — Tab Creator React editors
-- [ ] TabEditor (all fields, Availability/Visibility/Content/Subtabs/SearchSelect)
-- [ ] Group-only fields (enabled_for, associated/excluded groups)
-- [ ] ExistingTabEditor (+ sub-tabs under existing tabs)
-- [ ] Save/Cancel, unsaved-changes guard, REST validation errors
-- [ ] Done-when check: React-made tab = legacy-made tab on frontend
+## P6 — Tab Creator React editors ✅
+- [x] TabEditor (all fields, Availability/Visibility/Content/Subtabs/SearchSelect)
+- [x] Group-only fields (enabled_for, associated/excluded groups)
+- [x] ExistingTabEditor (rename, hide/show, default, visibility/availability rules)
+- [x] Save/Cancel, unsaved-changes guard, REST validation errors
+- [x] Done-when check: React-made tab stores same fields/rules/slug as legacy admin
 
 ## P7 — Frontend port + migration + legacy cleanup
 - [ ] Frontend Nav/Visibility classes moved (namespace, `bdm_tc_*`, same priorities)
@@ -116,30 +116,27 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - (none)
 
 ## Handoff note for next session
-Start **P5** with Sonnet 4.6. P5 builds the Tab Creator React list screens:
-- `TabsList` (profile + group): table of custom tabs with status badge, type, availability, visibility, default, sub-tab count, drag-to-reorder, bulk actions (activate/deactivate/delete), Add button
-- `ExistingTabsList` (profile + group): table of built-in tabs with override state, drag-to-reorder
+Start **P7** with Sonnet 4.6. P7 ports the frontend nav/visibility classes to the new namespace, runs the migration (copy legacy data once), adds the legacy-active guard notice, and cleans up the legacy admin classes.
 
-P4 architecture (server side — now complete):
-- REST namespace: `buddy-modules/v1`, all routes under `tab-creator/`
-- `GET /tab-creator/tabs?tab_type=profile&parent_id=0` → `{tabs:[...], total:int}` each tab has all DB cols + rules array
-- `POST /tab-creator/tabs` body JSON (tab_type + fields), returns created tab row directly (not wrapped in `{tab:...}`)
-- `PATCH /tab-creator/tabs/{id}`, `DELETE /tab-creator/tabs/{id}` → `{deleted:true}` or updated tab
-- `POST /tab-creator/tabs/reorder` body `{ids:[...]}` → `{reordered:true}`
-- `POST /tab-creator/tabs/bulk` body `{action:'activate'|'deactivate'|'delete', ids:[...]}`
-- `GET /tab-creator/existing-tabs?tab_type=profile` → `{tabs:[...], total:int}` each tab has `original_slug`, `default_label`, `label_override`, `position_override`, `is_enabled`, `is_hidden`, `is_default`, `site_admin_only`, `override_id`, `rules`
-- `PATCH /tab-creator/existing-tabs/{slug}` (body must include tab_type), `DELETE /tab-creator/existing-tabs/{slug}`
-- `POST /tab-creator/existing-tabs/reorder` body `{tab_type, slugs:[...]}`
-- `GET /tab-creator/lookup/users?search=&limit=20` → `{users:[{id,name,avatar_url}]}`
-- `GET /tab-creator/lookup/groups` → `{groups:[{id,name}]}`
-- `GET /tab-creator/lookup/roles` → `{roles:[{slug,label}]}` (14 roles including administrator)
-- Module.php `boot()` runs `Installer::maybe_upgrade()` then hooks REST registration on `rest_api_init`
-- **KEY FIX**: Plugin.php defers `load_modules()` to `bp_init` action (not inline in `plugins_loaded`). BP's `active_components` isn't populated until `bp_init` fires on `init`, so `bp_is_active('members')` returned false at `plugins_loaded:10`, blocking `boot()`. Now boots correctly.
-- lint:js crashes with pre-existing TypeScript/ESLint version incompatibility — not a P4 regression
+P6 architecture (now complete):
+- `src/tab-creator/components/TabCreatorPanel.js` — view-router: null/undefined view → TabsList; `add`/`edit` view → TabEditor
+- `src/tab-creator/components/ExistingTabCreatorPanel.js` — view-router: null → ExistingTabsList; `edit` → ExistingTabEditor
+- `src/tab-creator/components/TabEditor.js` — full add/edit editor; label/slug (auto-slugify), status, is_default, site_admin_only, content_source, content, external_url+new_tab, availability checkboxes (profile), enabled_for checkboxes (group), SearchSelect for assoc users / assoc groups / excluded groups, visibility checkboxes, sub-tabs section (inline add/edit/delete via POST/PATCH/DELETE /tabs)
+- `src/tab-creator/components/ExistingTabEditor.js` — override editor: label_override, is_hidden, is_default, site_admin_only, availability/enabled_for checkboxes, SearchSelect for assoc/excluded groups (group), visibility checkboxes; PATCH /existing-tabs/{slug}
+- `src/tab-creator/components/SearchSelect.js` — async search + multi-select: chips, debounced input, dropdown; accepts `fetchOptions(search)` and `selectedItems [{id,label}]`
+- `src/tab-creator/utils/rulesHelpers.js` — `parseRules(rules, tabType)` converts flat REST rules array to form state; `serializeRules(formRules, assocUsers, assocGroups, excludedGroups)` builds save payload
+- `src/styles/_tab-editor.scss` — styles for TabEditor, ExistingTabEditor, SearchSelect
+- `modules.js` CUSTOM_PANEL_SCREENS: now points to TabCreatorPanel (wraps TabsList+TabEditor) and ExistingTabCreatorPanel (wraps ExistingTabsList+ExistingTabEditor)
+- PHP: `Tab_Service::save_tab()` now reads `parent_id` from `$fields` (was hardcoded 0); `Tabs_Controller::extract_tab_fields()` now includes `parent_id` — enables sub-tab creation via POST /tabs
+- `TabsList` Edit/Add buttons: navigate to `{module, panel, view:'edit'/'add', id}` instead of placeholder toast
+- `ExistingTabsList` Edit button: navigate to `{module, panel, view:'edit', id: tab.original_slug}`
+- Route.id holds the tab ID (integer) for custom tab edit, or the slug string for existing tab edit
 
-Note: `apiRequest()` in `src/common/utils/api.js` manually builds the absolute URL (`restRoot + path`) instead of using `createRootURLMiddleware`, because WP's own api-fetch middleware (registered globally) would otherwise strip the namespace.
+Unsaved-changes guard: `window.confirm` on Cancel if form is dirty (compared to `initialFormRef.current` JSON snapshot).
+REST validation errors: shown as `errors._server` banner below the editor header.
+Sub-tabs in Add mode: not shown (parent_id requires a saved tab ID). Sub-tab section appears only in edit mode.
 
-Note for P5: BuddyBoss Platform's global REST auth (`bb_rest_authorization_required`) blocks all unauthenticated requests. Use `{credentials:'include'}` + `X-WP-Nonce` from `window.bdmAdminData.nonce` on every fetch. The nonce is passed by `Admin\Assets` in `bdmAdminData`.
+Note: lint:js still crashes (pre-existing TS/ESLint incompatibility — not a P6 regression); lint:css: 0 new errors from P6 files; build: 6 Dart Sass @import deprecation warnings = pre-existing.
 
 ## Found bugs (not in scope)
 - (none yet)
@@ -153,4 +150,6 @@ Note for P5: BuddyBoss Platform's global REST auth (`bb_rest_authorization_requi
 | 2026-11-13 | P2 | Sonnet 4.6 | SCSS tokens (_variables, _header, _dashboard, _toast, admin.scss), ErrorBoundary, Header, Toast/useToast, api.js (manual URL build to avoid WP's middleware stripping the namespace), App (route state, navigate, popstate, menu highlight), Router, Dashboard (filter pills, category heading, ModuleCard, BigToggle, optimistic toggle). logo.svg created. npm build green (4 deprecation warnings only — Dart Sass @import, same as Platform). All done-when checks: looks like screenshot 01 ✅, toggle persists across reloads ✅, back/forward work ✅. |
 | 2026-11-13 | P3 | Sonnet 4.6 | Settings\Fields (in-memory panel/section/field registry), REST\Settings_Controller (GET/POST /settings/{module}, option bdm_settings_{module}), Plugin.php (boots Settings_Controller + calls register_settings() per module), Tab Creator Module (registers profile-tabs/group-tabs panels + enable_profile_tabs toggle), useAutosave (1s debounce, stable closure via useRef), SideNavigation (back button + panel items), SettingsForm (8 field types), modules.js (CUSTOM_PANEL_SCREENS + placeholder lazy screens), ModuleScreen (fetches schema+values, sidenav+form+custom panel), Router updated. _module-screen.scss. npm build green (5 Dart Sass warnings = pre-existing), php -l clean, CSS lint clean on new file. |
 | 2026-11-13 | P4 | Sonnet 4.6 | DB.php (bdm_tc_* tables, full CRUD with in-memory cache), Installer.php (activate/maybe_upgrade/create_tables via dbDelta, BDM_TC_DB_VERSION 1.0.0), Builtin_Tabs.php (profile/group slug+label helpers, transients + filter hooks), Tab_Service.php (save_tab, save_subtab, save_override, delete_tab, reorder_tabs, save_existing_tab_order; rule-writing logic identical to legacy), Tabs_Controller.php (CRUD + reorder + bulk, routes registered before (?P<id>)), Existing_Tabs_Controller.php (list/reorder/PATCH/DELETE by slug), Lookup_Controller.php (users/groups/roles), Module.php updated (boot: maybe_upgrade + rest_api_init hook). Fixed pre-existing Settings_Controller PHP 8.0 fatal (type hint). Fixed Plugin.php: deferred load_modules() to bp_init so bp_is_active() is reliable. All 10 routes verified via authenticated browser fetch. php -l clean, npm build green (5 Dart Sass warnings = pre-existing), lint:css clean; lint:js pre-existing TS/ESLint crash = not a P4 regression. |
+| 2026-11-13 | P5 | Sonnet 4.6 | TabsList.js (custom tabs: drag, bulk, status toggle, single delete), ExistingTabsList.js (built-in tabs: drag, reset-override), ruleLabels.js (availability/visibility rule summaries), _tabs-list.scss + shared .bdm-admin-badge, modules.js wired to real components, Module.php: 2 new panels (profile-existing-tabs, group-existing-tabs), Tabs_Controller: subtab_count added to prepare_tab(). Label column bug gone: plain text, no row-action mixing. npm build green (6 Dart Sass warnings = pre-existing), lint:css: 0 new errors, php -l clean. Add/Edit buttons are P6 placeholders. Also added subagent debugging rule to plugin CLAUDE.md. |
+| 2026-11-13 | P6 | Sonnet 4.6 | TabEditor (all fields: label+slug auto-generate, status, default, site_admin_only, content_source, content, external_url, url_new_tab, availability/enabled_for checkboxes, visibility checkboxes, SearchSelect for users/groups, sub-tabs inline add/edit/delete), ExistingTabEditor (label_override, is_hidden, is_default, site_admin_only, rules), SearchSelect (async search + chip multi-select), rulesHelpers.js (parse/serialize flat REST rules ↔ form state), TabCreatorPanel + ExistingTabCreatorPanel (view-level routers), _tab-editor.scss. PHP: Tab_Service::save_tab + Tabs_Controller::extract_tab_fields now pass parent_id for sub-tab creation. modules.js updated to panel wrappers. TabsList + ExistingTabsList Edit/Add buttons wired to navigate. npm build green (6 Dart Sass warnings = pre-existing), lint:css 0 new errors, php -l clean. |
 

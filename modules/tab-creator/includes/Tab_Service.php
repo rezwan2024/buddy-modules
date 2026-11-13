@@ -81,7 +81,7 @@ class Tab_Service {
 			}
 
 			$tab_data['tab_type']   = $tab_type;
-			$tab_data['parent_id']  = 0;
+			$tab_data['parent_id']  = absint( $fields['parent_id'] ?? 0 );
 			$tab_data['slug']       = $slug;
 			$tab_data['created_at'] = current_time( 'mysql' );
 

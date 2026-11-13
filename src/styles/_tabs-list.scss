@@ -1,0 +1,232 @@
+// Tab Creator list screens — TabsList + ExistingTabsList.
+// Scoped to .bdm-admin-tabs-list which both components use.
+
+.bdm-admin-tabs-list {
+
+	// Toolbar
+	&__toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+		gap: 8px;
+	}
+
+	&__bulk-wrap {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	&__bulk-select {
+		height: 30px;
+		padding: 0 6px;
+		border: 1px solid $bdm-border-dark;
+		border-radius: $bdm-radius-sm;
+		font-size: 13px;
+		color: $bdm-text;
+		background: $bdm-bg-base;
+	}
+
+	// Loading / empty
+	&__loading {
+		display: flex;
+		justify-content: center;
+		padding: 40px 0;
+	}
+
+	&__empty {
+		color: $bdm-text-tertiary;
+		padding: 20px 0;
+	}
+
+	// Table
+	&__table {
+		border-spacing: 0;
+		width: 100%;
+
+		th,
+		td {
+			padding: 8px 10px;
+			text-align: left;
+			font-size: 13px;
+		}
+
+		th {
+			font-weight: 600;
+			color: $bdm-text-secondary;
+			border-bottom: 1px solid $bdm-border;
+			background-color: $bdm-bg-secondary;
+		}
+
+		td {
+			vertical-align: middle;
+			border-bottom: 1px solid $bdm-border;
+		}
+	}
+
+	// Column widths
+	&__col {
+
+		&--handle {
+			width: 24px;
+			min-width: 24px;
+		}
+
+		&--cb {
+			width: 30px;
+			min-width: 30px;
+		}
+
+		&--label {
+			min-width: 160px;
+		}
+
+		&--actions {
+			width: 1%;
+			white-space: nowrap;
+		}
+	}
+
+	// Rows
+	&__row {
+		transition: background-color 0.1s ease;
+
+		&:hover {
+			background-color: $bdm-bg-hover !important;
+		}
+
+		&--dragging {
+			background-color: $bdm-bg-secondary !important;
+			box-shadow: $bdm-shadow-card-hover;
+
+			td {
+				border-color: transparent;
+			}
+		}
+
+		&--selected {
+			background-color: #fef5f2 !important;
+		}
+	}
+
+	// Drag handle
+	.bdm-admin-drag-handle {
+		display: inline-block;
+		cursor: grab;
+		color: $bdm-text-disabled;
+		font-size: 18px;
+		line-height: 1;
+		padding: 2px 4px;
+		transition: color 0.1s ease;
+
+		&:hover {
+			color: $bdm-text-secondary;
+		}
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
+	// Label cell
+	&__slug {
+		display: inline-block;
+		margin-top: 2px;
+		font-size: 11px;
+		color: $bdm-text-tertiary;
+		background: $bdm-bg-secondary;
+		padding: 1px 5px;
+		border-radius: $bdm-radius-sm;
+	}
+
+	&__override-hint {
+		font-size: 11px;
+		color: $bdm-text-disabled;
+		font-style: italic;
+	}
+
+	// Status toggle
+	.bdm-admin-status-toggle {
+		display: inline-block;
+		padding: 3px 10px;
+		border-radius: $bdm-radius-sm;
+		border: 1px solid transparent;
+		font-size: 12px;
+		cursor: pointer;
+		line-height: 1.5;
+		transition: $bdm-transition;
+
+		&--active {
+			background: #e5f7e9;
+			border-color: #ccecd5;
+			color: #007220;
+
+			&:hover {
+				background: #cce8d2;
+			}
+		}
+
+		&--inactive {
+			background: $bdm-bg-secondary;
+			border-color: $bdm-border-dark;
+			color: $bdm-text-tertiary;
+
+			&:hover {
+				background: $bdm-border;
+			}
+		}
+	}
+
+	// Sub-tab count
+	&__subtab-count {
+		display: inline-block;
+		min-width: 24px;
+		padding: 2px 6px;
+		text-align: center;
+		border-radius: $bdm-radius-sm;
+		background: $bdm-bg-secondary;
+		font-size: 12px;
+		color: $bdm-text-secondary;
+	}
+
+	// Em dash placeholder
+	&__dash {
+		color: $bdm-text-disabled;
+	}
+}
+
+// Shared badges used in both list screens.
+.bdm-admin-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: $bdm-radius-sm;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.5;
+
+	&--type {
+		background: #fdeee9;
+		color: $bdm-brand-hover;
+	}
+
+	&--active {
+		background: #e5f7e9;
+		color: #007220;
+	}
+
+	&--inactive {
+		background: $bdm-bg-secondary;
+		color: $bdm-text-disabled;
+	}
+
+	&--default {
+		background: #fdeee9;
+		color: $bdm-brand-hover;
+	}
+
+	&--custom {
+		background: #e6f3f9;
+		color: #0073aa;
+	}
+}

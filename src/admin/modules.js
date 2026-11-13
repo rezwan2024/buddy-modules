@@ -5,9 +5,6 @@
  * renders the SettingsForm first (for schema-driven fields), then renders
  * the custom panel below it for module-specific content.
  *
- * Tab Creator's profile-tabs and group-tabs are placeholder divs for now;
- * real list screens are wired in P5.
- *
  * @since 2.0.0
  */
 
@@ -22,26 +19,18 @@ import { lazy } from '@wordpress/element';
  */
 export var CUSTOM_PANEL_SCREENS = {
 	'tab-creator/profile-tabs': lazy( function() {
-		return Promise.resolve( {
-			default: function TabCreatorProfileTabs() {
-				return (
-					<div className="bdm-admin-placeholder">
-						<p>{ 'Profile Tabs list — coming in P5.' }</p>
-					</div>
-				);
-			},
-		} );
+		return import( '../tab-creator/components/TabCreatorPanel' );
 	} ),
 
 	'tab-creator/group-tabs': lazy( function() {
-		return Promise.resolve( {
-			default: function TabCreatorGroupTabs() {
-				return (
-					<div className="bdm-admin-placeholder">
-						<p>{ 'Group Tabs list — coming in P5.' }</p>
-					</div>
-				);
-			},
-		} );
+		return import( '../tab-creator/components/TabCreatorPanel' );
+	} ),
+
+	'tab-creator/profile-existing-tabs': lazy( function() {
+		return import( '../tab-creator/components/ExistingTabCreatorPanel' );
+	} ),
+
+	'tab-creator/group-existing-tabs': lazy( function() {
+		return import( '../tab-creator/components/ExistingTabCreatorPanel' );
 	} ),
 };

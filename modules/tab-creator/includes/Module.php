@@ -108,5 +108,27 @@ class Module extends \BuddyModules\Modules\Module {
 				'label' => __( 'General', 'buddy-modules' ),
 			]
 		);
+
+		// ── Profile Built-in Tabs panel ───────────────────────────────────────
+
+		\BuddyModules\Settings\Fields::register_panel(
+			$module,
+			'profile-existing-tabs',
+			[
+				'label' => __( 'Profile Built-in Tabs', 'buddy-modules' ),
+				'icon'  => 'dashicons-admin-users',
+			]
+		);
+
+		// ── Group Built-in Tabs panel ─────────────────────────────────────────
+
+		\BuddyModules\Settings\Fields::register_panel(
+			$module,
+			'group-existing-tabs',
+			[
+				'label' => __( 'Group Built-in Tabs', 'buddy-modules' ),
+				'icon'  => 'dashicons-groups',
+			]
+		);
 	}
 }
