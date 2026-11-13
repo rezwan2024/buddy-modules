@@ -15,7 +15,7 @@ Instructions for every Claude Code session working on this plugin. Read this fil
 
 **One phase per chat session. Never start a second phase in the same session, even if the first finishes early. End the session after the phase commit.**
 
-1. Read `CLAUDE.md` → `PLAN.md` → `PROGRESS.md`. Find the first phase/task not marked done.
+1. Read **only `PROGRESS.md`** at session start (the handoff note tells you exactly what to do). Do NOT re-read CLAUDE.md or PLAN.md in full — the session prompt already contains the critical rules and phase scope. Only read a specific section of PLAN.md or CLAUDE.md if you need a detail not in the prompt or PROGRESS.md.
 2. Work **only on that phase**. No bonus features, no refactors outside the phase, no "while I'm here" fixes. A side bug goes into `PROGRESS.md` → "Found bugs (not in scope)".
 3. Tick tasks in `PROGRESS.md` as they finish (not at the end), so a cut-off session can resume.
 4. Before ending, run the phase's "Done when" checks, then update `PROGRESS.md`:
