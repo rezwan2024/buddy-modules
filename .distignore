@@ -1,0 +1,13 @@
+src/
+node_modules/
+.github/
+CLAUDE.md
+PLAN.md
+PROGRESS.md
+phpcs.xml.dist
+webpack.config.js
+package.json
+package-lock.json
+.gitignore
+.distignore
+*.log

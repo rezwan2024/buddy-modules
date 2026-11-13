@@ -1,0 +1,1503 @@
+/* BuddyBoss Tab Creator — Admin Styles */
+
+/* ── Drag-and-drop row reordering ── */
+.bbtc-drag-handle {
+	display: inline-block;
+	cursor: grab;
+	color: #b0b8c4;
+	font-size: 18px;
+	line-height: 1;
+	padding: 0 6px;
+	user-select: none;
+}
+
+.bbtc-drag-handle:active {
+	cursor: grabbing;
+}
+
+tr[data-tab-id] {
+	cursor: default;
+}
+
+tr.bbtc-dragging {
+	opacity: 0.45;
+}
+
+tr.bbtc-drag-over > td {
+	background: #e8f4fd !important;
+	border-top: 2px solid #3a8fd8;
+}
+
+.column-handle,
+.bbtc-col-handle {
+	width: 32px;
+	padding-left: 8px !important;
+	padding-right: 4px !important;
+}
+
+/* ── Base ── */
+#buddyboss-tab-creator-wrap,
+.wrap {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	font-size: 14px;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* ── Page background ── */
+.bbtc-page-wrap {
+	background: #f1f2f6;
+}
+
+/* ── Page heading ── */
+.wrap h1.wp-heading-inline {
+	font-size: 22px;
+	font-weight: 600;
+	color: #1d2327;
+	margin: 0 12px 0 0;
+	line-height: 1.3;
+	letter-spacing: -0.3px;
+}
+
+/* ── Nav tabs ── */
+.nav-tab-wrapper {
+	border-bottom: 2px solid #dde0e4;
+	margin: 16px 0 0;
+	padding: 0;
+}
+
+.nav-tab {
+	display: inline-block;
+	padding: 10px 18px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #50575e;
+	border: none;
+	border-bottom: 3px solid transparent;
+	cursor: pointer;
+	text-decoration: none;
+	margin-bottom: -2px;
+	transition: color 0.15s;
+}
+
+.nav-tab:hover {
+	color: #3a8fd8;
+	border-bottom-color: transparent;
+	background: transparent;
+}
+
+.nav-tab-active,
+.nav-tab-active:hover,
+.nav-tab-active:focus {
+	color: #3a8fd8;
+	border-bottom: 3px solid #3a8fd8;
+	font-weight: 600;
+	cursor: default;
+	background: transparent;
+}
+
+/* ── Tab content area ── */
+.bbtc-tab-content {
+	background: #fff;
+	border: 1px solid #dde0e4;
+	border-top: none;
+	border-radius: 0 0 6px 6px;
+}
+
+/* ── Tablenav toolbar ── */
+.bbtc-tab-content .tablenav {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 16px;
+	border-bottom: 1px solid #ebedf0;
+	flex-wrap: wrap;
+	background: #f9fafb;
+}
+
+.bbtc-tab-content .tablenav.bottom {
+	border-bottom: none;
+	border-top: 1px solid #ebedf0;
+	background: #f9fafb;
+	border-radius: 0 0 6px 6px;
+}
+
+.bbtc-tab-content .tablenav select {
+	padding: 6px 10px;
+	border: 1px solid #c5c9d0;
+	border-radius: 4px;
+	font-size: 13px;
+	color: #32373c;
+	background: #fff;
+	font-family: inherit;
+}
+
+.bbtc-tab-content .tablenav .button,
+.bbtc-tab-content .tablenav button {
+	padding: 6px 12px;
+	border: 1px solid #c5c9d0;
+	border-radius: 4px;
+	background: #fff;
+	font-size: 13px;
+	cursor: pointer;
+	color: #32373c;
+	font-family: inherit;
+	transition: all 0.15s;
+}
+
+.bbtc-tab-content .tablenav .button:hover,
+.bbtc-tab-content .tablenav button:hover {
+	background: #f0f4f8;
+	border-color: #3a8fd8;
+	color: #3a8fd8;
+}
+
+/* ── Add New button ── */
+.add-new-btn,
+a.add-new-btn,
+button.add-new-btn {
+	margin-left: auto;
+	background: #3a8fd8 !important;
+	color: #fff !important;
+	border: 1px solid #3a8fd8 !important;
+	padding: 7px 16px !important;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: background 0.15s;
+	text-shadow: none;
+	letter-spacing: 0.1px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.add-new-btn:hover,
+a.add-new-btn:hover,
+button.add-new-btn:hover {
+	background: #2b7bc4 !important;
+	border-color: #2b7bc4 !important;
+	color: #fff !important;
+}
+
+/* ── Primary button ── */
+.button-primary {
+	background: #3a8fd8;
+	color: #fff !important;
+	border: 1px solid #3a8fd8;
+	padding: 8px 18px;
+	border-radius: 4px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	font-family: inherit;
+	transition: background 0.15s;
+	text-shadow: none;
+	letter-spacing: 0.1px;
+}
+
+.button-primary:hover,
+.button-primary:focus {
+	background: #2b7bc4;
+	border-color: #2b7bc4;
+	color: #fff !important;
+}
+
+/* ── Secondary button ── */
+.button-secondary {
+	background: #fff;
+	color: #3a8fd8;
+	border: 1px solid #c5c9d0;
+	padding: 8px 18px;
+	border-radius: 4px;
+	font-size: 14px;
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.15s;
+}
+
+.button-secondary:hover {
+	background: #eaf4ff;
+	border-color: #3a8fd8;
+}
+
+/* ── Delete link button ── */
+.button-link-delete {
+	background: none;
+	border: none;
+	color: #c0392b;
+	font-size: 13px;
+	cursor: pointer;
+	padding: 0;
+	margin-left: auto;
+	font-family: inherit;
+}
+
+.button-link-delete:hover {
+	color: #e74c3c;
+	text-decoration: underline;
+}
+
+/* ── List table ── */
+.wp-list-table th {
+	text-align: left;
+	padding: 10px 12px;
+	background: #f9fafb;
+	border-bottom: 2px solid #ebedf0;
+	font-weight: 600;
+	font-size: 12.5px;
+	color: #50575e;
+	white-space: nowrap;
+	letter-spacing: 0.3px;
+	text-transform: uppercase;
+}
+
+.wp-list-table td {
+	padding: 11px 12px;
+	border-bottom: 1px solid #f0f1f3;
+	vertical-align: middle;
+	font-size: 13.5px;
+	color: #32373c;
+}
+
+.wp-list-table tr:last-child td {
+	border-bottom: none;
+}
+
+.wp-list-table tr:hover td {
+	background: #f5f8ff;
+}
+
+.wp-list-table .row-title {
+	font-weight: 600;
+	color: #1d2327;
+	font-size: 14px;
+}
+
+/* ── Row actions ── */
+.row-actions {
+	font-size: 12px;
+	margin-top: 5px;
+}
+
+.row-actions span {
+	margin-right: 6px;
+}
+
+.row-actions a {
+	color: #3a8fd8;
+	text-decoration: none;
+}
+
+.row-actions a:hover {
+	text-decoration: underline;
+}
+
+.row-actions .trash a,
+.bbtc-delete-link {
+	color: #c0392b;
+}
+
+.row-actions .sep {
+	color: #dde0e4;
+	margin-right: 6px;
+}
+
+/* ── Status dots ── */
+.bbtc-status-active,
+.status-dot-active {
+	color: #1e8a44;
+}
+
+.bbtc-status-inactive,
+.status-dot-inactive {
+	color: #c0392b;
+}
+
+.bbtc-status-active::before,
+.bbtc-status-inactive::before {
+	content: '';
+	display: inline-block;
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+
+.bbtc-status-active::before {
+	background: #27ae60;
+}
+
+.bbtc-status-inactive::before {
+	background: #e74c3c;
+}
+
+/* ── Badges ── */
+.bbtc-subtab-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: #8899a6;
+	color: #fff;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 7px;
+}
+
+.bbtc-subtab-count.has-subtabs {
+	background: #3a8fd8;
+	cursor: pointer;
+}
+
+.bbtc-subtab-count.has-subtabs:hover {
+	background: #2b7bc4;
+}
+
+.bbtc-hidden-badge {
+	display: inline-block;
+	background: #f0f1f3;
+	color: #50575e;
+	font-size: 11px;
+	padding: 2px 7px;
+	border-radius: 3px;
+	border: 1px solid #dde0e4;
+	font-weight: 500;
+}
+
+.bbtc-default-badge {
+	display: inline-block;
+	background: #e8f4fd;
+	color: #3a8fd8;
+	font-size: 11px;
+	padding: 2px 7px;
+	border-radius: 3px;
+	border: 1px solid #a8cfee;
+	font-weight: 600;
+}
+
+.bbtc-type-custom {
+	display: inline-block;
+	background: #eaf4ff;
+	color: #3a8fd8;
+	font-size: 11px;
+	padding: 2px 7px;
+	border-radius: 3px;
+	font-weight: 600;
+}
+
+.bbtc-type-builtin {
+	display: inline-block;
+	background: #f0f1f3;
+	color: #50575e;
+	font-size: 11px;
+	padding: 2px 7px;
+	border-radius: 3px;
+	border: 1px solid #dde0e4;
+}
+
+/* ── Postboxes / cards ── */
+.postbox {
+	background: #fff;
+	border: 1px solid #dde0e4;
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
+	margin-bottom: 18px;
+}
+
+.postbox .postbox-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 18px;
+	border-bottom: 1px solid #ebedf0;
+	background: #fff;
+}
+
+.postbox .postbox-header.bbtc-postbox-header-collapsible {
+	cursor: pointer;
+}
+
+.postbox .postbox-header.bbtc-postbox-header-collapsible:hover {
+	background: #f8f9fa;
+}
+
+.postbox .postbox-header h2,
+.postbox .postbox-header h3 {
+	font-size: 15px;
+	font-weight: 700;
+	color: #1d2327;
+	letter-spacing: -0.2px;
+	margin: 0;
+	padding: 0;
+	flex: 1;
+}
+
+/* Collapse toggle button */
+.bbtc-postbox-toggle {
+	background: none;
+	border: none;
+	padding: 0 0 0 10px;
+	cursor: pointer;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.bbtc-postbox-chevron {
+	font-size: 18px;
+	color: #8892a0;
+	display: inline-block;
+	transition: transform 0.18s ease;
+}
+
+/* Rotated state when closed */
+.bbtc-postbox-closed .postbox-header .bbtc-postbox-chevron {
+	transform: rotate(-90deg);
+}
+
+/* Hide body when closed — remove border-bottom on header too */
+.bbtc-postbox-closed .inside {
+	display: none;
+}
+
+.bbtc-postbox-closed .postbox-header {
+	border-bottom-color: transparent;
+}
+
+.postbox .inside {
+	padding: 18px 20px;
+}
+
+/* ── Form layout ── */
+.bbtc-form-wrap {
+	display: flex;
+	gap: 24px;
+	padding: 20px;
+	align-items: flex-start;
+}
+
+.bbtc-form-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.bbtc-form-sidebar {
+	width: 270px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+/* ── Form fields ── */
+.bbtc-form-field {
+	margin-bottom: 18px;
+}
+
+.bbtc-form-field:last-child {
+	margin-bottom: 0;
+}
+
+.bbtc-form-field > label {
+	display: block;
+	font-weight: 700;
+	margin-bottom: 6px;
+	font-size: 13.5px;
+	color: #1d2327;
+}
+
+.bbtc-form-field input[type="text"],
+.bbtc-form-field input[type="number"],
+.bbtc-form-field input[type="url"],
+.bbtc-form-field select,
+.bbtc-form-field textarea {
+	width: 100%;
+	padding: 8px 11px;
+	border: 1px solid #c5c9d0;
+	border-radius: 4px;
+	font-size: 14px;
+	color: #32373c;
+	font-family: inherit;
+	background: #fff;
+	transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.bbtc-form-field input[type="text"]:focus,
+.bbtc-form-field input[type="number"]:focus,
+.bbtc-form-field select:focus,
+.bbtc-form-field textarea:focus {
+	border-color: #3a8fd8;
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(58, 143, 216, 0.15);
+}
+
+.bbtc-form-field input[readonly] {
+	background: #f5f6f8;
+	color: #8892a0;
+	cursor: not-allowed;
+	border-color: #dde0e4;
+}
+
+.bbtc-form-field input[type="number"] {
+	width: 110px;
+}
+
+.bbtc-form-field textarea {
+	min-height: 80px;
+	resize: vertical;
+}
+
+.bbtc-form-field .description {
+	font-size: 12.5px;
+	color: #646970;
+	margin-top: 5px;
+	line-height: 1.5;
+}
+
+/* ── Sidebar boxes ── */
+.bbtc-sidebar-box {
+	background: #fff;
+	border: 1px solid #dde0e4;
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
+}
+
+.bbtc-sidebar-box-header {
+	padding: 12px 16px;
+	border-bottom: 1px solid #ebedf0;
+	font-weight: 700;
+	font-size: 14px;
+	color: #1d2327;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: #fff;
+}
+
+.bbtc-sidebar-box-body {
+	padding: 14px 16px;
+}
+
+.bbtc-sidebar-box-footer {
+	padding: 12px 16px;
+	border-top: 1px solid #ebedf0;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+	background: #f9fafb;
+}
+
+/* ── Publish rows ── */
+.bbtc-publish-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.bbtc-publish-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 13.5px;
+	color: #50575e;
+	padding: 6px 0;
+	border-bottom: 1px solid #f0f1f3;
+}
+
+.bbtc-publish-row:last-child {
+	border-bottom: none;
+}
+
+.bbtc-publish-row strong {
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.bbtc-publish-row a {
+	color: #3a8fd8;
+	cursor: pointer;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 500;
+}
+
+.bbtc-publish-row a:hover {
+	text-decoration: underline;
+}
+
+/* ── Inline notices ── */
+.bbtc-notice-info {
+	color: #1a6fa3;
+	font-size: 13px;
+	margin-top: 12px;
+	padding: 10px 14px;
+	background: #eaf4ff;
+	border-left: 4px solid #3a8fd8;
+	border-radius: 0 4px 4px 0;
+	line-height: 1.5;
+}
+
+.bbtc-notice-warning {
+	color: #7a5c00;
+	font-size: 13px;
+	margin-top: 12px;
+	padding: 10px 14px;
+	background: #fffae6;
+	border-left: 4px solid #f0c000;
+	border-radius: 0 4px 4px 0;
+}
+
+.bbtc-notice-experimental {
+	color: #9a4500;
+	font-size: 13px;
+	margin-top: 12px;
+	padding: 10px 14px;
+	background: #fff4ea;
+	border-left: 4px solid #e67e22;
+	border-radius: 0 4px 4px 0;
+	line-height: 1.5;
+}
+
+/* ── Existing tabs section ── */
+.bbtc-section-heading {
+	padding: 20px 16px 10px;
+	border-top: 2px solid #ebedf0;
+	margin-top: 8px;
+}
+
+.bbtc-section-heading h3 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #1d2327;
+	margin-bottom: 5px;
+	letter-spacing: -0.2px;
+}
+
+.bbtc-section-heading p {
+	color: #646970;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+/* ── Existing tabs table ── */
+.bbtc-existing-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+}
+
+.bbtc-existing-table th {
+	text-align: left;
+	padding: 9px 12px;
+	background: #f9fafb;
+	border-bottom: 2px solid #ebedf0;
+	font-weight: 600;
+	font-size: 12px;
+	color: #50575e;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.bbtc-existing-table td {
+	padding: 9px 12px;
+	border-bottom: 1px solid #f0f1f3;
+	color: #32373c;
+	font-size: 13.5px;
+	vertical-align: middle;
+}
+
+.bbtc-existing-table tr:last-child td {
+	border-bottom: none;
+}
+
+.bbtc-existing-table tr:hover td {
+	background: #f5f8ff;
+}
+
+.bbtc-existing-table a {
+	color: #3a8fd8;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.bbtc-existing-table a:hover {
+	text-decoration: underline;
+}
+
+/* ── Sub-tabs table inside edit screen ── */
+.bbtc-subtabs-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+	margin-top: 12px;
+}
+
+.bbtc-subtabs-table th {
+	text-align: left;
+	padding: 8px 10px;
+	background: #f9fafb;
+	border-bottom: 2px solid #ebedf0;
+	font-weight: 600;
+	color: #50575e;
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.bbtc-subtabs-table td {
+	padding: 9px 10px;
+	border-bottom: 1px solid #f0f1f3;
+	vertical-align: middle;
+}
+
+.bbtc-subtabs-table tr:last-child td {
+	border-bottom: none;
+}
+
+.bbtc-subtabs-table tr:hover td {
+	background: #f5f8ff;
+}
+
+.bbtc-subtabs-table a {
+	color: #3a8fd8;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.bbtc-subtabs-table a:hover {
+	text-decoration: underline;
+}
+
+.bbtc-subtabs-table a.del {
+	color: #c0392b;
+}
+
+/* ── Accordion (sub-nav) ── */
+.bbtc-accordion-item {
+	border: 1px solid #dde0e4;
+	border-radius: 6px;
+	margin-bottom: 10px;
+	background: #fff;
+	overflow: hidden;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.bbtc-accordion-drag-handle {
+	cursor: grab;
+	color: #aab0ba;
+	font-size: 18px;
+	line-height: 1;
+	padding: 0 8px 0 0;
+	flex-shrink: 0;
+	user-select: none;
+}
+
+.bbtc-accordion-drag-handle:active {
+	cursor: grabbing;
+}
+
+.bbtc-accordion-item.bbtc-dragging {
+	opacity: 0.5;
+}
+
+.bbtc-accordion-item.bbtc-drag-over {
+	border-color: #3a8fd8;
+	box-shadow: 0 0 0 2px rgba(58, 143, 216, 0.25);
+}
+
+.bbtc-accordion-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 11px 16px;
+	cursor: pointer;
+	background: #f5f6f8;
+	border-bottom: 1px solid #dde0e4;
+	user-select: none;
+	border-radius: 6px 6px 0 0;
+}
+
+.bbtc-accordion-header:hover {
+	background: #eef0f4;
+}
+
+.bbtc-accordion-title {
+	font-size: 13.5px;
+	font-weight: 700;
+	color: #1d2327;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.bbtc-accordion-chevron {
+	font-size: 16px;
+	color: #8892a0;
+	margin-left: 10px;
+	flex-shrink: 0;
+}
+
+.bbtc-accordion-body {
+	padding: 16px 18px;
+}
+
+.bbtc-accordion-body.bbtc-collapsed {
+	display: none;
+}
+
+/* ── Accordion footer (reorder + remove) ── */
+.bbtc-accordion-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 18px;
+	border-top: 1px solid #ebedf0;
+	background: #f9fafb;
+	margin: 14px -18px -16px;
+}
+
+.bbtc-accordion-reorder {
+	display: flex;
+	gap: 6px;
+}
+
+/* ── Sub-tab content textarea (new/unsaved items) ── */
+.bbtc-subtab-content-new {
+	width: 100%;
+	min-height: 100px;
+	padding: 8px 11px;
+	border: 1px solid #c5c9d0;
+	border-radius: 4px;
+	font-size: 13px;
+	font-family: inherit;
+	color: #32373c;
+	background: #fff;
+	resize: vertical;
+	box-sizing: border-box;
+}
+
+/* ── Group search ── */
+.bbtc-group-search-wrap {
+	position: relative;
+}
+
+.bbtc-group-search-input {
+	width: 100%;
+	padding: 8px 11px;
+	border: 1px solid #c5c9d0;
+	border-radius: 4px;
+	font-size: 14px;
+	color: #32373c;
+	font-family: inherit;
+	background: #fff;
+}
+
+.bbtc-group-search-input:focus {
+	border-color: #3a8fd8;
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(58, 143, 216, 0.15);
+}
+
+.bbtc-group-search-results {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	background: #fff;
+	border: 1px solid #c5c9d0;
+	border-top: none;
+	border-radius: 0 0 4px 4px;
+	z-index: 100;
+	max-height: 180px;
+	overflow-y: auto;
+	display: none;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bbtc-group-search-results.open {
+	display: block;
+}
+
+.bbtc-group-result {
+	padding: 9px 12px;
+	cursor: pointer;
+	font-size: 14px;
+	border-bottom: 1px solid #f0f1f3;
+}
+
+.bbtc-group-result:last-child {
+	border-bottom: none;
+}
+
+.bbtc-group-result:hover {
+	background: #eaf4ff;
+	color: #3a8fd8;
+}
+
+.bbtc-selected-groups {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.bbtc-group-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: #eaf4ff;
+	border: 1px solid #a8cfee;
+	border-radius: 4px;
+	padding: 3px 10px;
+	font-size: 12.5px;
+	color: #3a8fd8;
+}
+
+.bbtc-group-tag button {
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: #3a8fd8;
+	font-size: 15px;
+	line-height: 1;
+	padding: 0;
+}
+
+/* ── Content source toggle ── */
+.bbtc-content-editor-wrap,
+.bbtc-url-wrap {
+	margin-top: 12px;
+}
+
+.bbtc-availability-override,
+.bbtc-visibility-override {
+	margin-top: 10px;
+}
+
+/* ── Breadcrumb ── */
+.bbtc-breadcrumb {
+	font-size: 13px;
+	color: #646970;
+	margin-bottom: 8px;
+}
+
+.bbtc-breadcrumb a {
+	color: #3a8fd8;
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.bbtc-breadcrumb a:hover {
+	text-decoration: underline;
+}
+
+.bbtc-breadcrumb span {
+	margin: 0 6px;
+	color: #bdc3c7;
+}
+
+/* ── No items ── */
+.no-items td {
+	text-align: center;
+	padding: 48px;
+	color: #8892a0;
+	font-size: 14px;
+}
+
+/* ── Misc ── */
+.bbtc-confirm-delete {
+	cursor: pointer;
+}
+
+.bbtc-separator {
+	border: none;
+	border-top: 1px solid #ebedf0;
+	margin: 18px 0;
+}
+
+/* ── Inline labels ── */
+label.bbtc-inline {
+	display: inline-flex;
+	align-items: flex-start;
+	gap: 8px;
+	font-weight: 400;
+	cursor: pointer;
+	font-size: 14px;
+	color: #32373c;
+}
+
+label.bbtc-inline input {
+	margin-top: 3px;
+	flex-shrink: 0;
+}
+
+/* ── Checkbox / radio groups ── */
+.bbtc-checkbox-group {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.bbtc-checkbox-group label {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	font-size: 14px;
+	color: #32373c;
+	cursor: pointer;
+}
+
+.bbtc-radio-group {
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+}
+
+/* ── Field hint (grey inline note beside checkbox options) ── */
+.bbtc-field-hint {
+	font-size: 12px;
+	color: #8892a0;
+}
+
+/* ── Optional / tag badges ── */
+.bbtc-tag-optional {
+	display: inline-block;
+	background: #eaf4ff;
+	color: #3a8fd8;
+	font-size: 10px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 3px;
+	text-transform: uppercase;
+	vertical-align: middle;
+	margin-left: 5px;
+	letter-spacing: 0.3px;
+}
+
+/* ── Small action buttons (sub-tab accordion) ── */
+.bbtc-btn-sm {
+	padding: 4px 10px;
+	font-size: 12.5px;
+	border-radius: 3px;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.bbtc-btn-sm-outline {
+	border: 1px solid #c5c9d0;
+	background: #fff;
+	color: #32373c;
+}
+
+.bbtc-btn-sm-outline:hover {
+	border-color: #3a8fd8;
+	color: #3a8fd8;
+	background: #eaf4ff;
+}
+
+.bbtc-btn-sm-danger {
+	border: 1px solid #e74c3c;
+	background: #fff;
+	color: #c0392b;
+}
+
+.bbtc-btn-sm-danger:hover {
+	background: #fdf2f2;
+}
+
+/* ── Publish meta (last modified text) ── */
+.bbtc-publish-meta {
+	font-size: 12px;
+	color: #8892a0;
+	margin-top: 8px;
+	line-height: 1.6;
+}
+
+/* ── Form row (inline group of fields) ── */
+.bbtc-form-row {
+	display: flex;
+	gap: 18px;
+}
+
+.bbtc-form-row .bbtc-form-field {
+	flex: 1;
+}
+
+/* ── Add sub-tab button ── */
+.bbtc-add-subtab-btn {
+	display: inline-block;
+	margin-top: 12px;
+	padding: 6px 14px;
+	border: 1px solid #3a8fd8;
+	color: #3a8fd8;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	background: #fff;
+	transition: all 0.15s;
+	text-decoration: none;
+}
+
+.bbtc-add-subtab-btn:hover {
+	background: #eaf4ff;
+	color: #3a8fd8;
+}
+
+/* Column widths for list tables */
+.column-cb    { width: 32px; }
+.column-slug  { width: 130px; }
+.column-type  { width: 80px; }
+.column-position { width: 55px; text-align: center; }
+.column-status   { width: 85px; }
+.column-subtabs  { width: 68px; text-align: center; }
+.column-is_new_tab { width: 80px; text-align: center; }
+.column-is_default { width: 95px; }
+.column-date     { width: 95px; font-size: 13px; }
+.column-availability { width: 140px; font-size: 13px; }
+.column-visibility   { width: 120px; font-size: 13px; }
+.column-enabled_for  { width: 140px; font-size: 13px; }
+.column-visible_to   { width: 120px; font-size: 13px; }
+
+/* ── Override value indicators ── */
+.bbtc-override-none {
+	color: #b0b7bf;
+	font-style: italic;
+}
+
+.bbtc-override-set {
+	color: #2271b1;
+	font-weight: 600;
+}
+
+/* ── Conditional section (availability / visibility override toggles) ── */
+.bbtc-conditional-section {
+	display: none;
+	margin-top: 10px;
+	padding: 12px;
+	background: #f9fafb;
+	border-radius: 4px;
+	border: 1px solid #ebedf0;
+}
+
+.bbtc-conditional-section.bbtc-visible {
+	display: block;
+}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE STYLES
+   Strategy for custom tabs (.wp-list-table): work WITH
+   WordPress's 782px block/card layout — just clean it up.
+   Strategy for existing tabs (.bbtc-existing-table): hide
+   non-essential columns via nth-child, no scroll needed.
+   ════════════════════════════════════════════════════ */
+
+/* ── Custom tabs list table — clean up WP's block/card layout (≤ 782px) ── */
+@media only screen and (max-width: 782px) {
+
+	/* Remove WP's ::before card column-name ghost labels */
+	.bbtc-tab-content .wp-list-table td::before {
+		display: none !important;
+		content: none !important;
+	}
+
+	/* Hide WP's toggle-row expand button */
+	.bbtc-tab-content .wp-list-table button.toggle-row {
+		display: none !important;
+	}
+
+	/* Hide drag handle — useless on touch and takes up block space */
+	.bbtc-tab-content .wp-list-table th.column-handle,
+	.bbtc-tab-content .wp-list-table td.column-handle {
+		display: none !important;
+	}
+
+	/* Hide all non-label, non-cb columns */
+	.bbtc-tab-content .wp-list-table th.column-slug,
+	.bbtc-tab-content .wp-list-table td.column-slug,
+	.bbtc-tab-content .wp-list-table th.column-type,
+	.bbtc-tab-content .wp-list-table td.column-type,
+	.bbtc-tab-content .wp-list-table th.column-date,
+	.bbtc-tab-content .wp-list-table td.column-date,
+	.bbtc-tab-content .wp-list-table th.column-availability,
+	.bbtc-tab-content .wp-list-table td.column-availability,
+	.bbtc-tab-content .wp-list-table th.column-visibility,
+	.bbtc-tab-content .wp-list-table td.column-visibility,
+	.bbtc-tab-content .wp-list-table th.column-enabled_for,
+	.bbtc-tab-content .wp-list-table td.column-enabled_for,
+	.bbtc-tab-content .wp-list-table th.column-visible_to,
+	.bbtc-tab-content .wp-list-table td.column-visible_to,
+	.bbtc-tab-content .wp-list-table th.column-is_default,
+	.bbtc-tab-content .wp-list-table td.column-is_default,
+	.bbtc-tab-content .wp-list-table th.column-subtabs,
+	.bbtc-tab-content .wp-list-table td.column-subtabs,
+	.bbtc-tab-content .wp-list-table th.column-position,
+	.bbtc-tab-content .wp-list-table td.column-position,
+	.bbtc-tab-content .wp-list-table th.column-is_new_tab,
+	.bbtc-tab-content .wp-list-table td.column-is_new_tab {
+		display: none !important;
+	}
+
+
+	/* Force label column visible.
+	   WP's block mode sets text-align:right on non-checkbox cells —
+	   override that and restore a clean left-aligned block layout. */
+	.bbtc-tab-content .wp-list-table td.column-label {
+		display: block !important;
+		float: none !important;
+		text-align: left !important;
+		white-space: normal !important;
+		word-break: break-word;
+		padding: 10px 12px !important;
+		width: auto !important;
+		box-sizing: border-box;
+	}
+
+	.bbtc-tab-content .wp-list-table td.column-label a,
+	.bbtc-tab-content .wp-list-table td.column-label .row-title {
+		color: #1d2327 !important;
+		font-weight: 600;
+		font-size: 14px;
+		text-align: left !important;
+	}
+
+	/* Row actions (Edit / Deactivate / Delete): always visible on touch */
+	.bbtc-tab-content .wp-list-table .row-actions {
+		position: static !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		display: block !important;
+		text-align: left !important;
+		padding-top: 4px;
+		white-space: normal;
+		clip: auto !important;
+		float: none !important;
+	}
+
+	/* ── Existing tabs table (bbtc-existing-table) ──
+	   Keep only: col 2 (Tab name) + col 9 (Actions/Edit link).
+	   Columns: 1=handle, 2=Tab, 3=Slug, 4=Override Label,
+	            5=Hidden, 6=Default, 7=Visibility, 8=Availability, 9=Actions */
+	.bbtc-existing-table th:nth-child(1),
+	.bbtc-existing-table td:nth-child(1),
+	.bbtc-existing-table th:nth-child(3),
+	.bbtc-existing-table td:nth-child(3),
+	.bbtc-existing-table th:nth-child(4),
+	.bbtc-existing-table td:nth-child(4),
+	.bbtc-existing-table th:nth-child(5),
+	.bbtc-existing-table td:nth-child(5),
+	.bbtc-existing-table th:nth-child(6),
+	.bbtc-existing-table td:nth-child(6),
+	.bbtc-existing-table th:nth-child(7),
+	.bbtc-existing-table td:nth-child(7),
+	.bbtc-existing-table th:nth-child(8),
+	.bbtc-existing-table td:nth-child(8) {
+		display: none !important;
+	}
+
+	.bbtc-existing-table th:nth-child(2),
+	.bbtc-existing-table td:nth-child(2) {
+		width: auto;
+	}
+
+	.bbtc-existing-table th:nth-child(9),
+	.bbtc-existing-table td:nth-child(9) {
+		width: 60px;
+		white-space: nowrap;
+	}
+}
+
+/* ── Responsive: Tablet (≤ 1200px) ── */
+@media screen and (max-width: 1200px) {
+	.bbtc-form-wrap {
+		flex-direction: column;
+		padding: 16px;
+		gap: 16px;
+	}
+
+	.bbtc-form-sidebar {
+		width: 100%;
+	}
+
+	.bbtc-form-main {
+		width: 100%;
+	}
+
+	/* Custom tabs list table: hide lower-priority columns on tablet.
+	   Keep: handle, cb, label, status, subtabs only. */
+	.bbtc-tab-content .wp-list-table th.column-slug,
+	.bbtc-tab-content .wp-list-table td.column-slug,
+	.bbtc-tab-content .wp-list-table th.column-type,
+	.bbtc-tab-content .wp-list-table td.column-type,
+	.bbtc-tab-content .wp-list-table th.column-position,
+	.bbtc-tab-content .wp-list-table td.column-position,
+	.bbtc-tab-content .wp-list-table th.column-is_new_tab,
+	.bbtc-tab-content .wp-list-table td.column-is_new_tab,
+	.bbtc-tab-content .wp-list-table th.column-is_default,
+	.bbtc-tab-content .wp-list-table td.column-is_default,
+	.bbtc-tab-content .wp-list-table th.column-date,
+	.bbtc-tab-content .wp-list-table td.column-date,
+	.bbtc-tab-content .wp-list-table th.column-availability,
+	.bbtc-tab-content .wp-list-table td.column-availability,
+	.bbtc-tab-content .wp-list-table th.column-visibility,
+	.bbtc-tab-content .wp-list-table td.column-visibility,
+	.bbtc-tab-content .wp-list-table th.column-enabled_for,
+	.bbtc-tab-content .wp-list-table td.column-enabled_for,
+	.bbtc-tab-content .wp-list-table th.column-visible_to,
+	.bbtc-tab-content .wp-list-table td.column-visible_to {
+		display: none !important;
+	}
+
+	/* Row actions always visible on tablet (no hover on touch) */
+	.bbtc-tab-content .wp-list-table .row-actions {
+		position: static !important;
+		opacity: 1 !important;
+		visibility: visible !important;
+		display: block !important;
+		clip: auto !important;
+		padding-top: 4px;
+		white-space: normal;
+	}
+
+	/* Existing tabs table: hide lower-priority columns on tablet */
+	.bbtc-existing-table th:nth-child(4),
+	.bbtc-existing-table td:nth-child(4),
+	.bbtc-existing-table th:nth-child(7),
+	.bbtc-existing-table td:nth-child(7),
+	.bbtc-existing-table th:nth-child(8),
+	.bbtc-existing-table td:nth-child(8) {
+		display: none;
+	}
+}
+
+/* ── Responsive: Mobile (≤ 600px) ── */
+@media screen and (max-width: 600px) {
+	/* Page heading */
+	.wrap h1.wp-heading-inline {
+		font-size: 18px;
+	}
+
+	/* Nav tabs: fill width */
+	.nav-tab-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0;
+		margin: 10px 0 0;
+	}
+
+	.nav-tab {
+		flex: 1 1 auto;
+		text-align: center;
+		padding: 10px;
+		font-size: 13px;
+	}
+
+	/* Tablenav: stack vertically */
+	.bbtc-tab-content .tablenav {
+		flex-direction: column;
+		align-items: stretch;
+		padding: 10px 12px;
+		gap: 6px;
+	}
+
+	.bbtc-tab-content .tablenav select,
+	.bbtc-tab-content .tablenav .button,
+	.bbtc-tab-content .tablenav button {
+		width: 100%;
+		text-align: center;
+		box-sizing: border-box;
+	}
+
+	/* Add New button: full-width */
+	.add-new-btn,
+	a.add-new-btn,
+	button.add-new-btn {
+		margin-left: 0;
+		width: 100%;
+		text-align: center;
+		display: block;
+		box-sizing: border-box;
+	}
+
+	/* Form wrap */
+	.bbtc-form-wrap {
+		padding: 12px;
+		gap: 12px;
+	}
+
+	/* Postbox padding */
+	.postbox .inside {
+		padding: 14px;
+	}
+
+	.bbtc-sidebar-box-header,
+	.bbtc-sidebar-box-body,
+	.bbtc-sidebar-box-footer {
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+
+	/* Publish sidebar: stack buttons */
+	.bbtc-sidebar-box-footer {
+		flex-direction: column;
+	}
+
+	.bbtc-sidebar-box-footer .button-primary,
+	.bbtc-sidebar-box-footer .button-secondary {
+		width: 100%;
+		text-align: center;
+		box-sizing: border-box;
+	}
+
+	/* Form row: stack fields */
+	.bbtc-form-row {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	/* Radio group: stack vertically */
+	.bbtc-radio-group {
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	/* Accordion */
+	.bbtc-accordion-body {
+		padding: 12px 14px;
+	}
+
+	.bbtc-accordion-footer {
+		margin: 10px -14px -12px;
+		padding: 10px 14px;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	/* Section heading */
+	.bbtc-section-heading {
+		padding: 16px 12px 8px;
+	}
+
+	/* No items */
+	.no-items td {
+		padding: 32px 16px;
+		font-size: 13px;
+	}
+
+	/* Breadcrumb */
+	.bbtc-breadcrumb {
+		font-size: 12px;
+	}
+}
