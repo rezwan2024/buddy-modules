@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P1** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P0 session, Sonnet 4.6)
+**Current phase: P2** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P1 session, Sonnet 4.6)
 
 ---
 
@@ -22,14 +22,14 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Minimal `src/admin/index.js` + `npm run build` green
 - [x] Done-when check: repo on GitHub ✅, build green ✅, legacy code committed ✅
 
-## P1 — Core PHP framework
-- [ ] `buddy-modules.php` header/constants/autoloader
-- [ ] `Plugin.php` + BuddyBoss Platform dependency notice
-- [ ] `Modules\Module`, `Modules\Registry` (`bdm_active_modules`), `Modules\External_Module`
-- [ ] `Admin\Menu` (top level, right after BuddyBoss via `menu_order`), `Admin\Page`, `Admin\Assets`
-- [ ] `REST\Controller`, `REST\Modules_Controller` (GET /modules, POST /modules/{id})
-- [ ] Tab Creator registered as module stub
-- [ ] Done-when check: menu order, GET/POST /modules via curl
+## P1 — Core PHP framework ✅
+- [x] `buddy-modules.php` header/constants/autoloader
+- [x] `Plugin.php` + BuddyBoss Platform dependency notice
+- [x] `Modules\Module`, `Modules\Registry` (`bdm_active_modules`), `Modules\External_Module`
+- [x] `Admin\Menu` (top level, right after BuddyBoss via `menu_order`), `Admin\Page`, `Admin\Assets`
+- [x] `REST\Controller`, `REST\Modules_Controller` (GET /modules, POST /modules/{id})
+- [x] Tab Creator registered as module stub
+- [x] Done-when check: menu right after BuddyBoss ✅, GET /modules returns tab-creator ✅, POST toggle persists ✅, #bdm-admin-root renders ✅
 
 ## P2 — React shell + dashboard
 - [ ] SCSS tokens + base styles ported from Platform
@@ -113,6 +113,9 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 ## Open questions
 - (none)
 
+## Handoff note for next session
+Start **P2** with Sonnet 4.6. Plugin at `plugins/buddy-modules/`, both `buddy-modules.php` (new) and `buddyboss-tab-creator.php` (legacy) are active. P2 builds the React shell: SCSS tokens from Platform, Header, ErrorBoundary, Toast/useToast, utils/api.js, App+Router (query-param routing, pushState/popstate, menu highlight), Dashboard with filter pills, category heading, ModuleCard with optimistic toggle. Done-when: dashboard matches bm-study/01-bb-settings-home.png in look, toggle persists, back/forward work.
+
 ## Found bugs (not in scope)
 - (none yet)
 
@@ -121,6 +124,5 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 |---|---|---|---|
 | 2026-11-13 | Planning | Opus 5.5 | Studied legacy + Platform 3.0. Decisions D1–D16. Wrote PLAN/CLAUDE/PROGRESS. |
 | 2026-11-13 | P0 | Sonnet 4.6 | Backup, folder rename → buddy-modules, git init, scaffold (package.json/webpack/phpcs), src/admin/index.js, npm build green, first GPG-signed commit f445960 Verified, repo rezwan2024/buddy-modules created + dev pushed. |
+| 2026-11-13 | P1 | Sonnet 4.6 | buddy-modules.php + constants, Autoloader (PSR-4-ish), Plugin singleton, Module abstract, Registry (bdm_active_modules), External_Module, Admin\Menu (menu_order after BuddyBoss) + Page + Assets, REST\Controller + Modules_Controller (GET/POST /modules). Tab Creator stub module. npm build green, php -l clean, all done-when checks passed: menu after BuddyBoss ✅, GET /modules ✅, POST toggle ✅, page renders ✅. |
 
-## Handoff note for next session
-Start **P1** with Sonnet 4.6. Plugin is at `plugins/buddy-modules/`. The legacy Tab Creator plugin is deactivated in WP (Rezwan needs to reactivate it in WP admin so the site keeps working until P7). P1 builds the core PHP framework: buddy-modules.php, Plugin.php, Module/Registry, Admin menu, REST modules controller, Tab Creator stub. The legacy code is still untouched inside the folder and will stay until P7.
