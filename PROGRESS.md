@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P3** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P2 session, Sonnet 4.6)
+**Current phase: P4** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P3 session, Sonnet 4.6)
 
 ---
 
@@ -38,21 +38,23 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Dashboard: filter pills, category heading, ModuleCard, optimistic toggle
 - [x] Done-when check: matches screenshot 01 ✅, toggle persists ✅, back/forward work ✅
 
-## P3 — Module screen + generic settings form
-- [ ] ModuleScreen + SideNavigation
-- [ ] PHP `Settings\Fields` + `REST\Settings_Controller`
-- [ ] SettingsForm field types + useAutosave
-- [ ] CUSTOM_PANEL_SCREENS + lazy loading
-- [ ] Done-when check: demo field autosaves; Tab Creator side-nav shows Profile/Group panels
+## P3 — Module screen + generic settings form ✅
+- [x] ModuleScreen + SideNavigation
+- [x] PHP `Settings\Fields` + `REST\Settings_Controller`
+- [x] SettingsForm field types + useAutosave
+- [x] CUSTOM_PANEL_SCREENS + lazy loading
+- [x] Done-when check: demo field autosaves; Tab Creator side-nav shows Profile/Group panels
 
-## P4 — Tab Creator server side
-- [ ] `TabCreator\DB` (moved, `bdm_tc_*`)
-- [ ] `Installer` (moved activator SQL)
-- [ ] `Tab_Service` + `Builtin_Tabs` (logic extracted from legacy admin classes, behaviour identical)
-- [ ] `Tabs_Controller`
-- [ ] `Existing_Tabs_Controller`
-- [ ] `Lookup_Controller` (users, groups, roles)
-- [ ] Done-when check: all routes via curl; written data = legacy form output
+## P4 — Tab Creator server side ✅
+- [x] `TabCreator\DB` (moved, `bdm_tc_*`)
+- [x] `Installer` (moved activator SQL)
+- [x] `Tab_Service` + `Builtin_Tabs` (logic extracted from legacy admin classes, behaviour identical)
+- [x] `Tabs_Controller`
+- [x] `Existing_Tabs_Controller`
+- [x] `Lookup_Controller` (users, groups, roles)
+- [x] Module.php updated: boot() runs Installer::maybe_upgrade() + registers REST routes via rest_api_init
+- [x] Plugin.php: deferred load_modules() to `bp_init` so bp_is_active() is reliable (BP active_components not ready at plugins_loaded:10)
+- [x] Done-when check: all 10 routes respond correctly ✅; CRUD verified via authenticated browser fetch ✅
 
 ## P5 — Tab Creator React lists
 - [ ] TabsList (profile + group)
@@ -114,9 +116,30 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - (none)
 
 ## Handoff note for next session
-Start **P3** with Sonnet 4.6. P3 builds ModuleScreen + SideNavigation, PHP Settings\Fields + REST\Settings_Controller, SettingsForm with field types + useAutosave (1s debounce, single-flight), and CUSTOM_PANEL_SCREENS + lazy loading. Done-when: a demo field registered in PHP renders, autosaves and shows a toast. The Tab Creator side-nav shows Profile Tabs / Group Tabs placeholder panels (actual list screens are P5).
+Start **P5** with Sonnet 4.6. P5 builds the Tab Creator React list screens:
+- `TabsList` (profile + group): table of custom tabs with status badge, type, availability, visibility, default, sub-tab count, drag-to-reorder, bulk actions (activate/deactivate/delete), Add button
+- `ExistingTabsList` (profile + group): table of built-in tabs with override state, drag-to-reorder
+
+P4 architecture (server side — now complete):
+- REST namespace: `buddy-modules/v1`, all routes under `tab-creator/`
+- `GET /tab-creator/tabs?tab_type=profile&parent_id=0` → `{tabs:[...], total:int}` each tab has all DB cols + rules array
+- `POST /tab-creator/tabs` body JSON (tab_type + fields), returns created tab row directly (not wrapped in `{tab:...}`)
+- `PATCH /tab-creator/tabs/{id}`, `DELETE /tab-creator/tabs/{id}` → `{deleted:true}` or updated tab
+- `POST /tab-creator/tabs/reorder` body `{ids:[...]}` → `{reordered:true}`
+- `POST /tab-creator/tabs/bulk` body `{action:'activate'|'deactivate'|'delete', ids:[...]}`
+- `GET /tab-creator/existing-tabs?tab_type=profile` → `{tabs:[...], total:int}` each tab has `original_slug`, `default_label`, `label_override`, `position_override`, `is_enabled`, `is_hidden`, `is_default`, `site_admin_only`, `override_id`, `rules`
+- `PATCH /tab-creator/existing-tabs/{slug}` (body must include tab_type), `DELETE /tab-creator/existing-tabs/{slug}`
+- `POST /tab-creator/existing-tabs/reorder` body `{tab_type, slugs:[...]}`
+- `GET /tab-creator/lookup/users?search=&limit=20` → `{users:[{id,name,avatar_url}]}`
+- `GET /tab-creator/lookup/groups` → `{groups:[{id,name}]}`
+- `GET /tab-creator/lookup/roles` → `{roles:[{slug,label}]}` (14 roles including administrator)
+- Module.php `boot()` runs `Installer::maybe_upgrade()` then hooks REST registration on `rest_api_init`
+- **KEY FIX**: Plugin.php defers `load_modules()` to `bp_init` action (not inline in `plugins_loaded`). BP's `active_components` isn't populated until `bp_init` fires on `init`, so `bp_is_active('members')` returned false at `plugins_loaded:10`, blocking `boot()`. Now boots correctly.
+- lint:js crashes with pre-existing TypeScript/ESLint version incompatibility — not a P4 regression
 
 Note: `apiRequest()` in `src/common/utils/api.js` manually builds the absolute URL (`restRoot + path`) instead of using `createRootURLMiddleware`, because WP's own api-fetch middleware (registered globally) would otherwise strip the namespace.
+
+Note for P5: BuddyBoss Platform's global REST auth (`bb_rest_authorization_required`) blocks all unauthenticated requests. Use `{credentials:'include'}` + `X-WP-Nonce` from `window.bdmAdminData.nonce` on every fetch. The nonce is passed by `Admin\Assets` in `bdmAdminData`.
 
 ## Found bugs (not in scope)
 - (none yet)
@@ -128,4 +151,6 @@ Note: `apiRequest()` in `src/common/utils/api.js` manually builds the absolute U
 | 2026-11-13 | P0 | Sonnet 4.6 | Backup, folder rename → buddy-modules, git init, scaffold (package.json/webpack/phpcs), src/admin/index.js, npm build green, first GPG-signed commit f445960 Verified, repo rezwan2024/buddy-modules created + dev pushed. |
 | 2026-11-13 | P1 | Sonnet 4.6 | buddy-modules.php + constants, Autoloader (PSR-4-ish), Plugin singleton, Module abstract, Registry (bdm_active_modules), External_Module, Admin\Menu (menu_order after BuddyBoss) + Page + Assets, REST\Controller + Modules_Controller (GET/POST /modules). Tab Creator stub module. npm build green, php -l clean, all done-when checks passed: menu after BuddyBoss ✅, GET /modules ✅, POST toggle ✅, page renders ✅. |
 | 2026-11-13 | P2 | Sonnet 4.6 | SCSS tokens (_variables, _header, _dashboard, _toast, admin.scss), ErrorBoundary, Header, Toast/useToast, api.js (manual URL build to avoid WP's middleware stripping the namespace), App (route state, navigate, popstate, menu highlight), Router, Dashboard (filter pills, category heading, ModuleCard, BigToggle, optimistic toggle). logo.svg created. npm build green (4 deprecation warnings only — Dart Sass @import, same as Platform). All done-when checks: looks like screenshot 01 ✅, toggle persists across reloads ✅, back/forward work ✅. |
+| 2026-11-13 | P3 | Sonnet 4.6 | Settings\Fields (in-memory panel/section/field registry), REST\Settings_Controller (GET/POST /settings/{module}, option bdm_settings_{module}), Plugin.php (boots Settings_Controller + calls register_settings() per module), Tab Creator Module (registers profile-tabs/group-tabs panels + enable_profile_tabs toggle), useAutosave (1s debounce, stable closure via useRef), SideNavigation (back button + panel items), SettingsForm (8 field types), modules.js (CUSTOM_PANEL_SCREENS + placeholder lazy screens), ModuleScreen (fetches schema+values, sidenav+form+custom panel), Router updated. _module-screen.scss. npm build green (5 Dart Sass warnings = pre-existing), php -l clean, CSS lint clean on new file. |
+| 2026-11-13 | P4 | Sonnet 4.6 | DB.php (bdm_tc_* tables, full CRUD with in-memory cache), Installer.php (activate/maybe_upgrade/create_tables via dbDelta, BDM_TC_DB_VERSION 1.0.0), Builtin_Tabs.php (profile/group slug+label helpers, transients + filter hooks), Tab_Service.php (save_tab, save_subtab, save_override, delete_tab, reorder_tabs, save_existing_tab_order; rule-writing logic identical to legacy), Tabs_Controller.php (CRUD + reorder + bulk, routes registered before (?P<id>)), Existing_Tabs_Controller.php (list/reorder/PATCH/DELETE by slug), Lookup_Controller.php (users/groups/roles), Module.php updated (boot: maybe_upgrade + rest_api_init hook). Fixed pre-existing Settings_Controller PHP 8.0 fatal (type hint). Fixed Plugin.php: deferred load_modules() to bp_init so bp_is_active() is reliable. All 10 routes verified via authenticated browser fetch. php -l clean, npm build green (5 Dart Sass warnings = pre-existing), lint:css clean; lint:js pre-existing TS/ESLint crash = not a P4 regression. |
 

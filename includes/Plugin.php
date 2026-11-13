@@ -44,11 +44,9 @@ class Plugin {
 			return;
 		}
 
-		// Boot module registry and load all registered modules.
-		$registry = Modules\Registry::get_instance();
-
-		// Load module registrations.
-		$this->load_modules( $registry );
+		// Defer module loading to bp_init so bp_is_active() is reliable.
+		// BP components (active_components) are not populated until bp_init fires on init.
+		add_action( 'bp_init', [ $this, 'load_and_boot_modules' ] );
 
 		// Boot admin UI.
 		if ( is_admin() ) {
@@ -59,6 +57,21 @@ class Plugin {
 
 		// Boot REST API.
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+	}
+
+	/**
+	 * Load modules and register their settings. Called on bp_init so bp_is_active() is ready.
+	 *
+	 * @since 2.0.0
+	 */
+	public function load_and_boot_modules(): void {
+		$registry = Modules\Registry::get_instance();
+		$this->load_modules( $registry );
+
+		// Register settings schemas for all modules (always, regardless of active state).
+		foreach ( $registry->all() as $module ) {
+			$module->register_settings();
+		}
 	}
 
 	/**
@@ -85,6 +98,7 @@ class Plugin {
 	 */
 	public function register_rest_routes(): void {
 		( new REST\Modules_Controller() )->register_routes();
+		( new REST\Settings_Controller() )->register_routes();
 	}
 
 	/**
