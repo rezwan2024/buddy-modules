@@ -54,6 +54,7 @@ class Plugin {
 		if ( is_admin() ) {
 			( new Admin\Menu() )->register();
 			( new Admin\Assets() )->register();
+			Admin\Page::register();
 		}
 
 		// Boot REST API.

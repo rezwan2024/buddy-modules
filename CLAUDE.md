@@ -60,6 +60,7 @@ Instructions for every Claude Code session working on this plugin. Read this fil
   - Scope all CSS to `.bdm-admin-*` or the body class `toplevel_page_buddy-modules`.
   - Keep `<hr class="wp-header-end">` above the React root.
 - Optimistic toggles revert on failure. Autosave = 1s debounce + single-flight queue. The tab editor uses an explicit Save button.
+- **Foreign admin notices are suppressed on every Buddy Modules page.** `Admin\Page::register()` hooks into `admin_notices` / `all_admin_notices` at priority -1 and calls `remove_all_actions()` on those hooks, then fires `do_action('bdm_admin_notices')` so only BDM-specific notices appear. When adding a plugin notice, hook it onto `bdm_admin_notices`, not `admin_notices`. Never remove this suppression — it is intentional (Rezwan, 2026-11-13).
 - All user-facing strings go through `__()` (PHP) or `@wordpress/i18n` (JS) with the `buddy-modules` domain.
 - PHP 8.0+, WP 6.4+. Each function/class gets a docblock. `@since 2.0.0` for new code.
 - Escape output, sanitize input, `$wpdb->prepare` every query (keep the legacy `DB` allow-list for `orderby`).
