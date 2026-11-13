@@ -50,10 +50,16 @@ class Assets {
 			true
 		);
 
+		$style_deps = [ 'wp-components' ];
+		$icons      = $this->register_line_icons();
+		if ( $icons ) {
+			$style_deps[] = $icons;
+		}
+
 		wp_enqueue_style(
 			self::STYLE_HANDLE,
 			BDM_URL . 'build/admin.css',
-			[ 'wp-components' ],
+			$style_deps,
 			$asset['version']
 		);
 
@@ -61,6 +67,39 @@ class Assets {
 
 		// JS translations.
 		wp_set_script_translations( self::SCRIPT_HANDLE, 'buddy-modules', BDM_DIR . 'languages' );
+	}
+
+	/**
+	 * Register the BuddyBoss line-icon font (bb-icons-rl) that the admin UI uses
+	 * for side-nav, button and menu icons, so they match the Platform admin.
+	 *
+	 * Reuses the Platform's own handle when it is already registered.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string Style handle, or '' when BuddyBoss Platform is not available.
+	 */
+	private function register_line_icons(): string {
+		$handle = 'bb-icons-rl-css';
+
+		if ( wp_style_is( $handle, 'registered' ) ) {
+			return $handle;
+		}
+
+		if ( ! function_exists( 'buddypress' ) || empty( buddypress()->plugin_url ) ) {
+			return '';
+		}
+
+		$min = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		wp_register_style(
+			$handle,
+			buddypress()->plugin_url . "bp-templates/bp-nouveau/readylaunch/icons/css/bb-icons-rl{$min}.css",
+			[],
+			function_exists( 'bp_get_version' ) ? bp_get_version() : BDM_VERSION
+		);
+
+		return $handle;
 	}
 
 	/**
@@ -87,7 +126,6 @@ class Assets {
 				'restRoot' => esc_url_raw( rest_url( 'buddy-modules/v1' ) ),
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'adminUrl' => esc_url_raw( admin_url( 'admin.php?page=buddy-modules' ) ),
-				'logoUrl'  => esc_url_raw( BDM_URL . 'assets/images/logo.svg' ),
 				'version'  => $version,
 				'modules'  => $modules,
 			]

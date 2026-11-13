@@ -126,7 +126,7 @@ export function App() {
 	return (
 		<ToastProvider>
 			<Header navigate={ navigate } />
-			<div className="bdm-admin-content">
+			<div className={ 'bdm-admin-content' + ( route.module ? ' bdm-admin-content--module' : '' ) }>
 				<Router route={ route } navigate={ navigate } />
 			</div>
 			<Toast />

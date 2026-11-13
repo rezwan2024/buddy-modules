@@ -9,20 +9,22 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { Button, Spinner } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
+import { RowActions } from '../../common/components/RowActions';
 
 /**
  * @param {Object}   props
  * @param {{ module: string, panel: string }} props.route
+ * @param {string}   props.title      Panel title shown in the card header.
  * @param {Function} props.openModal  Called with {view, id?, label?} to open Edit/Reset modal.
  * @param {number}   props.refreshKey Increment from parent triggers a list reload.
  * @returns {JSX.Element}
  */
-export default function ExistingTabsList( { route, openModal, refreshKey } ) {
+export default function ExistingTabsList( { route, title, openModal, refreshKey } ) {
 	var tabType = route.panel === 'group-existing-tabs' ? 'group' : 'profile';
 
 	var [ tabs,    setTabs    ] = useState( [] );
@@ -85,7 +87,12 @@ export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 	// -------------------------------------------------------------------------
 
 	return (
-		<div className="bdm-admin-tabs-list bdm-admin-existing-tabs-list">
+		<div className="bdm-admin-card bdm-admin-tabs-list bdm-admin-existing-tabs-list">
+
+			{ /* Card header */ }
+			<div className="bdm-admin-card__header">
+				<h2 className="bdm-admin-card__title">{ title }</h2>
+			</div>
 
 			{ /* Loading */ }
 			{ loading && (
@@ -104,7 +111,7 @@ export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 			{ /* Table */ }
 			{ ! loading && tabs.length > 0 && (
 				<DragDropContext onDragEnd={ handleDragEnd }>
-					<table className="bdm-admin-tabs-list__table widefat striped">
+					<table className="bdm-admin-tabs-list__table">
 						<thead>
 							<tr>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--handle"></th>
@@ -121,7 +128,7 @@ export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 									{ __( 'Default', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-									{ __( 'Actions', 'buddy-modules' ) }
+									<span className="screen-reader-text">{ __( 'Actions', 'buddy-modules' ) }</span>
 								</th>
 							</tr>
 						</thead>
@@ -160,18 +167,24 @@ export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 																		className="bdm-admin-drag-handle"
 																		title={ __( 'Drag to reorder', 'buddy-modules' ) }
 																	>
-																		⠿
+																		<i className="bb-icons-rl bb-icons-rl-dots-six-vertical" aria-hidden="true" />
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--label">
-																	<strong>{ displayLabel }</strong>
+																	<button
+																		type="button"
+																		className="bdm-admin-tabs-list__name"
+																		onClick={ function() {
+																			openModal( { view: 'edit', id: tab.original_slug } );
+																		} }
+																	>
+																		{ displayLabel }
+																	</button>
 																	{ tab.label_override && tab.label_override !== tab.default_label && (
 																		<span className="bdm-admin-tabs-list__override-hint">
 																			{ ' (' + tab.default_label + ')' }
 																		</span>
 																	) }
-																	<br />
-																	<code className="bdm-admin-tabs-list__slug">{ tab.original_slug }</code>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
 																	{ hasOverride
@@ -192,31 +205,37 @@ export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 																	}
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-																	<Button
-																		variant="secondary"
-																		size="small"
-																		onClick={ function() {
-																			openModal( { view: 'edit', id: tab.original_slug } );
-																		} }
-																	>
-																		{ __( 'Edit', 'buddy-modules' ) }
-																	</Button>
-																	{ hasOverride && (
-																		<Button
-																			variant="tertiary"
-																			size="small"
-																			isDestructive
-																			onClick={ function() {
-																				openModal( {
-																					view:  'reset',
-																					id:    tab.original_slug,
-																					label: tab.label_override || tab.default_label,
-																				} );
-																			} }
-																		>
-																			{ __( 'Reset', 'buddy-modules' ) }
-																		</Button>
-																	) }
+																	<RowActions
+																		label={ sprintf(
+																			// translators: %s is the tab label.
+																			__( 'More options for %s', 'buddy-modules' ),
+																			displayLabel
+																		) }
+																		actions={ [
+																			{
+																				key:     'edit',
+																				label:   __( 'Edit', 'buddy-modules' ),
+																				icon:    'bb-icons-rl-pencil-simple',
+																				onClick: function() {
+																					openModal( { view: 'edit', id: tab.original_slug } );
+																				},
+																			},
+																		].concat( hasOverride ? [
+																			{
+																				key:           'reset',
+																				label:         __( 'Reset', 'buddy-modules' ),
+																				icon:          'bb-icons-rl-arrow-counter-clockwise',
+																				isDestructive: true,
+																				onClick:       function() {
+																					openModal( {
+																						view:  'reset',
+																						id:    tab.original_slug,
+																						label: tab.label_override || tab.default_label,
+																					} );
+																				},
+																			},
+																		] : [] ) }
+																	/>
 																</td>
 															</tr>
 														);

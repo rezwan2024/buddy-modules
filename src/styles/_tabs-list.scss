@@ -1,15 +1,18 @@
 // Tab Creator list screens — TabsList + ExistingTabsList.
-// Scoped to .bdm-admin-tabs-list which both components use.
+// Copied from the Platform list table (Groups → All Groups):
+// no outer border, transparent header row, 16px rows with thin dividers.
+// stylelint-disable declaration-no-important
 
 .bdm-admin-tabs-list {
 
-	// Toolbar
+	// Toolbar (bulk actions)
 	&__toolbar {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		margin-bottom: 12px;
 		gap: 8px;
+		padding: 24px 0 16px;
+		border-bottom: 1px solid $bdm-border-secondary;
 	}
 
 	&__bulk-wrap {
@@ -19,13 +22,8 @@
 	}
 
 	&__bulk-select {
-		height: 30px;
-		padding: 0 6px;
-		border: 1px solid $bdm-border-dark;
-		border-radius: $bdm-radius-sm;
-		font-size: 13px;
-		color: $bdm-text;
-		background: $bdm-bg-base;
+		min-width: 135px;
+		height: 40px;
 	}
 
 	// Loading / empty
@@ -36,32 +34,90 @@
 	}
 
 	&__empty {
+		margin: 0;
+		padding: 24px 0 8px;
 		color: $bdm-text-tertiary;
-		padding: 20px 0;
 	}
 
 	// Table
 	&__table {
-		border-spacing: 0;
 		width: 100%;
+		border: 0;
+		border-collapse: collapse;
+		border-spacing: 0;
+		background: transparent;
+		box-shadow: none;
 
 		th,
 		td {
-			padding: 8px 10px;
-			text-align: left;
+			padding: 16px 16px 16px 0;
 			font-size: 13px;
+			text-align: left;
+			vertical-align: middle;
+			color: $bdm-text-secondary;
 		}
 
 		th {
-			font-weight: 600;
-			color: $bdm-text-secondary;
-			border-bottom: 1px solid $bdm-border;
-			background-color: $bdm-bg-secondary;
+			padding-top: 10px;
+			padding-bottom: 10px;
+			font-weight: 400;
+			color: $bdm-text-tertiary;
+			background: transparent;
+			border-bottom: 0;
 		}
 
-		td {
-			vertical-align: middle;
+		tbody tr {
 			border-bottom: 1px solid $bdm-border;
+
+			&:last-child {
+				border-bottom: 0;
+			}
+		}
+
+		// Native checkboxes styled like Platform CheckboxControl.
+		input[type="checkbox"] {
+			width: 18px;
+			height: 18px;
+			margin: 0;
+			border: 1px solid $bdm-text-disabled;
+			border-radius: $bdm-radius-sm;
+			box-shadow: none;
+
+			&:checked {
+				background: $bdm-brand;
+				border-color: $bdm-brand;
+
+				&::before {
+					content: "";
+					display: block;
+					width: 5px;
+					height: 10px;
+					margin: 1px auto 0;
+					border: solid $bdm-text-inverse;
+					border-width: 0 2px 2px 0;
+					transform: rotate(45deg);
+				}
+			}
+
+			&:indeterminate {
+				background: $bdm-brand;
+				border-color: $bdm-brand;
+
+				&::before {
+					content: "";
+					display: block;
+					width: 8px;
+					height: 2px;
+					margin: 7px auto 0;
+					background: $bdm-text-inverse;
+				}
+			}
+
+			&:focus {
+				border-color: $bdm-brand;
+				box-shadow: 0 0 0 1px $bdm-brand;
+				outline: none;
+			}
 		}
 	}
 
@@ -83,7 +139,9 @@
 		}
 
 		&--actions {
-			width: 1%;
+			width: 32px;
+			padding-right: 0 !important;
+			text-align: right !important;
 			white-space: nowrap;
 		}
 	}
@@ -92,32 +150,23 @@
 	&__row {
 		transition: background-color 0.1s ease;
 
-		&:hover {
-			background-color: $bdm-bg-hover !important;
-		}
-
 		&--dragging {
-			background-color: $bdm-bg-secondary !important;
-			box-shadow: $bdm-shadow-card-hover;
+			background: $bdm-bg-base;
+			box-shadow: $bdm-shadow-popover;
 
 			td {
 				border-color: transparent;
 			}
 		}
-
-		&--selected {
-			background-color: #fef5f2 !important;
-		}
 	}
 
 	// Drag handle
 	.bdm-admin-drag-handle {
-		display: inline-block;
+		display: inline-flex;
 		cursor: grab;
 		color: $bdm-text-disabled;
-		font-size: 18px;
+		font-size: 20px;
 		line-height: 1;
-		padding: 2px 4px;
 		transition: color 0.1s ease;
 
 		&:hover {
@@ -129,64 +178,76 @@
 		}
 	}
 
-	// Label cell
-	&__slug {
-		display: inline-block;
-		margin-top: 2px;
-		font-size: 11px;
-		color: $bdm-text-tertiary;
-		background: $bdm-bg-secondary;
-		padding: 1px 5px;
-		border-radius: $bdm-radius-sm;
+	// Label cell: name is a link that opens the editor (Platform group name).
+	&__name {
+		display: block;
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: 0;
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 20px;
+		color: $bdm-link;
+		text-align: left;
+		cursor: pointer;
+
+		&:hover {
+			color: $bdm-text;
+		}
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 2px $bdm-brand;
+			border-radius: $bdm-radius-sm;
+		}
 	}
 
 	&__override-hint {
-		font-size: 11px;
+		font-size: 12px;
 		color: $bdm-text-disabled;
-		font-style: italic;
 	}
 
-	// Status toggle
+	// Status toggle — pill like the Platform privacy badge.
 	.bdm-admin-status-toggle {
-		display: inline-block;
-		padding: 3px 10px;
-		border-radius: $bdm-radius-sm;
-		border: 1px solid transparent;
-		font-size: 12px;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 2px 8px;
+		border: 1px solid $bdm-border-tertiary;
+		border-radius: 999px;
+		font-size: 11px;
+		line-height: 15px;
 		cursor: pointer;
-		line-height: 1.5;
 		transition: $bdm-transition;
 
-		&--active {
-			background: #e5f7e9;
-			border-color: #ccecd5;
-			color: #007220;
+		&::before {
+			content: "";
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: currentcolor;
+		}
 
-			&:hover {
-				background: #cce8d2;
-			}
+		&--active {
+			background: $bdm-bg-success;
+			border-color: #a6dfb6;
+			color: $bdm-text-success;
 		}
 
 		&--inactive {
 			background: $bdm-bg-secondary;
-			border-color: $bdm-border-dark;
 			color: $bdm-text-tertiary;
+		}
 
-			&:hover {
-				background: $bdm-border;
-			}
+		&:hover {
+			border-color: $bdm-text-disabled;
 		}
 	}
 
 	// Sub-tab count
 	&__subtab-count {
-		display: inline-block;
-		min-width: 24px;
-		padding: 2px 6px;
-		text-align: center;
-		border-radius: $bdm-radius-sm;
-		background: $bdm-bg-secondary;
-		font-size: 12px;
+		font-size: 13px;
 		color: $bdm-text-secondary;
 	}
 
@@ -196,24 +257,96 @@
 	}
 }
 
+// Row "⋯" menu (Platform components-dropdown-menu in list tables).
+.bdm-admin-row-menu__toggle.components-button.has-icon {
+	width: 32px;
+	min-width: 32px;
+	height: 32px;
+	padding: 4px;
+	justify-content: center;
+	border-radius: $bdm-radius-sm;
+	color: $bdm-text-tertiary;
+
+	i {
+		font-size: 24px;
+		line-height: 1;
+	}
+
+	&:hover,
+	&.is-opened {
+		background: $bdm-bg-secondary;
+		color: $bdm-text;
+	}
+}
+
+// The popover renders in a portal, outside .bdm-admin-wrap.
+.bdm-admin-row-menu__popover {
+
+	.components-popover__content {
+		min-width: 190px;
+		padding: 0;
+		border: 0;
+		border-radius: $bdm-radius-lg;
+		box-shadow: $bdm-shadow-popover;
+		outline: none;
+		overflow: hidden;
+	}
+
+	.components-dropdown-menu__menu {
+		padding: 0;
+	}
+
+	.components-menu-group {
+		margin: 0;
+		padding: 0;
+	}
+
+	.components-menu-item__button.bdm-admin-row-menu__item {
+		box-sizing: border-box;
+		height: 40px;
+		min-height: 40px;
+		margin: 0;
+		padding: 10px 8px 10px 16px;
+		border-radius: 0;
+		font-size: 13px;
+		font-weight: 400;
+		color: $bdm-text;
+
+		.components-menu-item__item {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		i {
+			font-size: 20px;
+			line-height: 1;
+			color: $bdm-text-tertiary;
+		}
+
+		// Platform shows focus/hover as a light row, not WP's focus ring.
+		&:hover,
+		&:focus,
+		&:focus-visible,
+		&:focus:not(:disabled) {
+			background: $bdm-bg-page;
+			box-shadow: none !important;
+			outline: none !important;
+			color: $bdm-text;
+		}
+
+		&.is-destructive,
+		&.is-destructive i {
+			color: $bdm-text-danger;
+		}
+	}
+}
+
 // Responsive column hiding.
-// TabsList (10 cols):       handle(1) cb(2) label(3) type(4) availability(5) visibility(6) status(7) default(8) subtabs(9) actions(10)
+// TabsList (7 cols):        handle(1) cb(2) label(3) type(4) status(5) subtabs(6) actions(7)
 // ExistingTabsList (6 cols): handle(1) label(2) override(3) visibility(4) default(5) actions(6)
 
 @media (max-width: 1024px) {
-
-	// TabsList: hide Availability (5), Visibility (6), Sub-tabs (9).
-	.bdm-admin-tabs-list:not(.bdm-admin-existing-tabs-list) .bdm-admin-tabs-list__table {
-
-		th:nth-child(5),
-		td:nth-child(5),
-		th:nth-child(6),
-		td:nth-child(6),
-		th:nth-child(9),
-		td:nth-child(9) {
-			display: none;
-		}
-	}
 
 	// ExistingTabsList: hide Visibility (4).
 	.bdm-admin-existing-tabs-list .bdm-admin-tabs-list__table {
@@ -227,13 +360,22 @@
 
 @media (max-width: 782px) {
 
-	// TabsList: also hide Type (4) and Default (8).
+	// Tighter cells so the row "⋯" menu stays inside the card.
+	.bdm-admin-tabs-list__table {
+
+		th,
+		td {
+			padding-right: 8px;
+		}
+	}
+
+	// TabsList: hide Type (4) and Sub-tabs (6).
 	.bdm-admin-tabs-list:not(.bdm-admin-existing-tabs-list) .bdm-admin-tabs-list__table {
 
 		th:nth-child(4),
 		td:nth-child(4),
-		th:nth-child(8),
-		td:nth-child(8) {
+		th:nth-child(6),
+		td:nth-child(6) {
 			display: none;
 		}
 	}
@@ -248,37 +390,35 @@
 	}
 }
 
-// Shared badges used in both list screens.
+// Shared badges used in both list screens — outlined pill like the
+// Platform privacy badge (bg #f0f0f0, 1px #ccc, fully rounded, 11px).
 .bdm-admin-badge {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 	padding: 2px 8px;
-	border-radius: $bdm-radius-sm;
+	background: $bdm-bg-secondary;
+	border: 1px solid $bdm-border-tertiary;
+	border-radius: 999px;
 	font-size: 11px;
-	font-weight: 600;
-	line-height: 1.5;
-
-	&--type {
-		background: #fdeee9;
-		color: $bdm-brand-hover;
-	}
+	font-weight: 400;
+	line-height: 15px;
+	color: $bdm-text;
 
 	&--active {
-		background: #e5f7e9;
-		color: #007220;
+		background: $bdm-bg-success;
+		border-color: #a6dfb6;
+		color: $bdm-text-success;
 	}
 
 	&--inactive {
-		background: $bdm-bg-secondary;
-		color: $bdm-text-disabled;
+		color: $bdm-text-tertiary;
 	}
 
 	&--default {
 		background: #fdeee9;
+		border-color: $bdm-brand-light;
 		color: $bdm-brand-hover;
 	}
-
-	&--custom {
-		background: #e6f3f9;
-		color: #0073aa;
-	}
 }
+// stylelint-enable declaration-no-important

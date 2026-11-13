@@ -94,6 +94,9 @@ export function ModuleScreen( { route, navigate } ) {
 	var CustomScreen      = CUSTOM_PANEL_SCREENS[ customKey ] || null;
 	var panelValues       = values[ activePanel ] || {};
 
+	var sections    = activePanelSchema ? activePanelSchema.sections || [] : [];
+	var panelTitle  = activePanelSchema ? activePanelSchema.label : '';
+
 	return (
 		<div className="bdm-admin-module-screen">
 			<SideNavigation
@@ -104,23 +107,31 @@ export function ModuleScreen( { route, navigate } ) {
 			/>
 
 			<main className="bdm-admin-module-screen__main">
-				{ activePanelSchema && activePanelSchema.label && (
-					<h2 className="bdm-admin-module-screen__panel-title">
-						{ activePanelSchema.label }
-					</h2>
+				{ /* Schema-driven settings get their own card. */ }
+				{ sections.length > 0 && (
+					<section className="bdm-admin-card">
+						{ panelTitle && (
+							<div className="bdm-admin-card__header">
+								<h2 className="bdm-admin-card__title">{ panelTitle }</h2>
+							</div>
+						) }
+						<div className="bdm-admin-card__body">
+							<SettingsForm
+								sections={ sections }
+								values={ panelValues }
+								onChange={ handleFieldChange }
+							/>
+						</div>
+					</section>
 				) }
 
-				<SettingsForm
-					sections={ activePanelSchema ? activePanelSchema.sections : [] }
-					values={ panelValues }
-					onChange={ handleFieldChange }
-				/>
-
+				{ /* Custom screens render their own card (title + header actions). */ }
 				{ CustomScreen && (
 					<Suspense fallback={ <Spinner /> }>
 						<CustomScreen
 							route={ route }
 							navigate={ navigate }
+							title={ panelTitle }
 							values={ panelValues }
 							onChange={ handleFieldChange }
 						/>

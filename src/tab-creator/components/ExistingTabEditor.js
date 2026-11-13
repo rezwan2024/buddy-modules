@@ -16,6 +16,7 @@ import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
 import { parseRules, serializeRules } from '../utils/rulesHelpers';
 import SearchSelect from './SearchSelect';
+import { FieldRow } from '../../common/components/FieldRow';
 
 /**
  * RoleSelect — compact multi-select dropdown showing chips for each option.
@@ -24,9 +25,10 @@ import SearchSelect from './SearchSelect';
  * @param {Array}    props.options   Array of {value, label}.
  * @param {Array}    props.selected  Array of selected value strings.
  * @param {Function} props.onChange  Called with the new selected array.
+ * @param {string}   [props.id]      ID for the trigger button (for an outside <label>).
  * @returns {JSX.Element}
  */
-function RoleSelect( { options, selected, onChange } ) {
+function RoleSelect( { options, selected, onChange, id } ) {
 	var [ open, setOpen ] = useState( false );
 	var wrapRef = useRef( null );
 
@@ -71,14 +73,16 @@ function RoleSelect( { options, selected, onChange } ) {
 		<div className="bdm-admin-role-select" ref={ wrapRef }>
 			<button
 				type="button"
+				id={ id }
 				className="bdm-admin-role-select__trigger"
 				onClick={ function() { setOpen( function( v ) { return ! v; } ); } }
 				aria-expanded={ open }
 			>
 				<span className="bdm-admin-role-select__summary">{ getSummary() }</span>
-				<span className="bdm-admin-role-select__arrow" aria-hidden="true">
-					{ open ? '▲' : '▼' }
-				</span>
+				<i
+					className={ 'bdm-admin-role-select__arrow bb-icons-rl ' + ( open ? 'bb-icons-rl-caret-up' : 'bb-icons-rl-caret-down' ) }
+					aria-hidden="true"
+				/>
 			</button>
 			{ open && (
 				<div className="bdm-admin-role-select__dropdown">
@@ -349,88 +353,77 @@ export default function ExistingTabEditor( { route, onSaved, onCancel } ) {
 				</div>
 			) }
 
-			{ /* Basic overrides */ }
-			<div className="bdm-admin-tab-editor__section">
-				<h4 className="bdm-admin-tab-editor__section-title">
-					{ __( 'Display', 'buddy-modules' ) }
-				</h4>
-
-				<div className="bdm-admin-tab-editor__field">
+			{ /* Settings rows (Platform settings-form layout) */ }
+			<div className="bdm-admin-tab-editor__fields">
+				<FieldRow
+					label={ __( 'Label Override', 'buddy-modules' ) }
+					htmlFor="bdm-admin-existing-tab-label"
+					help={ __( 'Leave blank to use the default label.', 'buddy-modules' ) }
+				>
 					<TextControl
-						label={ __( 'Label Override', 'buddy-modules' ) }
+						id="bdm-admin-existing-tab-label"
 						value={ form.label_override }
 						onChange={ function( v ) { setField( 'label_override', v ); } }
 						placeholder={ defaultLabel }
-						help={ __( 'Leave blank to use the default label.', 'buddy-modules' ) }
 					/>
-				</div>
+				</FieldRow>
 
-				<div className="bdm-admin-tab-editor__row">
-					<div className="bdm-admin-tab-editor__field">
-						<ToggleControl
-							label={ __( 'Hide Tab', 'buddy-modules' ) }
-							checked={ !! form.is_hidden }
-							onChange={ function( v ) { setField( 'is_hidden', v ? 1 : 0 ); } }
-						/>
-					</div>
-				</div>
-			</div>
+				<FieldRow label={ __( 'Hide Tab', 'buddy-modules' ) }>
+					<ToggleControl
+						label={ __( 'Hide this tab from the navigation.', 'buddy-modules' ) }
+						checked={ !! form.is_hidden }
+						onChange={ function( v ) { setField( 'is_hidden', v ? 1 : 0 ); } }
+					/>
+				</FieldRow>
 
-			{ /* Availability override (profile) */ }
-			{ 'profile' === tabType && (
-				<div className="bdm-admin-tab-editor__section">
-					<h4 className="bdm-admin-tab-editor__section-title">
-						{ __( 'Availability Override', 'buddy-modules' ) }
-					</h4>
-					<div className="bdm-admin-tab-editor__field">
+				{ /* Availability override (profile) */ }
+				{ 'profile' === tabType && (
+					<FieldRow label={ __( 'Availability Override', 'buddy-modules' ) } htmlFor="bdm-admin-existing-tab-availability">
 						<RoleSelect
+							id="bdm-admin-existing-tab-availability"
 							options={ profileAvailabilityOptions }
 							selected={ form.availability }
 							onChange={ function( v ) { setField( 'availability', v ); } }
 						/>
-					</div>
-				</div>
-			) }
+					</FieldRow>
+				) }
 
-			{ /* Enabled For override (group) */ }
-			{ 'group' === tabType && (
-				<div className="bdm-admin-tab-editor__section">
-					<h4 className="bdm-admin-tab-editor__section-title">
-						{ __( 'Enabled For', 'buddy-modules' ) }
-					</h4>
-					<div className="bdm-admin-tab-editor__field">
+				{ /* Enabled For override (group) */ }
+				{ 'group' === tabType && (
+					<FieldRow label={ __( 'Enabled For', 'buddy-modules' ) } htmlFor="bdm-admin-existing-tab-enabled-for">
 						<RoleSelect
+							id="bdm-admin-existing-tab-enabled-for"
 							options={ enabledForOptions }
 							selected={ form.enabled_for }
 							onChange={ function( v ) { setField( 'enabled_for', v ); } }
 						/>
-					</div>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Associated Groups', 'buddy-modules' ) }
-						</label>
+				{ 'group' === tabType && (
+					<FieldRow label={ __( 'Associated Groups', 'buddy-modules' ) } htmlFor="bdm-admin-existing-tab-assoc-groups">
 						<SearchSelect
+							inputId="bdm-admin-existing-tab-assoc-groups"
 							selectedItems={ assocGroups }
 							onChange={ setAssocGroups }
 							fetchOptions={ fetchGroups }
 							placeholder={ __( 'Search groups…', 'buddy-modules' ) }
 						/>
-					</div>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Excluded Groups', 'buddy-modules' ) }
-						</label>
+				{ 'group' === tabType && (
+					<FieldRow label={ __( 'Excluded Groups', 'buddy-modules' ) } htmlFor="bdm-admin-existing-tab-excluded-groups">
 						<SearchSelect
+							inputId="bdm-admin-existing-tab-excluded-groups"
 							selectedItems={ excludedGroups }
 							onChange={ setExcludedGroups }
 							fetchOptions={ fetchGroups }
 							placeholder={ __( 'Search groups…', 'buddy-modules' ) }
 						/>
-					</div>
-				</div>
-			) }
+					</FieldRow>
+				) }
+			</div>
 
 			{ /* Footer */ }
 			<div className="bdm-admin-tab-editor__footer">

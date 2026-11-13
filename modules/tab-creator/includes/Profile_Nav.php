@@ -15,6 +15,13 @@ class Profile_Nav {
 	private static array $tabs_cache = [];
 
 	/**
+	 * Whether a hidden "home" sub-nav item was registered on this request.
+	 *
+	 * @var bool
+	 */
+	private static bool $has_home_subnav = false;
+
+	/**
 	 * Registers all hooks.
 	 *
 	 * @since 2.0.0
@@ -26,6 +33,29 @@ class Profile_Nav {
 		add_action( 'bp_setup_nav', [ self::class, 'register_tabs' ], 20 );
 		add_action( 'bp_setup_nav', [ self::class, 'register_subtabs' ], 30 );
 		add_action( 'bp_setup_nav', [ self::class, 'apply_existing_overrides' ], 50 );
+		add_action( 'wp_enqueue_scripts', [ self::class, 'enqueue_home_subnav_style' ] );
+	}
+
+	/**
+	 * Hides the "home" sub-nav item of custom tabs with sub-tabs.
+	 *
+	 * The item must stay registered (the theme hides a sub-nav row with fewer
+	 * than 2 items), but the sub-nav row should list only the sub-tabs: the tab
+	 * itself is already in the main profile nav.
+	 *
+	 * @since 2.0.0
+	 */
+	public static function enqueue_home_subnav_style(): void {
+		if ( ! self::$has_home_subnav ) {
+			return;
+		}
+
+		wp_register_style( 'bdm-tc-profile-nav', false, [], BDM_VERSION );
+		wp_enqueue_style( 'bdm-tc-profile-nav' );
+		wp_add_inline_style(
+			'bdm-tc-profile-nav',
+			'.bp-subnavs li[id^="bdm-tc-home-"]{display:none !important;}'
+		);
 	}
 
 	/**
@@ -101,8 +131,17 @@ class Profile_Nav {
 
 		$displayed_user_id = bp_displayed_user_id();
 		$current_user_id   = get_current_user_id();
+		$user_domain       = bp_displayed_user_domain();
 
 		$tabs = self::get_tabs( 'profile' );
+
+		// Active custom sub-tabs, grouped by parent tab ID.
+		$children_by_parent = [];
+		foreach ( DB::get_tabs( 'profile', [ 'status' => 'active' ] ) as $child ) {
+			if ( (int) $child->parent_id > 0 && $child->is_enabled ) {
+				$children_by_parent[ (int) $child->parent_id ][] = $child->slug;
+			}
+		}
 
 		foreach ( $tabs as $tab ) {
 			if ( ! $tab->is_enabled ) {
@@ -123,13 +162,22 @@ class Profile_Nav {
 
 			$label = apply_filters( 'bdm_tc_tab_label', $tab->label, (int) $tab->id );
 
+			// A content tab with sub-tabs gets its own "home" sub-nav item. The
+			// theme/Nouveau sub-nav template hides a secondary nav with only one
+			// item, so a tab with a single sub-tab never showed its sub-nav.
+			$children    = $children_by_parent[ (int) $tab->id ] ?? [];
+			$home_subnav = 'url' !== $tab->content_source
+				&& empty( $tab->default_subnav_slug )
+				&& ! empty( $children )
+				&& ! in_array( $tab->slug, $children, true );
+
 			// Offset by 100 so custom tabs always appear after built-in BuddyBoss tabs.
 			$nav_args = [
 				'name'                => $label,
 				'slug'                => $tab->slug,
 				'position'            => (int) $tab->position + 100,
 				'screen_function'     => '__return_false',
-				'default_subnav_slug' => $tab->default_subnav_slug ?: false,
+				'default_subnav_slug' => $home_subnav ? $tab->slug : ( $tab->default_subnav_slug ?: false ),
 			];
 
 			if ( ! empty( $tab->item_css_id ) ) {
@@ -152,6 +200,24 @@ class Profile_Nav {
 			}
 
 			bp_core_new_nav_item( $nav_args );
+
+			if ( $home_subnav ) {
+				// Same closure object as the parent nav item, so BuddyPress hooks it
+				// to bp_screens once and the tab content renders once.
+				bp_core_new_subnav_item(
+					[
+						'name'            => apply_filters( 'bdm_tc_tab_home_subnav_label', $label, (int) $tab->id ),
+						'slug'            => $tab->slug,
+						// Hidden by enqueue_home_subnav_style() via this ID prefix.
+						'item_css_id'     => 'bdm-tc-home-' . $tab->slug,
+						'parent_slug'     => $tab->slug,
+						'parent_url'      => trailingslashit( $user_domain . $tab->slug ),
+						'position'        => 0,
+						'screen_function' => $nav_args['screen_function'],
+					]
+				);
+				self::$has_home_subnav = true;
+			}
 		}
 	}
 
@@ -513,17 +579,17 @@ class Profile_Nav {
 
 					if ( $active_subtab ) {
 						$content = apply_filters( 'bdm_tc_tab_content', $active_subtab->content, (int) $active_subtab->id );
-						echo wp_kses_post( do_shortcode( $content ) );
+						echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 					} else {
 						$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
-						echo wp_kses_post( do_shortcode( $content ) );
+						echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 					}
 
 					return;
 				}
 
 				$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
-				echo wp_kses_post( do_shortcode( $content ) );
+				echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 			}
 		);
 

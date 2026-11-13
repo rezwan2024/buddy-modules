@@ -48,7 +48,8 @@ $bdm-radius-2xl:         16px;
 $bdm-transition:         all 0.3s ease;
 
 // Layout
-$bdm-header-height:      60px;
+$bdm-header-height:      58px;
+$bdm-module-sidebar:     248px; // Platform .bb-admin-feature-settings__sidebar
 $bdm-sidebar-width:      160px;
 $bdm-sidebar-collapsed:  36px;
 $bdm-wp-adminbar:        32px;
@@ -56,3 +57,9 @@ $bdm-wp-adminbar:        32px;
 // Shadow
 $bdm-shadow-card:        0 1px 3px rgba(0, 0, 0, 0.08);
 $bdm-shadow-card-hover:  0 2px 8px rgba(0, 0, 0, 0.12);
+$bdm-shadow-section:     0 1.5px 1px rgba(0, 0, 0, 0.16); // Platform settings/list card
+$bdm-shadow-popover:     0 4px 12px rgba(0, 0, 0, 0.12);  // Platform dropdown menu
+$bdm-shadow-nav-active:  inset 0 0 0 0.6px #d9d9d9;       // Platform active side-nav item
+
+// Danger text (Platform destructive menu item).
+$bdm-text-danger:        #cc1818;

@@ -5,8 +5,8 @@
  * ModuleScreen via CUSTOM_PANEL_SCREENS. The `tabType` is derived from the
  * active panel: 'profile-tabs' → 'profile', 'group-tabs' → 'group'.
  *
- * Done-when (P5): real data loads, reorder/bulk/delete work without reload,
- * label shown as plain text (no row-action mixing — legacy Label column bug).
+ * Columns kept minimal like the Platform list tables: Label (link that opens
+ * the editor), Type, Status, Sub-tabs, and a "⋯" row menu (Edit / Delete).
  *
  * @since 2.0.0
  */
@@ -17,16 +17,17 @@ import { Button, Spinner } from '@wordpress/components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
-import { getRuleSummary } from '../utils/ruleLabels';
+import { RowActions } from '../../common/components/RowActions';
 
 /**
  * @param {Object}   props
  * @param {{ module: string, panel: string }} props.route
+ * @param {string}   props.title      Panel title shown in the card header.
  * @param {Function} props.openModal  Called with {view, id?, label?} to open Add/Edit/Delete modal.
  * @param {number}   props.refreshKey Increment from parent triggers a list reload.
  * @returns {JSX.Element}
  */
-export default function TabsList( { route, openModal, refreshKey } ) {
+export default function TabsList( { route, title, openModal, refreshKey } ) {
 	var tabType = route.panel === 'group-tabs' ? 'group' : 'profile';
 
 	var [ tabs,       setTabs       ] = useState( [] );
@@ -159,7 +160,24 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 	// -------------------------------------------------------------------------
 
 	return (
-		<div className="bdm-admin-tabs-list">
+		<div className="bdm-admin-card bdm-admin-tabs-list">
+
+			{ /* Card header: title + primary action */ }
+			<div className="bdm-admin-card__header">
+				<h2 className="bdm-admin-card__title">{ title }</h2>
+				<div className="bdm-admin-card__actions">
+					<Button
+						variant="primary"
+						className="bdm-admin-button-icon"
+						onClick={ function() {
+							openModal( { view: 'add' } );
+						} }
+					>
+						<i className="bb-icons-rl bb-icons-rl-plus" aria-hidden="true" />
+						{ __( 'Add Tab', 'buddy-modules' ) }
+					</Button>
+				</div>
+			</div>
 
 			{ /* Toolbar */ }
 			<div className="bdm-admin-tabs-list__toolbar">
@@ -182,15 +200,6 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 						{ __( 'Apply', 'buddy-modules' ) }
 					</Button>
 				</div>
-
-				<Button
-					variant="primary"
-					onClick={ function() {
-						openModal( { view: 'add' } );
-					} }
-				>
-					{ __( '+ Add Tab', 'buddy-modules' ) }
-				</Button>
 			</div>
 
 			{ /* Loading */ }
@@ -210,7 +219,7 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 			{ /* Table */ }
 			{ ! loading && tabs.length > 0 && (
 				<DragDropContext onDragEnd={ handleDragEnd }>
-					<table className="bdm-admin-tabs-list__table widefat striped">
+					<table className="bdm-admin-tabs-list__table">
 						<thead>
 							<tr>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--handle"></th>
@@ -232,22 +241,13 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 									{ __( 'Type', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col">
-									{ __( 'Availability', 'buddy-modules' ) }
-								</th>
-								<th className="bdm-admin-tabs-list__col">
-									{ __( 'Visibility', 'buddy-modules' ) }
-								</th>
-								<th className="bdm-admin-tabs-list__col">
 									{ __( 'Status', 'buddy-modules' ) }
-								</th>
-								<th className="bdm-admin-tabs-list__col">
-									{ __( 'Default', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col">
 									{ __( 'Sub-tabs', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-									{ __( 'Actions', 'buddy-modules' ) }
+									<span className="screen-reader-text">{ __( 'Actions', 'buddy-modules' ) }</span>
 								</th>
 							</tr>
 						</thead>
@@ -284,7 +284,7 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 																		className="bdm-admin-drag-handle"
 																		title={ __( 'Drag to reorder', 'buddy-modules' ) }
 																	>
-																		⠿
+																		<i className="bb-icons-rl bb-icons-rl-dots-six-vertical" aria-hidden="true" />
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--cb">
@@ -302,20 +302,20 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 																	/>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--label">
-																	<strong>{ tab.label }</strong>
-																	<br />
-																	<code className="bdm-admin-tabs-list__slug">{ tab.slug }</code>
+																	<button
+																		type="button"
+																		className="bdm-admin-tabs-list__name"
+																		onClick={ function() {
+																			openModal( { view: 'edit', id: tab.id } );
+																		} }
+																	>
+																		{ tab.label }
+																	</button>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
 																	<span className="bdm-admin-badge bdm-admin-badge--type">
 																		{ __( 'Custom', 'buddy-modules' ) }
 																	</span>
-																</td>
-																<td className="bdm-admin-tabs-list__col">
-																	{ getRuleSummary( tab.rules, 'availability' ) }
-																</td>
-																<td className="bdm-admin-tabs-list__col">
-																	{ getRuleSummary( tab.rules, 'visibility' ) }
 																</td>
 																<td className="bdm-admin-tabs-list__col">
 																	<button
@@ -336,36 +336,37 @@ export default function TabsList( { route, openModal, refreshKey } ) {
 																	</button>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
-																	{ tab.is_default
-																		? <span className="bdm-admin-badge bdm-admin-badge--default">{ __( 'Default', 'buddy-modules' ) }</span>
-																		: <span className="bdm-admin-tabs-list__dash">&mdash;</span>
-																	}
-																</td>
-																<td className="bdm-admin-tabs-list__col">
 																	<span className="bdm-admin-tabs-list__subtab-count">
 																		{ tab.subtab_count || 0 }
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-																	<Button
-																		variant="secondary"
-																		size="small"
-																		onClick={ function() {
-																			openModal( { view: 'edit', id: tab.id } );
-																		} }
-																	>
-																		{ __( 'Edit', 'buddy-modules' ) }
-																	</Button>
-																	<Button
-																		variant="tertiary"
-																		size="small"
-																		isDestructive
-																		onClick={ function() {
-																			openModal( { view: 'delete', id: tab.id, label: tab.label } );
-																		} }
-																	>
-																		{ __( 'Delete', 'buddy-modules' ) }
-																	</Button>
+																	<RowActions
+																		label={ sprintf(
+																			// translators: %s is the tab label.
+																			__( 'More options for %s', 'buddy-modules' ),
+																			tab.label
+																		) }
+																		actions={ [
+																			{
+																				key:     'edit',
+																				label:   __( 'Edit', 'buddy-modules' ),
+																				icon:    'bb-icons-rl-pencil-simple',
+																				onClick: function() {
+																					openModal( { view: 'edit', id: tab.id } );
+																				},
+																			},
+																			{
+																				key:           'delete',
+																				label:         __( 'Delete', 'buddy-modules' ),
+																				icon:          'bb-icons-rl-trash',
+																				isDestructive: true,
+																				onClick:       function() {
+																					openModal( { view: 'delete', id: tab.id, label: tab.label } );
+																				},
+																			},
+																		] }
+																	/>
 																</td>
 															</tr>
 														);

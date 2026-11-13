@@ -8,7 +8,7 @@
 	height: $bdm-header-height;
 	z-index: 100;
 	background: $bdm-bg-base;
-	border-bottom: 1px solid $bdm-border;
+	border-bottom: 1px solid $bdm-border-dark;
 	display: flex;
 	align-items: center;
 	padding: 0 24px;
@@ -25,25 +25,31 @@
 		top: 46px; // Mobile WP adminbar height.
 	}
 
-	&__logo {
-		display: flex;
+	// Plugin name in an outlined box (Platform outlined-button feel).
+	&__title {
+		display: inline-flex;
 		align-items: center;
-		gap: 10px;
-		text-decoration: none;
+		height: 34px;
+		padding: 0 16px;
+		background: $bdm-bg-base;
+		border: 1px solid $bdm-border-secondary;
+		border-radius: $bdm-radius-lg;
+		font-size: 16px;
+		font-weight: 600;
+		line-height: 1;
+		color: $bdm-text;
+		white-space: nowrap;
 		cursor: pointer;
 		flex-shrink: 0;
+		transition: $bdm-transition;
 
-		img {
-			width: 36px;
-			height: 36px;
-			display: block;
+		&:hover {
+			background: $bdm-bg-secondary;
 		}
 
-		span {
-			font-size: 16px;
-			font-weight: 600;
-			color: $bdm-text;
-			white-space: nowrap;
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 2px $bdm-brand;
 		}
 	}
 
@@ -64,4 +70,21 @@
 	padding: 24px;
 	background: $bdm-bg-page;
 	min-height: calc( 100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height} );
+
+	// Module screens are full-bleed like Platform settings: cancel the .wrap
+	// margins (10px top, 2px left, 20px right) and #wpcontent's 20px left padding.
+	&--module {
+		margin: #{$bdm-header-height - 10px} -20px 0 -22px;
+		padding: 0;
+
+		@media ( max-width: 782px ) {
+			margin-left: -12px;
+			margin-right: -12px;
+		}
+	}
+}
+
+// Platform settings page background.
+body.toplevel_page_buddy-modules {
+	background: $bdm-bg-page;
 }

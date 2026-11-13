@@ -72,7 +72,7 @@ class Module extends \BuddyModules\Modules\Module {
 			'profile-tabs',
 			[
 				'label' => __( 'Profile Tabs', 'buddy-modules' ),
-				'icon'  => 'dashicons-admin-users',
+				'icon'  => 'bb-icons-rl-user',
 			]
 		);
 
@@ -83,7 +83,7 @@ class Module extends \BuddyModules\Modules\Module {
 			'group-tabs',
 			[
 				'label' => __( 'Group Tabs', 'buddy-modules' ),
-				'icon'  => 'dashicons-groups',
+				'icon'  => 'bb-icons-rl-users-three',
 			]
 		);
 
@@ -94,7 +94,7 @@ class Module extends \BuddyModules\Modules\Module {
 			'profile-existing-tabs',
 			[
 				'label' => __( 'Profile Built-in Tabs', 'buddy-modules' ),
-				'icon'  => 'dashicons-admin-users',
+				'icon'  => 'bb-icons-rl-user-list',
 			]
 		);
 
@@ -105,7 +105,7 @@ class Module extends \BuddyModules\Modules\Module {
 			'group-existing-tabs',
 			[
 				'label' => __( 'Group Built-in Tabs', 'buddy-modules' ),
-				'icon'  => 'dashicons-groups',
+				'icon'  => 'bb-icons-rl-list-bullets',
 			]
 		);
 	}

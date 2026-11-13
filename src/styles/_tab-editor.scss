@@ -105,29 +105,32 @@
 		}
 	}
 
+	// Same as the Platform modal field label.
 	&__label {
 		display: block;
-		margin-bottom: 6px;
+		margin: 0 0 10px;
 		font-size: 13px;
-		font-weight: 600;
-		color: $bdm-text;
+		font-weight: 500;
+		line-height: 18px;
+		color: $bdm-text-secondary;
 	}
 
 	&__textarea {
 		width: 100%;
 		box-sizing: border-box;
-		padding: 8px 10px;
-		border: 1px solid $bdm-border-dark;
-		border-radius: $bdm-radius-sm;
+		padding: 8px;
+		background: $bdm-bg-base;
+		border: 1px solid $bdm-border-secondary;
+		border-radius: $bdm-radius-md;
 		font-size: 13px;
 		color: $bdm-text;
 		line-height: 1.6;
 		resize: vertical;
 
 		&:focus {
-			border-color: $bdm-brand;
+			border-color: $bdm-text-disabled;
 			outline: none;
-			box-shadow: 0 0 0 1px $bdm-brand;
+			box-shadow: none;
 		}
 	}
 
@@ -168,13 +171,9 @@
 	// Sub-tabs
 	&__subtab {
 		border: 1px solid $bdm-border;
-		border-radius: $bdm-radius-sm;
+		border-radius: $bdm-radius-lg;
 		margin-bottom: 8px;
 		overflow: hidden;
-
-		&--new {
-			border-color: $bdm-brand-light;
-		}
 	}
 
 	&__subtab-row {
@@ -189,19 +188,35 @@
 
 	&__subtab-actions {
 		display: flex;
-		gap: 6px;
+		align-items: center;
 		flex-shrink: 0;
 	}
 
 	&__subtab-form {
-		padding: 14px;
-		background: $bdm-bg-secondary;
+		padding: 16px;
+		background: $bdm-bg-base;
+
+		// Label + Slug share the first line, each taking half.
+		.bdm-admin-tab-editor__row {
+			gap: 16px;
+
+			> * {
+				flex: 1;
+				min-width: 160px;
+			}
+		}
+
+		.components-base-control,
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
 	}
 
 	&__subtab-form-actions {
 		display: flex;
+		justify-content: flex-end;
 		gap: 8px;
-		margin-top: 12px;
+		margin-top: 16px;
 	}
 
 	// Footer
@@ -215,34 +230,148 @@
 }
 
 // Tab editor modal — wraps TabEditor / ExistingTabEditor inside a @wordpress/components Modal.
+// Styled like the Platform Edit Group modal (.bb-admin-settings-modal).
 // WP's Modal component places className on the same element as components-modal__frame,
 // so we must use a combined selector (no space) to match it.
 .bdm-admin-tab-editor-modal.components-modal__frame {
-	width: 600px !important;
+	// The header is position:absolute. WP's open animation (transform) is what
+	// normally gives the frame a containing block; with the animation off
+	// (it caused a small→full flash) the header escaped to the page corner.
+	position: relative;
+	width: 680px !important;
 	max-width: 95vw !important;
 	min-width: 0 !important;
 	height: auto !important;
 	max-height: 85vh !important;
-	// Suppress WP's open animation that caused the small→full flash.
+	border-radius: $bdm-radius-xl;
 	animation: none !important;
 
-	@media ( max-width: 680px ) {
+	@media ( max-width: 740px ) {
 		width: 95vw !important;
 	}
+
+	.components-modal__header {
+		height: 65px;
+		padding: 16px 16px 16px 24px;
+		border-bottom: 1px solid $bdm-border-secondary;
+	}
+
+	.components-modal__header-heading {
+		font-size: 18px;
+		font-weight: 500;
+		line-height: 1.3;
+		color: $bdm-text;
+	}
+
+	.components-modal__content {
+		margin-top: 65px;
+		padding: 0;
+	}
+}
+
+// ── FieldRow (Platform .bb-admin-settings-form__field) ─────────────────────
+// Label column left, control column right, help under the control, divider
+// between rows. Sizes scaled to the 680px modal (Platform: 245px label column,
+// 32px gap in a 935px card).
+.bdm-admin-field-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 24px;
+	padding: 20px 0;
+	border-bottom: 1px solid $bdm-border-secondary;
+
+	&:first-child {
+		padding-top: 0;
+	}
+
+	&:last-child {
+		border-bottom: 0;
+	}
+
+	&__label {
+		flex: 0 0 160px;
+		// Centre the label on a 32px control.
+		padding-top: 9px;
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 14px;
+		color: $bdm-text;
+
+		label,
+		span {
+			font: inherit;
+			color: inherit;
+		}
+	}
+
+	// Toggle rows: align the label with the toggle's own text.
+	&:has(.components-toggle-control) &__label {
+		padding-top: 3px;
+	}
+
+	&__content {
+		flex: 1;
+		min-width: 0;
+
+		// WP controls bring their own bottom margins; the row handles spacing.
+		.components-base-control,
+		.components-base-control__field {
+			margin-bottom: 0;
+		}
+
+		// Toggle text (Platform: 14px / 400 / #1e1e1e).
+		.components-toggle-control .components-toggle-control__label,
+		.components-toggle-control label {
+			font-size: 14px;
+			font-weight: 400;
+			line-height: 20px;
+			color: $bdm-text;
+			text-transform: none;
+		}
+	}
+
+	&__help {
+		margin: 12px 0 0;
+		font-size: 13px;
+		line-height: 19.5px;
+		color: $bdm-text-tertiary;
+	}
+
+	&__error {
+		margin: 8px 0 0;
+		font-size: 13px;
+		color: $bdm-error;
+	}
+
+	// Narrow screens: stack label above the control.
+	@media ( max-width: 600px ) {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 10px;
+
+		&__label {
+			flex-basis: auto;
+			padding-top: 0;
+		}
+
+		&:has(.components-toggle-control) &__label {
+			padding-top: 0;
+		}
+	}
+}
+
+// Compact confirm (delete / reset) modal.
+.bdm-admin-tab-editor-modal--delete.components-modal__frame {
+	width: 480px !important;
 }
 
 .bdm-admin-tab-editor-modal {
 
-	// Scrollable body so tall forms work on small screens.
-	.components-modal__content {
-		padding: 0;
-	}
-
-	// Scrollable inner body wrapping the editor form.
+	// Scrollable body wrapping the editor form.
 	&__body {
-		max-height: calc( 85vh - 120px );
+		max-height: calc( 85vh - 65px );
 		overflow-y: auto;
-		padding: 24px;
+		padding: 24px 24px 0;
 		box-sizing: border-box;
 
 		// Remove the outer max-width since the modal constrains it.
@@ -255,15 +384,53 @@
 			display: none;
 		}
 
-		// Remove top margin from the first section (modal header provides spacing).
-		.bdm-admin-tab-editor__section:first-of-type {
-			margin-top: 0;
+		// Sections (sub-tabs) sit flat under the field rows, after a divider.
+		.bdm-admin-tab-editor__section {
+			margin: 0;
+			padding: 20px 0 24px;
+			background: none;
+			border: 0;
+			border-top: 1px solid $bdm-border-secondary;
+			border-radius: 0;
+			box-shadow: none;
+		}
+
+		.bdm-admin-tab-editor__section-title {
+			margin: 0 0 16px;
+			font-size: 14px;
+			font-weight: 500;
+			line-height: 1.4;
+			color: $bdm-text;
+			text-transform: none;
+			letter-spacing: normal;
+		}
+
+		.bdm-admin-tab-editor__section-header .bdm-admin-tab-editor__section-title {
+			margin-bottom: 0;
+		}
+
+		.bdm-admin-tab-editor__section-desc {
+			margin: -8px 0 16px;
+			font-size: 13px;
+			color: $bdm-text-tertiary;
+		}
+
+		// Footer sticks to the bottom of the modal (Platform modal footer).
+		.bdm-admin-tab-editor__footer {
+			position: sticky;
+			bottom: 0;
+			z-index: 2;
+			justify-content: flex-end;
+			margin: 0 -24px;
+			padding: 16px 24px;
+			background: $bdm-bg-base;
+			border-top: 1px solid $bdm-border-secondary;
 		}
 	}
 
 	// Delete / reset confirmation body.
 	&__delete-body {
-		padding: 20px 24px 8px;
+		padding: 24px;
 
 		p {
 			margin: 0;
@@ -276,16 +443,10 @@
 	// Delete / reset confirmation footer.
 	&__delete-footer {
 		display: flex;
+		justify-content: flex-end;
 		gap: 8px;
-		padding: 16px 24px 24px;
-	}
-
-	// Compact delete modal.
-	&--delete {
-		.components-modal__frame {
-			min-width: 360px;
-			max-width: 480px;
-		}
+		padding: 16px 24px;
+		border-top: 1px solid $bdm-border-secondary;
 	}
 }
 
@@ -305,11 +466,11 @@
 		align-items: center;
 		gap: 4px;
 		padding: 3px 8px;
-		background: #e6f3f9;
-		border: 1px solid #b8d9ec;
-		border-radius: $bdm-radius-sm;
+		background: $bdm-bg-secondary;
+		border: 1px solid $bdm-border-tertiary;
+		border-radius: 999px;
 		font-size: 12px;
-		color: #0073aa;
+		color: $bdm-text;
 	}
 
 	&__chip-remove {
@@ -323,7 +484,7 @@
 		background: none;
 		border: none;
 		cursor: pointer;
-		color: #0073aa;
+		color: $bdm-text-tertiary;
 		font-size: 14px;
 		line-height: 1;
 		border-radius: 50%;
@@ -344,20 +505,10 @@
 		}
 	}
 
+	// Input look comes from the shared field rules in admin.scss.
 	&__input {
 		width: 100%;
 		box-sizing: border-box;
-		padding: 6px 10px;
-		border: 1px solid $bdm-border-dark;
-		border-radius: $bdm-radius-sm;
-		font-size: 13px;
-		color: $bdm-text;
-
-		&:focus {
-			border-color: $bdm-brand;
-			outline: none;
-			box-shadow: 0 0 0 1px $bdm-brand;
-		}
 	}
 
 	&__dropdown {
@@ -366,12 +517,13 @@
 		left: 0;
 		right: 0;
 		z-index: 100;
-		margin-top: 2px;
-		padding: 4px 0;
+		margin-top: 4px;
+		padding: 0;
 		background: $bdm-bg-base;
-		border: 1px solid $bdm-border-dark;
-		border-radius: $bdm-radius-sm;
-		box-shadow: $bdm-shadow-card-hover;
+		border: 0;
+		border-radius: $bdm-radius-lg;
+		box-shadow: $bdm-shadow-popover;
+		overflow: hidden;
 		list-style: none;
 		max-height: 220px;
 		overflow-y: auto;
@@ -380,7 +532,7 @@
 	&__option {
 		display: block;
 		width: 100%;
-		padding: 7px 12px;
+		padding: 10px 16px;
 		text-align: left;
 		background: none;
 		border: none;
@@ -390,7 +542,7 @@
 		transition: background-color 0.1s ease;
 
 		&:hover {
-			background: $bdm-bg-hover;
+			background: $bdm-bg-page;
 		}
 	}
 
@@ -399,9 +551,9 @@
 		font-size: 12px;
 		color: $bdm-text-tertiary;
 		background: $bdm-bg-base;
-		border: 1px solid $bdm-border-dark;
+		border: 1px solid $bdm-border-secondary;
 		border-top: none;
-		border-radius: 0 0 $bdm-radius-sm $bdm-radius-sm;
+		border-radius: 0 0 $bdm-radius-md $bdm-radius-md;
 	}
 }
 
@@ -414,26 +566,24 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 8px;
-		min-width: 200px;
-		max-width: 100%;
-		padding: 7px 12px;
-		background: $bdm-bg-base;
-		border: 1px solid $bdm-border-dark;
+		box-sizing: border-box;
+		width: 100%;
+		min-height: 32px;
+		padding: 6px 8px;
+		background: $bdm-bg-page;
+		border: 1px solid $bdm-border-tertiary;
 		border-radius: $bdm-radius-md;
 		font-size: 13px;
 		color: $bdm-text;
 		cursor: pointer;
 		text-align: left;
-		transition: border-color 0.15s ease, box-shadow 0.15s ease;
+		transition: border-color 0.15s ease;
 
-		&:hover {
-			border-color: $bdm-brand;
-		}
-
+		&:hover,
 		&:focus {
 			outline: none;
-			border-color: $bdm-brand;
-			box-shadow: 0 0 0 1px $bdm-brand;
+			border-color: $bdm-text-disabled;
+			box-shadow: none;
 		}
 	}
 
@@ -446,7 +596,8 @@
 
 	&__arrow {
 		flex-shrink: 0;
-		font-size: 10px;
+		font-size: 16px;
+		line-height: 1;
 		color: $bdm-text-tertiary;
 	}
 
@@ -458,9 +609,9 @@
 		min-width: 320px;
 		max-width: 480px;
 		background: $bdm-bg-base;
-		border: 1px solid $bdm-border-dark;
-		border-radius: $bdm-radius-md;
-		box-shadow: $bdm-shadow-card-hover;
+		border: 0;
+		border-radius: $bdm-radius-lg;
+		box-shadow: $bdm-shadow-popover;
 		padding: 12px;
 	}
 
@@ -474,11 +625,11 @@
 		display: inline-flex;
 		align-items: center;
 		padding: 4px 10px;
-		border-radius: 20px;
-		border: 1px solid $bdm-border-dark;
+		border-radius: 999px;
+		border: 1px solid $bdm-border-tertiary;
 		font-size: 12px;
 		cursor: pointer;
-		background: $bdm-bg-base;
+		background: $bdm-bg-secondary;
 		color: $bdm-text;
 		transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
 

@@ -26,7 +26,7 @@ class Fields {
 	 * @param string $panel_id Unique panel slug within the module.
 	 * @param array  $args {
 	 *     @type string $label Human-readable panel title.
-	 *     @type string $icon  Optional dashicons class (e.g. 'dashicons-menu-alt').
+	 *     @type string $icon  Optional icon: BuddyBoss line icon (e.g. 'bb-icons-rl-user') or dashicons class (e.g. 'dashicons-menu-alt').
 	 * }
 	 */
 	public static function register_panel( string $module, string $panel_id, array $args ): void {

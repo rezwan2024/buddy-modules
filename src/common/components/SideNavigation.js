@@ -1,8 +1,9 @@
 /**
  * Module settings side navigation.
  *
- * Shows a "← Back" button at the top, then a vertical list of panel items
- * (optional dashicon + label). Highlights the active panel.
+ * Shows a "Back to Modules" button at the top, then a vertical list of panel
+ * items (optional icon + label). Highlights the active panel. Matches the
+ * BuddyBoss Platform settings side navigation.
  *
  * @since 2.0.0
  */
@@ -10,10 +11,26 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Icon class for a panel: 'dashicons-*' keeps Dashicons, anything else is a
+ * BuddyBoss line icon name (bb-icons-rl-*).
+ *
+ * @since 2.0.0
+ *
+ * @param {string} icon Icon identifier from the panel schema.
+ * @returns {string} Class names for the icon element.
+ */
+function getIconClass( icon ) {
+	if ( 0 === icon.indexOf( 'dashicons-' ) ) {
+		return 'dashicons ' + icon;
+	}
+	return 'bb-icons-rl ' + icon;
+}
+
+/**
  * @since 2.0.0
  *
  * @param {Object}   props
- * @param {Array}    props.panels      Array of panel objects: { id, label, icon? }.
+ * @param {Array}    props.panels      Array of panel objects: { id, label, icon? } (icon = bb-icons-rl-* or dashicons-*).
  * @param {string}   props.activePanel Currently-active panel ID.
  * @param {Function} props.onSelect    Called with panel ID when an item is clicked.
  * @param {Function} props.onBack      Called when the Back button is clicked.
@@ -30,7 +47,8 @@ export function SideNavigation( { panels, activePanel, onSelect, onBack } ) {
 				className="bdm-admin-sidenav__back"
 				onClick={ onBack }
 			>
-				{ __( '← Back', 'buddy-modules' ) }
+				<span className="bdm-admin-sidenav__back-icon bb-icons-rl-arrow-left" aria-hidden="true" />
+				{ __( 'Back to Modules', 'buddy-modules' ) }
 			</button>
 
 			<ul className="bdm-admin-sidenav__list" role="list">
@@ -53,7 +71,7 @@ export function SideNavigation( { panels, activePanel, onSelect, onBack } ) {
 								{ panel.icon && (
 									<span
 										className={
-											'bdm-admin-sidenav__icon dashicons ' + panel.icon
+											'bdm-admin-sidenav__icon ' + getIconClass( panel.icon )
 										}
 										aria-hidden="true"
 									/>

@@ -19,6 +19,8 @@ import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
 import { parseRules, serializeRules } from '../utils/rulesHelpers';
 import SearchSelect from './SearchSelect';
+import { FieldRow } from '../../common/components/FieldRow';
+import { RowActions } from '../../common/components/RowActions';
 
 /**
  * RoleSelect — compact multi-select dropdown showing chips for each option.
@@ -27,9 +29,10 @@ import SearchSelect from './SearchSelect';
  * @param {Array}    props.options   Array of {value, label}.
  * @param {Array}    props.selected  Array of selected value strings.
  * @param {Function} props.onChange  Called with the new selected array.
+ * @param {string}   [props.id]      ID for the trigger button (for an outside <label>).
  * @returns {JSX.Element}
  */
-function RoleSelect( { options, selected, onChange } ) {
+function RoleSelect( { options, selected, onChange, id } ) {
 	var [ open, setOpen ] = useState( false );
 	var wrapRef = useRef( null );
 
@@ -74,14 +77,16 @@ function RoleSelect( { options, selected, onChange } ) {
 		<div className="bdm-admin-role-select" ref={ wrapRef }>
 			<button
 				type="button"
+				id={ id }
 				className="bdm-admin-role-select__trigger"
 				onClick={ function() { setOpen( function( v ) { return ! v; } ); } }
 				aria-expanded={ open }
 			>
 				<span className="bdm-admin-role-select__summary">{ getSummary() }</span>
-				<span className="bdm-admin-role-select__arrow" aria-hidden="true">
-					{ open ? '▲' : '▼' }
-				</span>
+				<i
+					className={ 'bdm-admin-role-select__arrow bb-icons-rl ' + ( open ? 'bb-icons-rl-caret-up' : 'bb-icons-rl-caret-down' ) }
+					aria-hidden="true"
+				/>
 			</button>
 			{ open && (
 				<div className="bdm-admin-role-select__dropdown">
@@ -541,56 +546,43 @@ export default function TabEditor( { route, onSaved, onCancel } ) {
 				</div>
 			) }
 
-			{ /* Basic Info */ }
-			<div className="bdm-admin-tab-editor__section">
-				<h4 className="bdm-admin-tab-editor__section-title">
-					{ __( 'Basic Info', 'buddy-modules' ) }
-				</h4>
-
-				<div className="bdm-admin-tab-editor__field">
+			{ /* Settings rows (Platform settings-form layout) */ }
+			<div className="bdm-admin-tab-editor__fields">
+				<FieldRow label={ __( 'Label', 'buddy-modules' ) } htmlFor="bdm-admin-tab-label" error={ errors.label }>
 					<TextControl
-						label={ __( 'Label', 'buddy-modules' ) }
+						id="bdm-admin-tab-label"
 						value={ form.label }
 						onChange={ handleLabelChange }
 					/>
-					{ errors.label && (
-						<p className="bdm-admin-tab-editor__field-error">{ errors.label }</p>
-					) }
-				</div>
+				</FieldRow>
 
-				<div className="bdm-admin-tab-editor__field">
+				<FieldRow
+					label={ __( 'Slug', 'buddy-modules' ) }
+					htmlFor="bdm-admin-tab-slug"
+					help={ __( 'URL-friendly identifier. Auto-generated from label; edit to override.', 'buddy-modules' ) }
+				>
 					<TextControl
-						label={ __( 'Slug', 'buddy-modules' ) }
+						id="bdm-admin-tab-slug"
 						value={ form.slug }
 						onChange={ handleSlugChange }
-						help={ __( 'URL-friendly identifier. Auto-generated from label; edit to override.', 'buddy-modules' ) }
 					/>
-				</div>
+				</FieldRow>
 
-				<div className="bdm-admin-tab-editor__row">
-					<div className="bdm-admin-tab-editor__field">
-						<SelectControl
-							label={ __( 'Status', 'buddy-modules' ) }
-							value={ form.status }
-							onChange={ function( v ) { setField( 'status', v ); } }
-							options={ [
-								{ value: 'active',   label: __( 'Active', 'buddy-modules' ) },
-								{ value: 'inactive', label: __( 'Inactive', 'buddy-modules' ) },
-							] }
-						/>
-					</div>
-				</div>
-			</div>
-
-			{ /* Content */ }
-			<div className="bdm-admin-tab-editor__section">
-				<h4 className="bdm-admin-tab-editor__section-title">
-					{ __( 'Content', 'buddy-modules' ) }
-				</h4>
-
-				<div className="bdm-admin-tab-editor__field">
+				<FieldRow label={ __( 'Status', 'buddy-modules' ) } htmlFor="bdm-admin-tab-status">
 					<SelectControl
-						label={ __( 'Content Source', 'buddy-modules' ) }
+						id="bdm-admin-tab-status"
+						value={ form.status }
+						onChange={ function( v ) { setField( 'status', v ); } }
+						options={ [
+							{ value: 'active',   label: __( 'Active', 'buddy-modules' ) },
+							{ value: 'inactive', label: __( 'Inactive', 'buddy-modules' ) },
+						] }
+					/>
+				</FieldRow>
+
+				<FieldRow label={ __( 'Content Source', 'buddy-modules' ) } htmlFor="bdm-admin-tab-content-source">
+					<SelectControl
+						id="bdm-admin-tab-content-source"
 						value={ form.content_source }
 						onChange={ function( v ) { setField( 'content_source', v ); } }
 						options={ [
@@ -598,119 +590,122 @@ export default function TabEditor( { route, onSaved, onCancel } ) {
 							{ value: 'url',     label: __( 'External URL', 'buddy-modules' ) },
 						] }
 					/>
-				</div>
+				</FieldRow>
 
 				{ 'content' === form.content_source && (
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Content', 'buddy-modules' ) }
-						</label>
+					<FieldRow label={ __( 'Content', 'buddy-modules' ) } htmlFor="bdm-admin-tab-content">
 						<textarea
+							id="bdm-admin-tab-content"
 							className="bdm-admin-tab-editor__textarea"
 							value={ form.content }
 							onChange={ function( e ) { setField( 'content', e.target.value ); } }
 							rows={ 6 }
 						/>
-					</div>
+					</FieldRow>
 				) }
 
 				{ 'url' === form.content_source && (
-					<div>
-						<div className="bdm-admin-tab-editor__field">
-							<TextControl
-								label={ __( 'External URL', 'buddy-modules' ) }
-								value={ form.external_url }
-								onChange={ function( v ) { setField( 'external_url', v ); } }
-								type="url"
-								placeholder="https://"
-							/>
-						</div>
-						<div className="bdm-admin-tab-editor__field">
-							<ToggleControl
-								label={ __( 'Open in New Tab', 'buddy-modules' ) }
-								checked={ !! form.url_new_tab }
-								onChange={ function( v ) { setField( 'url_new_tab', v ? 1 : 0 ); } }
-							/>
-						</div>
-					</div>
+					<FieldRow label={ __( 'External URL', 'buddy-modules' ) } htmlFor="bdm-admin-tab-external-url">
+						<TextControl
+							id="bdm-admin-tab-external-url"
+							value={ form.external_url }
+							onChange={ function( v ) { setField( 'external_url', v ); } }
+							type="url"
+							placeholder="https://"
+						/>
+					</FieldRow>
 				) }
-			</div>
 
-			{ /* Availability (profile) */ }
-			{ 'profile' === tabType && (
-				<div className="bdm-admin-tab-editor__section">
-					<h4 className="bdm-admin-tab-editor__section-title">
-						{ __( 'Availability', 'buddy-modules' ) }
-					</h4>
-					<p className="bdm-admin-tab-editor__section-desc">
-						{ __( 'Control who can see this tab on a member\'s profile.', 'buddy-modules' ) }
-					</p>
+				{ 'url' === form.content_source && (
+					<FieldRow label={ __( 'Open in New Tab', 'buddy-modules' ) }>
+						<ToggleControl
+							label={ __( 'Open the external URL in a new browser tab.', 'buddy-modules' ) }
+							checked={ !! form.url_new_tab }
+							onChange={ function( v ) { setField( 'url_new_tab', v ? 1 : 0 ); } }
+						/>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
+				{ /* Availability (profile) */ }
+				{ 'profile' === tabType && (
+					<FieldRow
+						label={ __( 'Availability', 'buddy-modules' ) }
+						htmlFor="bdm-admin-tab-availability"
+						help={ __( 'Control who can see this tab on a member\'s profile.', 'buddy-modules' ) }
+					>
 						<RoleSelect
+							id="bdm-admin-tab-availability"
 							options={ availabilityOptions }
 							selected={ form.availability }
 							onChange={ function( v ) { setField( 'availability', v ); } }
 						/>
-					</div>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Associated Users (tab appears on their profiles only)', 'buddy-modules' ) }
-						</label>
+				{ 'profile' === tabType && (
+					<FieldRow
+						label={ __( 'Associated Users', 'buddy-modules' ) }
+						htmlFor="bdm-admin-tab-assoc-users"
+						help={ __( 'The tab appears on these members\' profiles only.', 'buddy-modules' ) }
+					>
 						<SearchSelect
+							inputId="bdm-admin-tab-assoc-users"
 							selectedItems={ assocUsers }
 							onChange={ setAssocUsers }
 							fetchOptions={ fetchUsers }
 							placeholder={ __( 'Search users…', 'buddy-modules' ) }
 						/>
-					</div>
-				</div>
-			) }
+					</FieldRow>
+				) }
 
-			{ /* Availability (group) */ }
-			{ 'group' === tabType && (
-				<div className="bdm-admin-tab-editor__section">
-					<h4 className="bdm-admin-tab-editor__section-title">
-						{ __( 'Enabled For', 'buddy-modules' ) }
-					</h4>
-					<p className="bdm-admin-tab-editor__section-desc">
-						{ __( 'Enable this tab only for selected group types.', 'buddy-modules' ) }
-					</p>
-
-					<div className="bdm-admin-tab-editor__field">
+				{ /* Availability (group) */ }
+				{ 'group' === tabType && (
+					<FieldRow
+						label={ __( 'Enabled For', 'buddy-modules' ) }
+						htmlFor="bdm-admin-tab-enabled-for"
+						help={ __( 'Enable this tab only for selected group types.', 'buddy-modules' ) }
+					>
 						<RoleSelect
+							id="bdm-admin-tab-enabled-for"
 							options={ enabledForOptions }
 							selected={ form.enabled_for }
 							onChange={ function( v ) { setField( 'enabled_for', v ); } }
 						/>
-					</div>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Associated Groups (show only in these groups)', 'buddy-modules' ) }
-						</label>
+				{ 'group' === tabType && (
+					<FieldRow
+						label={ __( 'Associated Groups', 'buddy-modules' ) }
+						htmlFor="bdm-admin-tab-assoc-groups"
+						help={ __( 'Show the tab only in these groups.', 'buddy-modules' ) }
+					>
 						<SearchSelect
+							inputId="bdm-admin-tab-assoc-groups"
 							selectedItems={ assocGroups }
 							onChange={ setAssocGroups }
 							fetchOptions={ fetchGroups }
 							placeholder={ __( 'Search groups…', 'buddy-modules' ) }
 						/>
-					</div>
+					</FieldRow>
+				) }
 
-					<div className="bdm-admin-tab-editor__field">
-						<label className="bdm-admin-tab-editor__label">
-							{ __( 'Excluded Groups (hide in these groups)', 'buddy-modules' ) }
-						</label>
+				{ 'group' === tabType && (
+					<FieldRow
+						label={ __( 'Excluded Groups', 'buddy-modules' ) }
+						htmlFor="bdm-admin-tab-excluded-groups"
+						help={ __( 'Hide the tab in these groups.', 'buddy-modules' ) }
+					>
 						<SearchSelect
+							inputId="bdm-admin-tab-excluded-groups"
 							selectedItems={ excludedGroups }
 							onChange={ setExcludedGroups }
 							fetchOptions={ fetchGroups }
 							placeholder={ __( 'Search groups…', 'buddy-modules' ) }
 						/>
-					</div>
-				</div>
-			) }
+					</FieldRow>
+				) }
+			</div>
 
 			{ /* Sub-tabs (edit mode only — parent_id requires a saved tab ID) */ }
 			{ ! isNew && (
@@ -722,10 +717,12 @@ export default function TabEditor( { route, onSaved, onCancel } ) {
 						<Button
 							variant="secondary"
 							size="small"
+							className="bdm-admin-button-icon"
 							onClick={ handleAddSubtab }
 							disabled={ !! subtabForm }
 						>
-							{ __( '+ Add Sub-tab', 'buddy-modules' ) }
+							<i className="bb-icons-rl bb-icons-rl-plus" aria-hidden="true" />
+							{ __( 'Add Sub-tab', 'buddy-modules' ) }
 						</Button>
 					</div>
 
@@ -756,25 +753,30 @@ export default function TabEditor( { route, onSaved, onCancel } ) {
 									<div className="bdm-admin-tab-editor__subtab-row">
 										<div>
 											<strong>{ st.label }</strong>
-											{ ' ' }
-											<code className="bdm-admin-tabs-list__slug">{ st.slug }</code>
 										</div>
 										<div className="bdm-admin-tab-editor__subtab-actions">
-											<Button
-												variant="secondary"
-												size="small"
-												onClick={ function() { handleEditSubtab( st ); } }
-											>
-												{ __( 'Edit', 'buddy-modules' ) }
-											</Button>
-											<Button
-												variant="tertiary"
-												size="small"
-												isDestructive
-												onClick={ function() { handleSubtabDelete( st ); } }
-											>
-												{ __( 'Delete', 'buddy-modules' ) }
-											</Button>
+											<RowActions
+												label={ sprintf(
+													// translators: %s is the sub-tab label.
+													__( 'More options for %s', 'buddy-modules' ),
+													st.label
+												) }
+												actions={ [
+													{
+														key:     'edit',
+														label:   __( 'Edit', 'buddy-modules' ),
+														icon:    'bb-icons-rl-pencil-simple',
+														onClick: function() { handleEditSubtab( st ); },
+													},
+													{
+														key:           'delete',
+														label:         __( 'Delete', 'buddy-modules' ),
+														icon:          'bb-icons-rl-trash',
+														isDestructive: true,
+														onClick:       function() { handleSubtabDelete( st ); },
+													},
+												] }
+											/>
 										</div>
 									</div>
 								) }
@@ -856,11 +858,11 @@ function SubtabForm( { form, onLabelChange, onSlugChange, onChange, onSave, onCa
 				/>
 			</div>
 			<div className="bdm-admin-tab-editor__subtab-form-actions">
+				<Button variant="secondary" size="small" onClick={ onCancel }>
+					{ __( 'Cancel', 'buddy-modules' ) }
+				</Button>
 				<Button variant="primary" size="small" onClick={ onSave }>
 					{ __( 'Save', 'buddy-modules' ) }
-				</Button>
-				<Button variant="tertiary" size="small" onClick={ onCancel }>
-					{ __( 'Cancel', 'buddy-modules' ) }
 				</Button>
 			</div>
 		</div>

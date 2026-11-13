@@ -44,13 +44,77 @@ body.toplevel_page_buddy-modules {
 @import 'tabs-list';
 @import 'tab-editor';
 
-// Field styles — exact match to BuddyBoss Platform Settings 2.0 mixins
-// (bb-input-text + bb-admin-settings-select from Platform _mixings.scss).
-// 0.5px border, $bdm-radius-md (6px), custom SVG chevron on selects.
+// Buttons, fields and modals — values measured on the BuddyBoss Platform
+// settings screens (Groups → All Groups list + Edit Group modal).
+// Modals render in a portal outside .bdm-admin-wrap, so every rule is scoped
+// to both the page wrap and our modal frame.
 // stylelint-disable declaration-no-important
-.bdm-admin-wrap {
+.bdm-admin-wrap,
+.bdm-admin-tab-editor-modal {
 
-	// Text / URL / email / number inputs
+	// ── Buttons ──────────────────────────────────────────────────────────────
+	.components-button.is-primary,
+	.components-button.is-secondary {
+		height: auto;
+		min-height: 32px;
+		padding: 8px 16px;
+		border-radius: $bdm-radius-lg;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 16px;
+		box-shadow: none;
+	}
+
+	.components-button.is-primary:not(.is-destructive) {
+		background: $bdm-brand;
+		border: 0;
+		color: $bdm-text-inverse;
+
+		&:hover:not(:disabled) {
+			background: $bdm-brand-hover;
+			color: $bdm-text-inverse;
+		}
+	}
+
+	.components-button.is-secondary {
+		background: $bdm-bg-secondary;
+		border: 1px solid $bdm-border-secondary;
+		color: $bdm-text;
+
+		&:disabled {
+			background: $bdm-bg-secondary;
+			border-color: $bdm-border;
+			color: $bdm-text-disabled;
+		}
+
+		&:hover:not(:disabled) {
+			background: $bdm-bg-secondary-hover;
+			color: $bdm-text;
+		}
+	}
+
+	.components-button.is-primary.is-destructive {
+		background: $bdm-text-danger;
+		border: 0;
+		color: $bdm-text-inverse;
+	}
+
+	.components-button.is-small {
+		min-height: 28px;
+		padding: 4px 12px;
+	}
+
+	// Button with a leading line icon ("+ Add Tab").
+	.bdm-admin-button-icon {
+		gap: 6px;
+
+		i {
+			font-size: 16px;
+			line-height: 1;
+		}
+	}
+
+	// ── Text inputs (Platform modal: 32px, #f6f6f6, 1px #d9d9d9, 6px) ───────
 	input[type="text"],
 	input[type="url"],
 	input[type="email"],
@@ -59,29 +123,35 @@ body.toplevel_page_buddy-modules {
 	input[type="password"],
 	.components-text-control__input {
 		height: 32px !important;
-		min-height: auto !important;
+		min-height: 32px !important;
 		padding: 0 8px !important;
-		border: 0.5px solid $bdm-border-secondary !important;
+		background-color: $bdm-bg-page !important;
+		border: 1px solid $bdm-border-secondary !important;
 		border-radius: $bdm-radius-md !important;
 		font-size: 13px !important;
 		color: $bdm-text !important;
-		background-color: $bdm-bg-base !important;
 		box-shadow: none !important;
 
-		&:focus,
 		&:hover {
 			border-color: $bdm-border-tertiary !important;
+		}
+
+		&:focus {
+			border-color: $bdm-text-disabled !important;
 			box-shadow: none !important;
 			outline: none !important;
 		}
 	}
 
-	// Select dropdowns — custom SVG chevron, no native appearance.
+	// ── Selects (Platform: 40px, #f6f6f6, 1px #ccc, 6px, SVG chevron) ───────
 	// stylelint-disable-next-line property-no-vendor-prefix
 	select,
 	.components-select-control__input {
+		height: 40px !important;
+		min-height: 40px !important;
 		padding: 6px 26px 6px 8px !important;
-		border: 0.5px solid $bdm-border-tertiary !important;
+		background-color: $bdm-bg-page !important;
+		border: 1px solid $bdm-border-tertiary !important;
 		border-radius: $bdm-radius-md !important;
 		font-size: 13px !important;
 		line-height: 18px !important;
@@ -89,7 +159,6 @@ body.toplevel_page_buddy-modules {
 		cursor: pointer !important;
 		-webkit-appearance: none !important;
 		appearance: none !important;
-		background-color: $bdm-bg-page !important;
 		// Chevron SVG (same as Platform bb-admin-settings-select mixin).
 		// stylelint-disable-next-line function-url-quotes
 		background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2211%22%20height%3D%226%22%20viewBox%3D%220%200%2011%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M10.854%200.854028L5.85403%205.85403C5.80759%205.90052%205.75245%205.9374%205.69175%205.96256C5.63105%205.98772%205.56599%206.00067%205.50028%206.00067C5.43457%206.00067%205.36951%205.98772%205.30881%205.96256C5.24811%205.9374%205.19296%205.90052%205.14653%205.85403L0.146528%200.854028C0.0527077%200.760208%200%200.63296%200%200.500278C0%200.367596%200.0527077%200.240348%200.146528%200.146528C0.240348%200.0527074%200.367596%200%200.500278%200C0.63296%200%200.760208%200.0527074%200.854028%200.146528L5.50028%204.7934L10.1465%200.146528C10.193%200.100073%2010.2481%200.0632225%2010.3088%200.0380812C10.3695%200.0129398%2010.4346%200%2010.5003%200C10.566%200%2010.631%200.0129398%2010.6917%200.0380812C10.7524%200.0632225%2010.8076%200.100073%2010.854%200.146528C10.9005%200.192983%2010.9373%200.248133%2010.9625%200.30883C10.9876%200.369526%2011.0006%200.434581%2011.0006%200.500278C11.0006%200.565975%2010.9876%200.63103%2010.9625%200.691726C10.9373%200.752423%2010.9005%200.807573%2010.854%200.854028Z%22%20fill%3D%22%23666666%22%2F%3E%3C%2Fsvg%3E") !important;
@@ -98,40 +167,105 @@ body.toplevel_page_buddy-modules {
 		background-size: 11px 6px !important;
 		box-shadow: none !important;
 
-		&:focus,
-		&:hover {
-			border-color: #999 !important;
+		&:hover,
+		&:focus {
+			border-color: $bdm-text-disabled !important;
 			box-shadow: none !important;
 			outline: none !important;
 		}
 	}
 
-	// Textareas
+	// Settings rows use Platform's compact 32px dropdown.
+	.bdm-admin-field-row select,
+	.bdm-admin-field-row .components-select-control__input {
+		height: 32px !important;
+		min-height: 32px !important;
+		padding-top: 0 !important;
+		padding-bottom: 0 !important;
+	}
+
+	// SelectControl draws its own border + arrow; the select above has both.
+	.components-input-control__backdrop {
+		border-color: transparent !important;
+	}
+
+	.components-input-control__suffix {
+		display: none !important;
+	}
+
+	// ── Textareas (Platform: white, 1px #d9d9d9, 6px, 8px padding) ──────────
 	textarea,
 	.components-textarea-control__input {
-		padding: 8px 10px !important;
-		border: 0.5px solid $bdm-border-secondary !important;
+		padding: 8px !important;
+		background-color: $bdm-bg-base !important;
+		border: 1px solid $bdm-border-secondary !important;
 		border-radius: $bdm-radius-md !important;
 		font-size: 13px !important;
 		color: $bdm-text !important;
-		background-color: $bdm-bg-base !important;
 		box-shadow: none !important;
 
 		&:focus {
-			border-color: $bdm-border-tertiary !important;
+			border-color: $bdm-text-disabled !important;
 			box-shadow: none !important;
 			outline: none !important;
 		}
 	}
 
-	// WP component labels — small uppercase like Platform.
+	// ── Labels (Platform: 13px / 500 / #2f2f2f, normal case, 10px gap) ──────
 	.components-base-control__label,
 	.components-input-control__label {
-		font-size: 11px !important;
-		font-weight: 600 !important;
+		margin: 0 0 10px !important;
+		padding: 0 !important;
+		font-size: 13px !important;
+		font-weight: 500 !important;
+		line-height: 18px !important;
 		color: $bdm-text-secondary !important;
-		text-transform: uppercase !important;
-		letter-spacing: 0.04em !important;
+		text-transform: none !important;
+		letter-spacing: normal !important;
+	}
+
+	// ── Toggles (Platform: 30×18; off = #b2b2b2 track + white thumb,
+	//    on = transparent track, 1px brand border, brand thumb) ──────────────
+	.components-form-toggle {
+		width: 30px;
+		height: 18px;
+
+		.components-form-toggle__track {
+			width: 30px;
+			height: 18px;
+			background: #b2b2b2;
+			border: 1px solid transparent;
+			border-radius: 999px;
+		}
+
+		.components-form-toggle__thumb {
+			top: 3px;
+			left: 3px;
+			width: 12px;
+			height: 12px;
+			background: $bdm-bg-base;
+			border: 0;
+			box-shadow: none;
+		}
+
+		&.is-checked {
+
+			.components-form-toggle__track {
+				background: transparent;
+				border-color: $bdm-brand;
+			}
+
+			.components-form-toggle__thumb {
+				background: $bdm-brand;
+				transform: translateX(12px);
+			}
+		}
+	}
+
+	.components-base-control__help {
+		margin-top: 8px;
+		font-size: 13px;
+		color: $bdm-text-tertiary;
 	}
 }
 // stylelint-enable declaration-no-important

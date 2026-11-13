@@ -18,6 +18,7 @@ import { useToast } from '../../common/hooks/useToast';
 /**
  * @param {Object} props
  * @param {Object} props.route
+ * @param {string} props.title Panel title, shown in the list card header.
  * @returns {JSX.Element}
  */
 export default function ExistingTabCreatorPanel( props ) {
@@ -78,6 +79,7 @@ export default function ExistingTabCreatorPanel( props ) {
 		<div>
 			<ExistingTabsList
 				route={ route }
+				title={ props.title }
 				openModal={ openModal }
 				refreshKey={ refreshKey }
 			/>
@@ -115,6 +117,13 @@ export default function ExistingTabCreatorPanel( props ) {
 					</div>
 					<div className="bdm-admin-tab-editor-modal__delete-footer">
 						<Button
+							variant="secondary"
+							onClick={ closeModal }
+							disabled={ resetting }
+						>
+							{ __( 'Cancel', 'buddy-modules' ) }
+						</Button>
+						<Button
 							variant="primary"
 							isDestructive
 							isBusy={ resetting }
@@ -122,13 +131,6 @@ export default function ExistingTabCreatorPanel( props ) {
 							onClick={ handleResetConfirm }
 						>
 							{ __( 'Reset', 'buddy-modules' ) }
-						</Button>
-						<Button
-							variant="secondary"
-							onClick={ closeModal }
-							disabled={ resetting }
-						>
-							{ __( 'Cancel', 'buddy-modules' ) }
 						</Button>
 					</div>
 				</Modal>

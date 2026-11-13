@@ -20,9 +20,10 @@ import { Spinner } from '@wordpress/components';
  * @param {Function} props.onChange
  * @param {Function} props.fetchOptions
  * @param {string}   [props.placeholder]
+ * @param {string}   [props.inputId]     ID for the search input (for an outside <label>).
  * @returns {JSX.Element}
  */
-export default function SearchSelect( { selectedItems, onChange, fetchOptions, placeholder } ) {
+export default function SearchSelect( { selectedItems, onChange, fetchOptions, placeholder, inputId } ) {
 	var [ search,    setSearch    ] = useState( '' );
 	var [ results,   setResults   ] = useState( [] );
 	var [ loading,   setLoading   ] = useState( false );
@@ -111,6 +112,7 @@ export default function SearchSelect( { selectedItems, onChange, fetchOptions, p
 			<div className="bdm-admin-search-select__input-wrap">
 				<input
 					type="text"
+					id={ inputId }
 					className="bdm-admin-search-select__input"
 					value={ search }
 					onChange={ handleSearchChange }

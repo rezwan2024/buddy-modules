@@ -20,8 +20,12 @@ class Group_Nav {
 	 * @since 2.0.0
 	 */
 	public static function init(): void {
-		add_action( 'bp_groups_setup_nav', [ self::class, 'register_tabs' ], 20 );
-		add_action( 'bp_groups_setup_nav', [ self::class, 'register_subtabs' ], 30 );
+		// `bp_groups_setup_nav` only fires when there is a user domain (a logged-in
+		// user or a displayed profile), so logged-out visitors never got custom
+		// group tabs. `groups_setup_nav` fires on every single-group request, after
+		// the built-in group tabs exist; run before the overrides at priority 10.
+		add_action( 'groups_setup_nav', [ self::class, 'register_tabs' ], 5 );
+		add_action( 'groups_setup_nav', [ self::class, 'register_subtabs' ], 6 );
 
 		// apply_existing_overrides and inject_existing_group_subtabs must run on
 		// `groups_setup_nav`, NOT `bp_groups_setup_nav`. In BuddyBoss Platform,
@@ -135,7 +139,7 @@ class Group_Nav {
 
 	/**
 	 * Registers top-level custom group tabs via bp_core_new_subnav_item().
-	 * Hooked to bp_groups_setup_nav at priority 20.
+	 * Hooked to groups_setup_nav at priority 5.
 	 *
 	 * @since 2.0.0
 	 */
@@ -177,7 +181,9 @@ class Group_Nav {
 				'parent_url'      => $group_link,
 				'parent_slug'     => $current_group->slug,
 				'screen_function' => '__return_false',
-				'user_has_access' => true,
+				// Same access as the built-in group tabs: non-members can't open
+				// custom tab content on private/hidden groups.
+				'user_has_access' => (bool) ( $current_group->user_has_access ?? false ),
 			];
 
 			if ( ! empty( $tab->item_css_id ) ) {
@@ -207,7 +213,7 @@ class Group_Nav {
 	 * items for custom group tabs — the parent tab's screen_function is always called.
 	 * Sub-tabs of built-in group tabs are handled by inject_existing_group_subtabs().
 	 *
-	 * Hooked to bp_groups_setup_nav at priority 30 (kept for future compatibility).
+	 * Hooked to groups_setup_nav at priority 6 (kept for future compatibility).
 	 *
 	 * @since 2.0.0
 	 */
@@ -506,18 +512,29 @@ class Group_Nav {
 						}
 					}
 
-					echo '<nav class="bp-navs group-subnav" id="bdm-group-subnav" aria-label="' . esc_attr__( 'Group sub-navigation', 'buddy-modules' ) . '">';
-					echo '<ul>';
+					// Same markup/classes as the theme's own sub-nav (members/single/
+					// parts/item-subnav.php), so it gets the theme's button styling.
+					// Only the sub-tabs are listed; the tab itself is in the main nav.
+					$items = [];
 					foreach ( $visible_subtabs as $st ) {
-						$is_current = ( $active_subtab && (int) $st->id === (int) $active_subtab->id );
-						$subtab_url = trailingslashit( $group_link . $parent_slug . '/' . $st->slug );
-						$label      = apply_filters( 'bdm_tc_tab_label', $st->label, (int) $st->id );
+						$items[] = [
+							'slug'    => $st->slug,
+							'url'     => trailingslashit( $group_link . $parent_slug . '/' . $st->slug ),
+							'label'   => apply_filters( 'bdm_tc_tab_label', $st->label, (int) $st->id ),
+							'current' => $active_subtab && (int) $st->id === (int) $active_subtab->id,
+						];
+					}
+
+					echo '<nav class="bp-navs bp-subnavs no-ajax group-subnav bb-subnav-plain" id="bdm-group-subnav" role="navigation" aria-label="' . esc_attr__( 'Group sub-navigation', 'buddy-modules' ) . '">';
+					echo '<ul class="subnav">';
+					foreach ( $items as $item ) {
 						printf(
-							'<li id="nav-%s"%s><a href="%s">%s</a></li>',
-							esc_attr( $st->slug ),
-							$is_current ? ' class="current"' : '',
-							esc_url( $subtab_url ),
-							esc_html( $label )
+							'<li id="%s-groups-sub-li" class="bp-groups-sub-tab%s"><a href="%s"%s>%s</a></li>',
+							esc_attr( $item['slug'] ),
+							$item['current'] ? ' current selected' : '',
+							esc_url( $item['url'] ),
+							$item['current'] ? ' aria-current="page"' : '',
+							esc_html( $item['label'] )
 						);
 					}
 					echo '</ul>';
@@ -525,17 +542,17 @@ class Group_Nav {
 
 					if ( $active_subtab ) {
 						$content = apply_filters( 'bdm_tc_tab_content', $active_subtab->content, (int) $active_subtab->id );
-						echo wp_kses_post( do_shortcode( $content ) );
+						echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 					} else {
 						$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
-						echo wp_kses_post( do_shortcode( $content ) );
+						echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 					}
 
 					return;
 				}
 
 				$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
-				echo wp_kses_post( do_shortcode( $content ) );
+				echo Content::render( (string) $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in Content::render() via wp_kses_post().
 			}
 		);
 
