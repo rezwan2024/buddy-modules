@@ -20,19 +20,19 @@ import { useToast } from '../../common/hooks/useToast';
 import { getRuleSummary } from '../utils/ruleLabels';
 
 /**
- * @param {Object} props
+ * @param {Object}   props
  * @param {{ module: string, panel: string }} props.route
- * @param {Function} props.navigate
+ * @param {Function} props.openModal  Called with {view, id?, label?} to open Add/Edit/Delete modal.
+ * @param {number}   props.refreshKey Increment from parent triggers a list reload.
  * @returns {JSX.Element}
  */
-export default function TabsList( { route, navigate } ) {
+export default function TabsList( { route, openModal, refreshKey } ) {
 	var tabType = route.panel === 'group-tabs' ? 'group' : 'profile';
 
 	var [ tabs,       setTabs       ] = useState( [] );
 	var [ loading,    setLoading    ] = useState( true );
 	var [ selected,   setSelected   ] = useState( [] );
 	var [ bulkAction, setBulkAction ] = useState( '' );
-	var [ deleting,   setDeleting   ] = useState( null );
 	var { addToast } = useToast();
 
 	// Keep a stable ref to the latest tabs so the drag-end closure can revert.
@@ -52,6 +52,13 @@ export default function TabsList( { route, navigate } ) {
 	}, [ tabType ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect( function() { load(); }, [ load ] );
+
+	// Reload when parent signals a refresh (e.g. after a delete from the modal).
+	useEffect( function() {
+		if ( refreshKey > 0 ) {
+			load();
+		}
+	}, [ refreshKey ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// -------------------------------------------------------------------------
 	// Status toggle — optimistic
@@ -76,36 +83,6 @@ export default function TabsList( { route, navigate } ) {
 			} );
 			addToast( __( 'Could not update status.', 'buddy-modules' ), 'error' );
 		} );
-	}
-
-	// -------------------------------------------------------------------------
-	// Single delete
-	// -------------------------------------------------------------------------
-
-	function handleDelete( tab ) {
-		// eslint-disable-next-line no-alert
-		if ( ! window.confirm( sprintf(
-			// translators: %s is the tab label.
-			__( 'Delete "%s"? This cannot be undone.', 'buddy-modules' ),
-			tab.label
-		) ) ) {
-			return;
-		}
-		setDeleting( tab.id );
-		apiRequest( { method: 'DELETE', path: '/tab-creator/tabs/' + tab.id } )
-			.then( function() {
-				setTabs( function( prev ) {
-					return prev.filter( function( t ) { return t.id !== tab.id; } );
-				} );
-				setSelected( function( prev ) {
-					return prev.filter( function( id ) { return id !== tab.id; } );
-				} );
-				addToast( __( 'Tab deleted.', 'buddy-modules' ), 'success' );
-			} )
-			.catch( function() {
-				addToast( __( 'Could not delete tab.', 'buddy-modules' ), 'error' );
-			} )
-			.finally( function() { setDeleting( null ); } );
 	}
 
 	// -------------------------------------------------------------------------
@@ -209,7 +186,7 @@ export default function TabsList( { route, navigate } ) {
 				<Button
 					variant="primary"
 					onClick={ function() {
-						navigate( { module: route.module, panel: route.panel, view: 'add' } );
+						openModal( { view: 'add' } );
 					} }
 				>
 					{ __( '+ Add Tab', 'buddy-modules' ) }
@@ -374,7 +351,7 @@ export default function TabsList( { route, navigate } ) {
 																		variant="secondary"
 																		size="small"
 																		onClick={ function() {
-																			navigate( { module: route.module, panel: route.panel, view: 'edit', id: tab.id } );
+																			openModal( { view: 'edit', id: tab.id } );
 																		} }
 																	>
 																		{ __( 'Edit', 'buddy-modules' ) }
@@ -383,9 +360,9 @@ export default function TabsList( { route, navigate } ) {
 																		variant="tertiary"
 																		size="small"
 																		isDestructive
-																		isBusy={ deleting === tab.id }
-																		disabled={ deleting !== null }
-																		onClick={ function() { handleDelete( tab ); } }
+																		onClick={ function() {
+																			openModal( { view: 'delete', id: tab.id, label: tab.label } );
+																		} }
 																	>
 																		{ __( 'Delete', 'buddy-modules' ) }
 																	</Button>

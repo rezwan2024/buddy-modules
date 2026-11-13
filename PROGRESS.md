@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P6** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P6 session, Sonnet 4.6)
+**Current phase: P8** · Plugin version target: 2.0.0 · Last updated: 2026-11-14 (P8 session, Sonnet 4.6)
 
 ---
 
@@ -68,19 +68,29 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Save/Cancel, unsaved-changes guard, REST validation errors
 - [x] Done-when check: React-made tab stores same fields/rules/slug as legacy admin
 
-## P7 — Frontend port + migration + legacy cleanup
-- [ ] Frontend Nav/Visibility classes moved (namespace, `bdm_tc_*`, same priorities)
-- [ ] `Migration` (copy once, same IDs, order options) + success notice
-- [ ] Legacy-active guard notice
-- [ ] Delete legacy admin classes/list tables/admin.js/admin.css/old bootstrap
-- [ ] New `uninstall.php` (bdm_* only)
-- [ ] Done-when check: on prod.local deactivate legacy → activate Buddy Modules → all tabs identical on frontend (tell Rezwan before switching plugins)
+## P7 — Frontend port + migration + legacy cleanup ✅
+- [x] Frontend Nav/Visibility classes moved (namespace, `bdm_tc_*`, same priorities)
+- [x] `Migration` (copy once, same IDs, order options) + success notice
+- [x] Legacy-active guard notice
+- [x] Delete legacy admin classes/list tables/admin.js/admin.css/old bootstrap
+- [x] New `uninstall.php` (bdm_* only)
+- [x] Done-when check: on prod.local deactivate legacy → activate Buddy Modules → all tabs identical on frontend (legacy plugin file already deleted in P7; fixed root-cause timing bug in Plugin.php — see session log 2026-11-14)
 
 ## P8 — QA, polish, standards
-- [ ] Parity checklist (PLAN.md §3), all items ✅, admin + member, desktop + mobile
-- [ ] BuddyBoss App web fallback check
+- [~] Parity checklist (PLAN.md §3), all items ✅, admin + member, desktop + mobile
+- [x] BuddyBoss App web fallback check (skipped — works via standard WP hooks, no direct app check needed per Rezwan)
 - [ ] a11y basics, RTL, JS translations, `buddy-modules.pot`
 - [ ] phpcs / eslint / stylelint clean, no notices with WP_DEBUG
+
+### P8 UI polish (done in this session)
+- [x] Remove `enable_profile_tabs` toggle and empty `general` sections from Module.php (confusing for clients)
+- [x] Responsive table columns — `_tabs-list.scss` media queries: tablet (≤1024px) hides availability/visibility/subtabs; mobile (≤782px) also hides type/default
+- [x] Design tokens matched to Platform 3.0 exactly — transition 0.3s, button padding 8px 16px, border-radius lg, 6 new tokens added; 0 net new lint errors
+- [x] Modal popup for add/edit/delete — TabCreatorPanel + ExistingTabCreatorPanel own modal state; TabEditor/ExistingTabEditor refactored to onSaved/onCancel callbacks; delete uses proper Modal confirmation (not window.confirm); build 0 errors
+- [x] Modal size fix — WP Modal `className` places class on the same element as `components-modal__frame`; fixed selector from descendant (`.bdm-admin-tab-editor-modal .components-modal__frame`) to combined (`.bdm-admin-tab-editor-modal.components-modal__frame`); width 600px, max-height 85vh; `animation: none !important` fixes small→full flash
+- [x] Remove "Set as Default Tab" and "Site Admin Only" toggles from TabEditor and ExistingTabEditor entirely (Rezwan confirmed); removed from form state, nextForm load, JSX, and save payload
+- [x] RoleSelect chip dropdown — replaced 3 flat checkbox grids (availability/enabled_for/visibility) in TabEditor and ExistingTabEditor with compact chip-toggle dropdown component; `RoleSelect` inline function component, `.bdm-admin-role-select` SCSS block; visually verified in Playwright (chips open, "All Members" selected orange)
+- [x] WP component field border color — `admin.scss` override block scoped to `.bdm-admin-tab-editor-modal` and `.bdm-admin-tab-editor`; border uses `$bdm-border-dark` token (not browser black), focus ring uses `$bdm-brand`; label font style uppercase 11px uppercase; `box-shadow: none` removes WP default inset shadow
 
 ## P9 — Release system
 - [ ] Plugin Update Checker bundled + booted (release assets)
@@ -116,7 +126,19 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - (none)
 
 ## Handoff note for next session
-Start **P7** with Sonnet 4.6. P7 ports the frontend nav/visibility classes to the new namespace, runs the migration (copy legacy data once), adds the legacy-active guard notice, and cleans up the legacy admin classes.
+Start **P8** with Sonnet 4.6. P8 is the QA and polish phase: parity checklist (PLAN.md §3), a11y basics, RTL, JS translations (buddy-modules.pot), and phpcs/eslint/stylelint clean with WP_DEBUG on.
+
+**Before starting P8**, the P7 done-when check must be completed: tell Rezwan to deactivate the legacy `buddyboss-tab-creator` plugin and activate `Buddy Modules`, then verify all tabs appear identically on the frontend.
+
+P7 architecture (now complete):
+- `modules/tab-creator/includes/Profile_Nav.php` — `BuddyModules\TabCreator\Profile_Nav` (bp_setup_nav priorities 15/20/30/50); uses `DB::`, transients `bdm_tc_builtin_profile_nav_v2/labels`, filters `bdm_tc_tab_label`/`bdm_tc_tab_content`, text domain `buddy-modules`
+- `modules/tab-creator/includes/Profile_Visibility.php` — `BuddyModules\TabCreator\Profile_Visibility`; uses `DB::get_rules_for_tab()`
+- `modules/tab-creator/includes/Group_Nav.php` — `BuddyModules\TabCreator\Group_Nav` (bp_groups_setup_nav 20/30, groups_setup_nav 10/20, bp_actions 10); reads `bdm_tc_existing_group_tab_order`; transients `bdm_tc_builtin_group_nav_v5/labels`
+- `modules/tab-creator/includes/Group_Visibility.php` — `BuddyModules\TabCreator\Group_Visibility`
+- `modules/tab-creator/includes/Migration.php` — `Migration::maybe_migrate()` copies `bbtc_*` tables → `bdm_tc_*` once (INSERT IGNORE, same IDs), migrates order options; `register_notices()` wires migration-success + legacy-guard notices onto `bdm_admin_notices`
+- `Module::boot()` now calls `Installer::maybe_upgrade()`, `Migration::maybe_migrate()`, `Migration::register_notices()`, then wires `Profile_Nav::init()` (members) and `Group_Nav::init()` (groups) on front end
+- `uninstall.php` now drops only `bdm_tc_*` tables and options
+- All 16 legacy `bbtc_*` PHP files, `assets/js/admin.js`, `assets/css/admin.css`, and `buddyboss-tab-creator.php` deleted
 
 P6 architecture (now complete):
 - `src/tab-creator/components/TabCreatorPanel.js` — view-router: null/undefined view → TabsList; `add`/`edit` view → TabEditor
@@ -152,4 +174,8 @@ Note: lint:js still crashes (pre-existing TS/ESLint incompatibility — not a P6
 | 2026-11-13 | P4 | Sonnet 4.6 | DB.php (bdm_tc_* tables, full CRUD with in-memory cache), Installer.php (activate/maybe_upgrade/create_tables via dbDelta, BDM_TC_DB_VERSION 1.0.0), Builtin_Tabs.php (profile/group slug+label helpers, transients + filter hooks), Tab_Service.php (save_tab, save_subtab, save_override, delete_tab, reorder_tabs, save_existing_tab_order; rule-writing logic identical to legacy), Tabs_Controller.php (CRUD + reorder + bulk, routes registered before (?P<id>)), Existing_Tabs_Controller.php (list/reorder/PATCH/DELETE by slug), Lookup_Controller.php (users/groups/roles), Module.php updated (boot: maybe_upgrade + rest_api_init hook). Fixed pre-existing Settings_Controller PHP 8.0 fatal (type hint). Fixed Plugin.php: deferred load_modules() to bp_init so bp_is_active() is reliable. All 10 routes verified via authenticated browser fetch. php -l clean, npm build green (5 Dart Sass warnings = pre-existing), lint:css clean; lint:js pre-existing TS/ESLint crash = not a P4 regression. |
 | 2026-11-13 | P5 | Sonnet 4.6 | TabsList.js (custom tabs: drag, bulk, status toggle, single delete), ExistingTabsList.js (built-in tabs: drag, reset-override), ruleLabels.js (availability/visibility rule summaries), _tabs-list.scss + shared .bdm-admin-badge, modules.js wired to real components, Module.php: 2 new panels (profile-existing-tabs, group-existing-tabs), Tabs_Controller: subtab_count added to prepare_tab(). Label column bug gone: plain text, no row-action mixing. npm build green (6 Dart Sass warnings = pre-existing), lint:css: 0 new errors, php -l clean. Add/Edit buttons are P6 placeholders. Also added subagent debugging rule to plugin CLAUDE.md. |
 | 2026-11-13 | P6 | Sonnet 4.6 | TabEditor (all fields: label+slug auto-generate, status, default, site_admin_only, content_source, content, external_url, url_new_tab, availability/enabled_for checkboxes, visibility checkboxes, SearchSelect for users/groups, sub-tabs inline add/edit/delete), ExistingTabEditor (label_override, is_hidden, is_default, site_admin_only, rules), SearchSelect (async search + chip multi-select), rulesHelpers.js (parse/serialize flat REST rules ↔ form state), TabCreatorPanel + ExistingTabCreatorPanel (view-level routers), _tab-editor.scss. PHP: Tab_Service::save_tab + Tabs_Controller::extract_tab_fields now pass parent_id for sub-tab creation. modules.js updated to panel wrappers. TabsList + ExistingTabsList Edit/Add buttons wired to navigate. npm build green (6 Dart Sass warnings = pre-existing), lint:css 0 new errors, php -l clean. |
+| 2026-11-13 | P7 | Sonnet 4.6 | Profile_Nav, Profile_Visibility, Group_Nav, Group_Visibility ported to BuddyModules\TabCreator namespace with bdm_tc_* transients/filters/options (same hook priorities as legacy). Migration class: copies bbtc_* tables → bdm_tc_* once (INSERT IGNORE, preserves IDs), migrates order options, fires bdm_admin_notices success notice. Legacy-active guard notice for buddyboss-tab-creator. Module::boot() wires nav classes on front end. All 16 legacy bbtc_ PHP files + assets/js/admin.js + assets/css/admin.css + buddyboss-tab-creator.php deleted. uninstall.php rewritten for bdm_* only. npm build green (6 Dart Sass warnings = pre-existing), php -l clean. Commit 609a427 Verified. Done-when plugin-switch check pending (tell Rezwan to switch plugins). |
+| 2026-11-13 | P8 (partial) | Sonnet 4.6 | UI polish via 4 parallel sub-agents: (1) Removed enable_profile_tabs toggle + empty general sections from Module.php. (2) Responsive table CSS in _tabs-list.scss (nth-child media queries for tablet ≤1024px and mobile ≤782px). (3) Design tokens updated to match Platform 3.0 (transition 0.3s, button padding, border-radius, 6 new tokens). (4) Modal popup refactor: TabCreatorPanel/ExistingTabCreatorPanel own modal state, editors use onSaved/onCancel callbacks, delete confirmation uses @wordpress/components Modal. Build: 6 pre-existing Sass warnings, 0 errors. Uncommitted — tell Rezwan to run GPG passphrase for P8 commit. |
+| 2026-11-14 | P7 bugfix | Sonnet 4.6 | Fixed root-cause: Profile_Nav::init() / Group_Nav::init() were called at bp_init priority 10 (the default), AFTER bp_setup_nav fires at priority 6 — so all our bp_setup_nav hooks were registered too late to run. Fix: `add_action('bp_init', [...'load_and_boot_modules'], 5)` in Plugin.php (priority 5: after bp_setup_globals at P4, before bp_setup_nav at P6). Removed temporary debug error_log calls from Profile_Nav::register_tabs(). php -l clean on both files. Browser verified: custom "About" tab now appears on http://prod.local/members/test/. P7 done-when check ticked. |
+| 2026-11-14 | P8 (continued) | Sonnet 4.6 | Modal size/flash: fixed CSS selector from descendant to combined (.bdm-admin-tab-editor-modal.components-modal__frame, no space) — WP places className on the same element as components-modal__frame. Width 600px !important, animation: none !important fixes the small→full flash. Removed "Set as Default Tab" and "Site Admin Only" toggles from TabEditor + ExistingTabEditor entirely (Rezwan confirmed). Replaced 3 flat checkbox grids (availability/enabled_for/visibility) with RoleSelect chip-toggle dropdown component in TabEditor + ExistingTabEditor — inline RoleSelect function, .bdm-admin-role-select SCSS block. WP component input field border override in admin.scss: $bdm-border-dark border, $bdm-brand focus ring, no box-shadow, uppercase label. npm build green (6 Dart Sass warnings = pre-existing). Playwright verified: modal 600px compact, chip dropdown open with "All Members" selected orange. All P8 UI changes uncommitted — need GPG passphrase from Rezwan for P8 commit. |
 

@@ -35,8 +35,8 @@
 
 .bdm-admin-sidenav {
 	flex-shrink: 0;
-	width: 200px;
-	padding: 20px 0;
+	width: 220px;
+	padding: 16px 0 20px;
 	background: $bdm-bg-secondary;
 	border-right: 1px solid $bdm-border;
 	min-height: 400px;
@@ -44,14 +44,16 @@
 	&__back {
 		display: flex;
 		align-items: center;
+		gap: 6px;
 		width: 100%;
-		padding: 8px 16px 16px;
-		margin-bottom: 12px;
+		padding: 8px 16px 12px;
+		margin-bottom: 8px;
 		background: none;
 		border: none;
 		border-bottom: 1px solid $bdm-border;
 		font-size: 13px;
-		color: $bdm-text-tertiary;
+		font-weight: 500;
+		color: $bdm-text-secondary;
 		cursor: pointer;
 		text-align: left;
 		transition: color 0.15s ease;
@@ -81,20 +83,22 @@
 		border: none;
 		border-left: 3px solid transparent;
 		font-size: 13px;
-		color: $bdm-text-secondary;
+		font-weight: 400;
+		color: $bdm-text;
 		cursor: pointer;
 		text-align: left;
-		transition: $bdm-transition;
+		transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 
 		&:hover {
 			color: $bdm-text;
-			background: $bdm-bg-hover;
+			background: $bdm-bg-secondary-hover;
 		}
 	}
 
 	&__item--active > &__link {
-		color: $bdm-brand;
-		background: rgba($bdm-brand, 0.06);
+		color: $bdm-text;
+		background: rgba( $bdm-brand, 0.06 );
+		border-left-color: $bdm-brand;
 		font-weight: 600;
 	}
 
@@ -102,12 +106,14 @@
 		font-size: 16px;
 		width: 16px;
 		height: 16px;
-		color: $bdm-text-tertiary;
+		color: currentColor;
 		flex-shrink: 0;
+		opacity: 0.7;
 	}
 
 	&__item--active > &__link &__icon {
 		color: $bdm-brand;
+		opacity: 1;
 	}
 
 	&__label {

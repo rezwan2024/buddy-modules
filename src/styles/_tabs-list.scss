@@ -196,6 +196,58 @@
 	}
 }
 
+// Responsive column hiding.
+// TabsList (10 cols):       handle(1) cb(2) label(3) type(4) availability(5) visibility(6) status(7) default(8) subtabs(9) actions(10)
+// ExistingTabsList (6 cols): handle(1) label(2) override(3) visibility(4) default(5) actions(6)
+
+@media (max-width: 1024px) {
+
+	// TabsList: hide Availability (5), Visibility (6), Sub-tabs (9).
+	.bdm-admin-tabs-list:not(.bdm-admin-existing-tabs-list) .bdm-admin-tabs-list__table {
+
+		th:nth-child(5),
+		td:nth-child(5),
+		th:nth-child(6),
+		td:nth-child(6),
+		th:nth-child(9),
+		td:nth-child(9) {
+			display: none;
+		}
+	}
+
+	// ExistingTabsList: hide Visibility (4).
+	.bdm-admin-existing-tabs-list .bdm-admin-tabs-list__table {
+
+		th:nth-child(4),
+		td:nth-child(4) {
+			display: none;
+		}
+	}
+}
+
+@media (max-width: 782px) {
+
+	// TabsList: also hide Type (4) and Default (8).
+	.bdm-admin-tabs-list:not(.bdm-admin-existing-tabs-list) .bdm-admin-tabs-list__table {
+
+		th:nth-child(4),
+		td:nth-child(4),
+		th:nth-child(8),
+		td:nth-child(8) {
+			display: none;
+		}
+	}
+
+	// ExistingTabsList: also hide Default (5).
+	.bdm-admin-existing-tabs-list .bdm-admin-tabs-list__table {
+
+		th:nth-child(5),
+		td:nth-child(5) {
+			display: none;
+		}
+	}
+}
+
 // Shared badges used in both list screens.
 .bdm-admin-badge {
 	display: inline-block;

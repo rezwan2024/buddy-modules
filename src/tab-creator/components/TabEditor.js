@@ -20,6 +20,92 @@ import { useToast } from '../../common/hooks/useToast';
 import { parseRules, serializeRules } from '../utils/rulesHelpers';
 import SearchSelect from './SearchSelect';
 
+/**
+ * RoleSelect — compact multi-select dropdown showing chips for each option.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.options   Array of {value, label}.
+ * @param {Array}    props.selected  Array of selected value strings.
+ * @param {Function} props.onChange  Called with the new selected array.
+ * @returns {JSX.Element}
+ */
+function RoleSelect( { options, selected, onChange } ) {
+	var [ open, setOpen ] = useState( false );
+	var wrapRef = useRef( null );
+
+	useEffect( function() {
+		if ( ! open ) {
+			return;
+		}
+		function handleOutsideClick( e ) {
+			if ( wrapRef.current && ! wrapRef.current.contains( e.target ) ) {
+				setOpen( false );
+			}
+		}
+		document.addEventListener( 'mousedown', handleOutsideClick );
+		return function() {
+			document.removeEventListener( 'mousedown', handleOutsideClick );
+		};
+	}, [ open ] );
+
+	function getSummary() {
+		if ( selected.length === 0 ) {
+			return __( 'None selected', 'buddy-modules' );
+		}
+		if ( selected.length === 1 ) {
+			var found = options.find( function( o ) { return o.value === selected[ 0 ]; } );
+			return found ? found.label : selected[ 0 ];
+		}
+		return sprintf(
+			// translators: %d is the number of selected roles/options.
+			__( '%d selected', 'buddy-modules' ),
+			selected.length
+		);
+	}
+
+	function toggleOption( value ) {
+		var next = selected.indexOf( value ) !== -1
+			? selected.filter( function( v ) { return v !== value; } )
+			: selected.concat( [ value ] );
+		onChange( next );
+	}
+
+	return (
+		<div className="bdm-admin-role-select" ref={ wrapRef }>
+			<button
+				type="button"
+				className="bdm-admin-role-select__trigger"
+				onClick={ function() { setOpen( function( v ) { return ! v; } ); } }
+				aria-expanded={ open }
+			>
+				<span className="bdm-admin-role-select__summary">{ getSummary() }</span>
+				<span className="bdm-admin-role-select__arrow" aria-hidden="true">
+					{ open ? '▲' : '▼' }
+				</span>
+			</button>
+			{ open && (
+				<div className="bdm-admin-role-select__dropdown">
+					<div className="bdm-admin-role-select__chips">
+						{ options.map( function( opt ) {
+							var isSelected = selected.indexOf( opt.value ) !== -1;
+							return (
+								<button
+									key={ opt.value }
+									type="button"
+									className={ 'bdm-admin-role-select__chip' + ( isSelected ? ' bdm-admin-role-select__chip--selected' : '' ) }
+									onClick={ function() { toggleOption( opt.value ); } }
+								>
+									{ opt.label }
+								</button>
+							);
+						} ) }
+					</div>
+				</div>
+			) }
+		</div>
+	);
+}
+
 /** Slugify a label (mirrors sanitize_title behaviour). */
 function slugify( label ) {
 	return label
@@ -33,10 +119,11 @@ function slugify( label ) {
 /**
  * @param {Object}   props
  * @param {Object}   props.route
- * @param {Function} props.navigate
+ * @param {Function} props.onSaved  Called after a successful save (closes the modal).
+ * @param {Function} props.onCancel Called when the user cancels (closes the modal).
  * @returns {JSX.Element}
  */
-export default function TabEditor( { route, navigate } ) {
+export default function TabEditor( { route, onSaved, onCancel } ) {
 	var tabType   = route.panel === 'group-tabs' ? 'group' : 'profile';
 	var editId    = route.view === 'edit' ? route.id : null;
 	var isNew     = ! editId;
@@ -48,8 +135,6 @@ export default function TabEditor( { route, navigate } ) {
 		label:            '',
 		slug:             '',
 		status:           'active',
-		is_default:       0,
-		site_admin_only:  0,
 		content_source:   'content',
 		content:          '',
 		external_url:     '',
@@ -107,8 +192,6 @@ export default function TabEditor( { route, navigate } ) {
 					label:           tab.label || '',
 					slug:            tab.slug  || '',
 					status:          tab.status || 'active',
-					is_default:      tab.is_default ? 1 : 0,
-					site_admin_only: tab.site_admin_only ? 1 : 0,
 					content_source:  tab.content_source || 'content',
 					content:         tab.content || '',
 					external_url:    tab.external_url || '',
@@ -253,7 +336,7 @@ export default function TabEditor( { route, navigate } ) {
 		setErrors( {} );
 
 		var rules = serializeRules(
-			{ availability: form.availability, enabled_for: form.enabled_for, visibility: form.visibility },
+			{ availability: form.availability, enabled_for: form.enabled_for, visibility: [] },
 			assocUsers.map( function( u ) { return u.id; } ),
 			assocGroups.map( function( g ) { return g.id; } ),
 			excludedGroups.map( function( g ) { return g.id; } )
@@ -264,8 +347,6 @@ export default function TabEditor( { route, navigate } ) {
 			label:           form.label,
 			slug:            form.slug,
 			status:          form.status,
-			is_default:      form.is_default,
-			site_admin_only: form.site_admin_only,
 			content_source:  form.content_source,
 			content:         form.content,
 			external_url:    form.external_url,
@@ -283,7 +364,7 @@ export default function TabEditor( { route, navigate } ) {
 					? __( 'Tab created.', 'buddy-modules' )
 					: __( 'Tab saved.', 'buddy-modules' ),
 				'success' );
-				navigate( { module: route.module, panel: route.panel } );
+				onSaved();
 			} )
 			.catch( function( err ) {
 				// WP REST errors arrive as { code, message, data }.
@@ -308,7 +389,7 @@ export default function TabEditor( { route, navigate } ) {
 			}
 		}
 
-		navigate( { module: route.module, panel: route.panel } );
+		onCancel();
 	}
 
 	// -------------------------------------------------------------------------
@@ -416,30 +497,6 @@ export default function TabEditor( { route, navigate } ) {
 		{ value: 'none',    label: __( 'None', 'buddy-modules' ) },
 	];
 
-	var profileVisibilityOptions = [
-		{ value: 'do_not_modify', label: __( 'Do Not Modify', 'buddy-modules' ) },
-		{ value: 'anyone',        label: __( 'Anyone', 'buddy-modules' ) },
-		{ value: 'none_remove',   label: __( 'None (remove tab)', 'buddy-modules' ) },
-		{ value: 'logged_in',     label: __( 'Logged-in Users', 'buddy-modules' ) },
-		{ value: 'owner_only',    label: __( 'Profile Owner Only', 'buddy-modules' ) },
-		{ value: 'friends',       label: __( 'Friends', 'buddy-modules' ) },
-		{ value: 'site_admin',    label: __( 'Site Admins', 'buddy-modules' ) },
-	].concat(
-		wpRoles.map( function( r ) { return { value: r.slug, label: r.label }; } )
-	);
-
-	var groupVisibilityOptions = [
-		{ value: 'do_not_modify', label: __( 'Do Not Modify', 'buddy-modules' ) },
-		{ value: 'anyone',        label: __( 'Anyone', 'buddy-modules' ) },
-		{ value: 'logged_in',     label: __( 'Logged-in Users', 'buddy-modules' ) },
-		{ value: 'members',       label: __( 'Group Members', 'buddy-modules' ) },
-		{ value: 'mods',          label: __( 'Group Mods', 'buddy-modules' ) },
-		{ value: 'admins',        label: __( 'Group Admins', 'buddy-modules' ) },
-		{ value: 'site_admin',    label: __( 'Site Admins', 'buddy-modules' ) },
-	];
-
-	var visibilityOptions = 'profile' === tabType ? profileVisibilityOptions : groupVisibilityOptions;
-
 	// -------------------------------------------------------------------------
 	// Render.
 	// -------------------------------------------------------------------------
@@ -522,22 +579,6 @@ export default function TabEditor( { route, navigate } ) {
 							] }
 						/>
 					</div>
-
-					<div className="bdm-admin-tab-editor__field">
-						<ToggleControl
-							label={ __( 'Set as Default Tab', 'buddy-modules' ) }
-							checked={ !! form.is_default }
-							onChange={ function( v ) { setField( 'is_default', v ? 1 : 0 ); } }
-						/>
-					</div>
-
-					<div className="bdm-admin-tab-editor__field">
-						<ToggleControl
-							label={ __( 'Site Admin Only', 'buddy-modules' ) }
-							checked={ !! form.site_admin_only }
-							onChange={ function( v ) { setField( 'site_admin_only', v ? 1 : 0 ); } }
-						/>
-					</div>
 				</div>
 			</div>
 
@@ -605,19 +646,12 @@ export default function TabEditor( { route, navigate } ) {
 						{ __( 'Control who can see this tab on a member\'s profile.', 'buddy-modules' ) }
 					</p>
 
-					<div className="bdm-admin-tab-editor__checkboxes">
-						{ availabilityOptions.map( function( opt ) {
-							return (
-								<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-									<input
-										type="checkbox"
-										checked={ form.availability.indexOf( opt.value ) !== -1 }
-										onChange={ function() { toggleCheckbox( 'availability', opt.value ); } }
-									/>
-									{ ' ' }{ opt.label }
-								</label>
-							);
-						} ) }
+					<div className="bdm-admin-tab-editor__field">
+						<RoleSelect
+							options={ availabilityOptions }
+							selected={ form.availability }
+							onChange={ function( v ) { setField( 'availability', v ); } }
+						/>
 					</div>
 
 					<div className="bdm-admin-tab-editor__field">
@@ -644,19 +678,12 @@ export default function TabEditor( { route, navigate } ) {
 						{ __( 'Enable this tab only for selected group types.', 'buddy-modules' ) }
 					</p>
 
-					<div className="bdm-admin-tab-editor__checkboxes">
-						{ enabledForOptions.map( function( opt ) {
-							return (
-								<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-									<input
-										type="checkbox"
-										checked={ form.enabled_for.indexOf( opt.value ) !== -1 }
-										onChange={ function() { toggleCheckbox( 'enabled_for', opt.value ); } }
-									/>
-									{ ' ' }{ opt.label }
-								</label>
-							);
-						} ) }
+					<div className="bdm-admin-tab-editor__field">
+						<RoleSelect
+							options={ enabledForOptions }
+							selected={ form.enabled_for }
+							onChange={ function( v ) { setField( 'enabled_for', v ); } }
+						/>
 					</div>
 
 					<div className="bdm-admin-tab-editor__field">
@@ -684,31 +711,6 @@ export default function TabEditor( { route, navigate } ) {
 					</div>
 				</div>
 			) }
-
-			{ /* Visibility */ }
-			<div className="bdm-admin-tab-editor__section">
-				<h4 className="bdm-admin-tab-editor__section-title">
-					{ __( 'Visibility', 'buddy-modules' ) }
-				</h4>
-				<p className="bdm-admin-tab-editor__section-desc">
-					{ __( 'Control who can see the content of this tab.', 'buddy-modules' ) }
-				</p>
-
-				<div className="bdm-admin-tab-editor__checkboxes">
-					{ visibilityOptions.map( function( opt ) {
-						return (
-							<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-								<input
-									type="checkbox"
-									checked={ form.visibility.indexOf( opt.value ) !== -1 }
-									onChange={ function() { toggleCheckbox( 'visibility', opt.value ); } }
-								/>
-								{ ' ' }{ opt.label }
-							</label>
-						);
-					} ) }
-				</div>
-			</div>
 
 			{ /* Sub-tabs (edit mode only — parent_id requires a saved tab ID) */ }
 			{ ! isNew && (

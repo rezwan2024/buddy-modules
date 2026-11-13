@@ -9,19 +9,20 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button, Spinner } from '@wordpress/components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
 
 /**
- * @param {Object} props
+ * @param {Object}   props
  * @param {{ module: string, panel: string }} props.route
- * @param {Function} props.navigate
+ * @param {Function} props.openModal  Called with {view, id?, label?} to open Edit/Reset modal.
+ * @param {number}   props.refreshKey Increment from parent triggers a list reload.
  * @returns {JSX.Element}
  */
-export default function ExistingTabsList( { route, navigate } ) {
+export default function ExistingTabsList( { route, openModal, refreshKey } ) {
 	var tabType = route.panel === 'group-existing-tabs' ? 'group' : 'profile';
 
 	var [ tabs,    setTabs    ] = useState( [] );
@@ -44,6 +45,13 @@ export default function ExistingTabsList( { route, navigate } ) {
 	}, [ tabType ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	useEffect( function() { load(); }, [ load ] );
+
+	// Reload when parent signals a refresh (e.g. after a reset from the modal).
+	useEffect( function() {
+		if ( refreshKey > 0 ) {
+			load();
+		}
+	}, [ refreshKey ] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// -------------------------------------------------------------------------
 	// Drag to reorder
@@ -70,36 +78,6 @@ export default function ExistingTabsList( { route, navigate } ) {
 			setTabs( before );
 			addToast( __( 'Could not save order.', 'buddy-modules' ), 'error' );
 		} );
-	}
-
-	// -------------------------------------------------------------------------
-	// Reset override (delete override row)
-	// -------------------------------------------------------------------------
-
-	function handleReset( tab ) {
-		if ( ! tab.override_id ) {
-			return;
-		}
-		// eslint-disable-next-line no-alert
-		if ( ! window.confirm( sprintf(
-			// translators: %s is the tab label.
-			__( 'Reset "%s" to its default settings?', 'buddy-modules' ),
-			tab.label_override || tab.default_label
-		) ) ) {
-			return;
-		}
-		apiRequest( {
-			method: 'DELETE',
-			path:   '/tab-creator/existing-tabs/' + tab.original_slug,
-			data:   { tab_type: tabType },
-		} )
-			.then( function() {
-				load();
-				addToast( __( 'Override reset.', 'buddy-modules' ), 'success' );
-			} )
-			.catch( function() {
-				addToast( __( 'Could not reset override.', 'buddy-modules' ), 'error' );
-			} );
 	}
 
 	// -------------------------------------------------------------------------
@@ -218,7 +196,7 @@ export default function ExistingTabsList( { route, navigate } ) {
 																		variant="secondary"
 																		size="small"
 																		onClick={ function() {
-																			navigate( { module: route.module, panel: route.panel, view: 'edit', id: tab.original_slug } );
+																			openModal( { view: 'edit', id: tab.original_slug } );
 																		} }
 																	>
 																		{ __( 'Edit', 'buddy-modules' ) }
@@ -228,7 +206,13 @@ export default function ExistingTabsList( { route, navigate } ) {
 																			variant="tertiary"
 																			size="small"
 																			isDestructive
-																			onClick={ function() { handleReset( tab ); } }
+																			onClick={ function() {
+																				openModal( {
+																					view:  'reset',
+																					id:    tab.original_slug,
+																					label: tab.label_override || tab.default_label,
+																				} );
+																			} }
 																		>
 																			{ __( 'Reset', 'buddy-modules' ) }
 																		</Button>

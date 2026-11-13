@@ -76,28 +76,6 @@ class Module extends \BuddyModules\Modules\Module {
 			]
 		);
 
-		\BuddyModules\Settings\Fields::register_section(
-			$module,
-			'profile-tabs',
-			'general',
-			[
-				'label' => __( 'General', 'buddy-modules' ),
-			]
-		);
-
-		\BuddyModules\Settings\Fields::register_field(
-			$module,
-			'profile-tabs',
-			'general',
-			'enable_profile_tabs',
-			[
-				'type'        => 'toggle',
-				'label'       => __( 'Enable Profile Tabs', 'buddy-modules' ),
-				'description' => __( 'Allow custom tabs on member profile pages.', 'buddy-modules' ),
-				'default'     => false,
-			]
-		);
-
 		// ── Group Tabs panel ──────────────────────────────────────────────────
 
 		\BuddyModules\Settings\Fields::register_panel(
@@ -106,15 +84,6 @@ class Module extends \BuddyModules\Modules\Module {
 			[
 				'label' => __( 'Group Tabs', 'buddy-modules' ),
 				'icon'  => 'dashicons-groups',
-			]
-		);
-
-		\BuddyModules\Settings\Fields::register_section(
-			$module,
-			'group-tabs',
-			'general',
-			[
-				'label' => __( 'General', 'buddy-modules' ),
 			]
 		);
 

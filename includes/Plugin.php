@@ -46,7 +46,11 @@ class Plugin {
 
 		// Defer module loading to bp_init so bp_is_active() is reliable.
 		// BP components (active_components) are not populated until bp_init fires on init.
-		add_action( 'bp_init', [ $this, 'load_and_boot_modules' ] );
+		// Priority 5: after bp_setup_globals (priority 4, which populates active_components)
+		// but before bp_setup_nav (priority 6, which fires do_action('bp_setup_nav')).
+		// Our Profile_Nav::init() / Group_Nav::init() register callbacks on bp_setup_nav,
+		// so they must be hooked before that action fires.
+		add_action( 'bp_init', [ $this, 'load_and_boot_modules' ], 5 );
 
 		// Boot admin UI.
 		if ( is_admin() ) {

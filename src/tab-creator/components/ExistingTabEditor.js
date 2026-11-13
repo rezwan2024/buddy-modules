@@ -18,12 +18,99 @@ import { parseRules, serializeRules } from '../utils/rulesHelpers';
 import SearchSelect from './SearchSelect';
 
 /**
+ * RoleSelect — compact multi-select dropdown showing chips for each option.
+ *
  * @param {Object}   props
- * @param {Object}   props.route
- * @param {Function} props.navigate
+ * @param {Array}    props.options   Array of {value, label}.
+ * @param {Array}    props.selected  Array of selected value strings.
+ * @param {Function} props.onChange  Called with the new selected array.
  * @returns {JSX.Element}
  */
-export default function ExistingTabEditor( { route, navigate } ) {
+function RoleSelect( { options, selected, onChange } ) {
+	var [ open, setOpen ] = useState( false );
+	var wrapRef = useRef( null );
+
+	useEffect( function() {
+		if ( ! open ) {
+			return;
+		}
+		function handleOutsideClick( e ) {
+			if ( wrapRef.current && ! wrapRef.current.contains( e.target ) ) {
+				setOpen( false );
+			}
+		}
+		document.addEventListener( 'mousedown', handleOutsideClick );
+		return function() {
+			document.removeEventListener( 'mousedown', handleOutsideClick );
+		};
+	}, [ open ] );
+
+	function getSummary() {
+		if ( selected.length === 0 ) {
+			return __( 'None selected', 'buddy-modules' );
+		}
+		if ( selected.length === 1 ) {
+			var found = options.find( function( o ) { return o.value === selected[ 0 ]; } );
+			return found ? found.label : selected[ 0 ];
+		}
+		return sprintf(
+			// translators: %d is the number of selected roles/options.
+			__( '%d selected', 'buddy-modules' ),
+			selected.length
+		);
+	}
+
+	function toggleOption( value ) {
+		var next = selected.indexOf( value ) !== -1
+			? selected.filter( function( v ) { return v !== value; } )
+			: selected.concat( [ value ] );
+		onChange( next );
+	}
+
+	return (
+		<div className="bdm-admin-role-select" ref={ wrapRef }>
+			<button
+				type="button"
+				className="bdm-admin-role-select__trigger"
+				onClick={ function() { setOpen( function( v ) { return ! v; } ); } }
+				aria-expanded={ open }
+			>
+				<span className="bdm-admin-role-select__summary">{ getSummary() }</span>
+				<span className="bdm-admin-role-select__arrow" aria-hidden="true">
+					{ open ? '▲' : '▼' }
+				</span>
+			</button>
+			{ open && (
+				<div className="bdm-admin-role-select__dropdown">
+					<div className="bdm-admin-role-select__chips">
+						{ options.map( function( opt ) {
+							var isSelected = selected.indexOf( opt.value ) !== -1;
+							return (
+								<button
+									key={ opt.value }
+									type="button"
+									className={ 'bdm-admin-role-select__chip' + ( isSelected ? ' bdm-admin-role-select__chip--selected' : '' ) }
+									onClick={ function() { toggleOption( opt.value ); } }
+								>
+									{ opt.label }
+								</button>
+							);
+						} ) }
+					</div>
+				</div>
+			) }
+		</div>
+	);
+}
+
+/**
+ * @param {Object}   props
+ * @param {Object}   props.route
+ * @param {Function} props.onSaved  Called after a successful save (closes the modal).
+ * @param {Function} props.onCancel Called when the user cancels (closes the modal).
+ * @returns {JSX.Element}
+ */
+export default function ExistingTabEditor( { route, onSaved, onCancel } ) {
 	var tabType = route.panel === 'group-existing-tabs' ? 'group' : 'profile';
 	var slug    = route.id; // stored as the slug string in route.id.
 
@@ -33,8 +120,6 @@ export default function ExistingTabEditor( { route, navigate } ) {
 	var [ form,    setForm    ] = useState( {
 		label_override:  '',
 		is_hidden:       0,
-		is_default:      0,
-		site_admin_only: 0,
 		// Rules.
 		availability:    [],
 		enabled_for:     [],
@@ -79,8 +164,6 @@ export default function ExistingTabEditor( { route, navigate } ) {
 				var nextForm = {
 					label_override:  data.label_override || '',
 					is_hidden:       data.is_hidden ? 1 : 0,
-					is_default:      data.is_default ? 1 : 0,
-					site_admin_only: data.site_admin_only ? 1 : 0,
 					availability:    parsed.availability,
 					enabled_for:     parsed.enabled_for,
 					visibility:      parsed.visibility,
@@ -161,7 +244,7 @@ export default function ExistingTabEditor( { route, navigate } ) {
 		setErrors( {} );
 
 		var rules = serializeRules(
-			{ availability: form.availability, enabled_for: form.enabled_for, visibility: form.visibility },
+			{ availability: form.availability, enabled_for: form.enabled_for, visibility: [] },
 			[],
 			assocGroups.map( function( g ) { return g.id; } ),
 			excludedGroups.map( function( g ) { return g.id; } )
@@ -171,15 +254,13 @@ export default function ExistingTabEditor( { route, navigate } ) {
 			tab_type:        tabType,
 			label_override:  form.label_override,
 			is_hidden:       form.is_hidden,
-			is_default:      form.is_default,
-			site_admin_only: form.site_admin_only,
 			rules:           rules,
 		};
 
 		apiRequest( { method: 'PATCH', path: '/tab-creator/existing-tabs/' + slug, data: body } )
 			.then( function() {
 				addToast( __( 'Settings saved.', 'buddy-modules' ), 'success' );
-				navigate( { module: route.module, panel: route.panel } );
+				onSaved();
 			} )
 			.catch( function( err ) {
 				if ( err && err.message ) {
@@ -203,7 +284,7 @@ export default function ExistingTabEditor( { route, navigate } ) {
 			}
 		}
 
-		navigate( { module: route.module, panel: route.panel } );
+		onCancel();
 	}
 
 	// -------------------------------------------------------------------------
@@ -225,29 +306,6 @@ export default function ExistingTabEditor( { route, navigate } ) {
 		{ value: 'none',    label: __( 'None', 'buddy-modules' ) },
 	];
 
-	var profileVisibilityOptions = [
-		{ value: 'do_not_modify', label: __( 'Do Not Modify', 'buddy-modules' ) },
-		{ value: 'anyone',        label: __( 'Anyone', 'buddy-modules' ) },
-		{ value: 'none_remove',   label: __( 'None (remove tab)', 'buddy-modules' ) },
-		{ value: 'logged_in',     label: __( 'Logged-in Users', 'buddy-modules' ) },
-		{ value: 'owner_only',    label: __( 'Profile Owner Only', 'buddy-modules' ) },
-		{ value: 'friends',       label: __( 'Friends', 'buddy-modules' ) },
-		{ value: 'site_admin',    label: __( 'Site Admins', 'buddy-modules' ) },
-	].concat(
-		wpRoles.map( function( r ) { return { value: r.slug, label: r.label }; } )
-	);
-
-	var groupVisibilityOptions = [
-		{ value: 'do_not_modify', label: __( 'Do Not Modify', 'buddy-modules' ) },
-		{ value: 'anyone',        label: __( 'Anyone', 'buddy-modules' ) },
-		{ value: 'logged_in',     label: __( 'Logged-in Users', 'buddy-modules' ) },
-		{ value: 'members',       label: __( 'Group Members', 'buddy-modules' ) },
-		{ value: 'mods',          label: __( 'Group Mods', 'buddy-modules' ) },
-		{ value: 'admins',        label: __( 'Group Admins', 'buddy-modules' ) },
-		{ value: 'site_admin',    label: __( 'Site Admins', 'buddy-modules' ) },
-	];
-
-	var visibilityOptions = 'profile' === tabType ? profileVisibilityOptions : groupVisibilityOptions;
 
 	// -------------------------------------------------------------------------
 	// Render.
@@ -315,20 +373,6 @@ export default function ExistingTabEditor( { route, navigate } ) {
 							onChange={ function( v ) { setField( 'is_hidden', v ? 1 : 0 ); } }
 						/>
 					</div>
-					<div className="bdm-admin-tab-editor__field">
-						<ToggleControl
-							label={ __( 'Set as Default Tab', 'buddy-modules' ) }
-							checked={ !! form.is_default }
-							onChange={ function( v ) { setField( 'is_default', v ? 1 : 0 ); } }
-						/>
-					</div>
-					<div className="bdm-admin-tab-editor__field">
-						<ToggleControl
-							label={ __( 'Site Admin Only', 'buddy-modules' ) }
-							checked={ !! form.site_admin_only }
-							onChange={ function( v ) { setField( 'site_admin_only', v ? 1 : 0 ); } }
-						/>
-					</div>
 				</div>
 			</div>
 
@@ -338,19 +382,12 @@ export default function ExistingTabEditor( { route, navigate } ) {
 					<h4 className="bdm-admin-tab-editor__section-title">
 						{ __( 'Availability Override', 'buddy-modules' ) }
 					</h4>
-					<div className="bdm-admin-tab-editor__checkboxes">
-						{ profileAvailabilityOptions.map( function( opt ) {
-							return (
-								<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-									<input
-										type="checkbox"
-										checked={ form.availability.indexOf( opt.value ) !== -1 }
-										onChange={ function() { toggleCheckbox( 'availability', opt.value ); } }
-									/>
-									{ ' ' }{ opt.label }
-								</label>
-							);
-						} ) }
+					<div className="bdm-admin-tab-editor__field">
+						<RoleSelect
+							options={ profileAvailabilityOptions }
+							selected={ form.availability }
+							onChange={ function( v ) { setField( 'availability', v ); } }
+						/>
 					</div>
 				</div>
 			) }
@@ -361,19 +398,12 @@ export default function ExistingTabEditor( { route, navigate } ) {
 					<h4 className="bdm-admin-tab-editor__section-title">
 						{ __( 'Enabled For', 'buddy-modules' ) }
 					</h4>
-					<div className="bdm-admin-tab-editor__checkboxes">
-						{ enabledForOptions.map( function( opt ) {
-							return (
-								<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-									<input
-										type="checkbox"
-										checked={ form.enabled_for.indexOf( opt.value ) !== -1 }
-										onChange={ function() { toggleCheckbox( 'enabled_for', opt.value ); } }
-									/>
-									{ ' ' }{ opt.label }
-								</label>
-							);
-						} ) }
+					<div className="bdm-admin-tab-editor__field">
+						<RoleSelect
+							options={ enabledForOptions }
+							selected={ form.enabled_for }
+							onChange={ function( v ) { setField( 'enabled_for', v ); } }
+						/>
 					</div>
 
 					<div className="bdm-admin-tab-editor__field">
@@ -401,27 +431,6 @@ export default function ExistingTabEditor( { route, navigate } ) {
 					</div>
 				</div>
 			) }
-
-			{ /* Visibility override */ }
-			<div className="bdm-admin-tab-editor__section">
-				<h4 className="bdm-admin-tab-editor__section-title">
-					{ __( 'Visibility Override', 'buddy-modules' ) }
-				</h4>
-				<div className="bdm-admin-tab-editor__checkboxes">
-					{ visibilityOptions.map( function( opt ) {
-						return (
-							<label key={ opt.value } className="bdm-admin-tab-editor__checkbox-label">
-								<input
-									type="checkbox"
-									checked={ form.visibility.indexOf( opt.value ) !== -1 }
-									onChange={ function() { toggleCheckbox( 'visibility', opt.value ); } }
-								/>
-								{ ' ' }{ opt.label }
-							</label>
-						);
-					} ) }
-				</div>
-			</div>
 
 			{ /* Footer */ }
 			<div className="bdm-admin-tab-editor__footer">

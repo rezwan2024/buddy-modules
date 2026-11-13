@@ -31,7 +31,7 @@
 	&--success {
 		border-color: $bdm-success;
 		background: $bdm-bg-success;
-		color: #008a23; // darken( $bdm-success, 5% )
+		color: $bdm-text-success;
 	}
 
 	&--error {
