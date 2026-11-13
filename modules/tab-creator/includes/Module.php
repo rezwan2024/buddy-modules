@@ -2,8 +2,8 @@
 /**
  * Profile and Group Tab Creator module.
  *
- * Boots the REST controllers and runs the DB installer on plugin activate.
- * Frontend Nav/Visibility logic is wired in P7.
+ * Boots the Tab Creator module: DB installer, migration, REST controllers,
+ * and front-end nav/visibility hooks.
  *
  * @since 2.0.0
  */
@@ -26,15 +26,24 @@ class Module extends \BuddyModules\Modules\Module {
 	/**
 	 * Boot the module on each page load when active.
 	 *
-	 * Runs the DB version check and registers REST routes.
-	 * Frontend Nav/Visibility classes are wired in P7.
-	 *
 	 * @since 2.0.0
 	 */
 	public function boot(): void {
 		Installer::maybe_upgrade();
+		Migration::maybe_migrate();
+		Migration::register_notices();
 
 		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+
+		// Front-end nav: profile tabs.
+		if ( ! is_admin() && bp_is_active( 'members' ) ) {
+			Profile_Nav::init();
+		}
+
+		// Front-end nav: group tabs.
+		if ( ! is_admin() && bp_is_active( 'groups' ) ) {
+			Group_Nav::init();
+		}
 	}
 
 	/**

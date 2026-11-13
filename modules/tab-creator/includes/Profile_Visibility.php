@@ -1,22 +1,27 @@
 <?php
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Checks profile tab availability and visibility on the front end.
- * All methods are static.
+ *
+ * @since 2.0.0
  */
-class BBTC_Profile_Visibility {
+
+namespace BuddyModules\TabCreator;
+
+defined( 'ABSPATH' ) || exit;
+
+class Profile_Visibility {
 
 	/**
 	 * Determines whether a tab is available on a specific user's profile.
-	 * "Availability" controls which profiles show this tab at all (based on profile owner attributes).
+	 *
+	 * @since 2.0.0
 	 *
 	 * @param int $tab_id           The tab ID.
 	 * @param int $displayed_user_id The ID of the profile being viewed.
 	 * @return bool
 	 */
 	public static function can_use_tab( int $tab_id, int $displayed_user_id ): bool {
-		$rules = BBTC_DB::get_rules_for_tab( $tab_id );
+		$rules = DB::get_rules_for_tab( $tab_id );
 
 		$availability_rules = array_filter( $rules, fn( $r ) => 'availability' === $r->rule_type );
 
@@ -52,7 +57,8 @@ class BBTC_Profile_Visibility {
 
 	/**
 	 * Determines whether the current visitor can see a tab on a profile.
-	 * "Visibility" controls who (the viewer) can see the tab.
+	 *
+	 * @since 2.0.0
 	 *
 	 * @param int $tab_id            The tab ID.
 	 * @param int $displayed_user_id The ID of the profile being viewed.
@@ -60,7 +66,7 @@ class BBTC_Profile_Visibility {
 	 * @return bool
 	 */
 	public static function can_view_tab( int $tab_id, int $displayed_user_id, int $current_user_id ): bool {
-		$rules = BBTC_DB::get_rules_for_tab( $tab_id );
+		$rules = DB::get_rules_for_tab( $tab_id );
 
 		$visibility_rules = array_filter( $rules, fn( $r ) => 'visibility' === $r->rule_type );
 
@@ -69,7 +75,7 @@ class BBTC_Profile_Visibility {
 		}
 
 		foreach ( $visibility_rules as $rule ) {
-			// Skip admin-only flags — these do not drive front-end visibility logic directly.
+			// Skip admin-only flags.
 			if ( 'audience' === $rule->rule_key && in_array( $rule->rule_value, [ 'do_not_modify', 'none_remove' ], true ) ) {
 				continue;
 			}

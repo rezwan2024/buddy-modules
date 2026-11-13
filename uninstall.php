@@ -3,10 +3,24 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 global $wpdb;
 
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bbtc_tabs" );
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bbtc_tab_rules" );
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bbtc_existing_tab_overrides" );
-$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bbtc_existing_tab_override_rules" );
+// Drop Tab Creator tables.
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdm_tc_tabs" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdm_tc_tab_rules" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdm_tc_existing_tab_overrides" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}bdm_tc_existing_tab_override_rules" ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
 
-delete_option( 'bbtc_db_version' );
-delete_metadata( 'user', 0, 'bbtc_experimental_notice_shown', '', true );
+// Delete Tab Creator options.
+delete_option( 'bdm_tc_db_version' );
+delete_option( 'bdm_tc_migration_done' );
+delete_option( 'bdm_tc_existing_profile_tab_order' );
+delete_option( 'bdm_tc_existing_group_tab_order' );
+
+// Delete core module options.
+delete_option( 'bdm_active_modules' );
+
+// Delete Tab Creator transients.
+delete_transient( 'bdm_tc_builtin_profile_nav_v2' );
+delete_transient( 'bdm_tc_builtin_profile_nav_labels' );
+delete_transient( 'bdm_tc_builtin_group_nav_v5' );
+delete_transient( 'bdm_tc_builtin_group_nav_labels' );
+delete_transient( 'bdm_tc_migration_notice' );

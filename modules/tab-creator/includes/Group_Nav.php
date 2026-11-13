@@ -1,17 +1,23 @@
 <?php
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Registers custom group tabs and sub-tabs on the BuddyBoss front end.
- * All methods are static.
+ *
+ * @since 2.0.0
  */
-class BBTC_Group_Nav {
+
+namespace BuddyModules\TabCreator;
+
+defined( 'ABSPATH' ) || exit;
+
+class Group_Nav {
 
 	/** @var array Cached top-level group tabs keyed by tab_type. */
 	private static array $tabs_cache = [];
 
 	/**
 	 * Registers all hooks.
+	 *
+	 * @since 2.0.0
 	 */
 	public static function init(): void {
 		add_action( 'bp_groups_setup_nav', [ self::class, 'register_tabs' ], 20 );
@@ -20,35 +26,31 @@ class BBTC_Group_Nav {
 		// apply_existing_overrides and inject_existing_group_subtabs must run on
 		// `groups_setup_nav`, NOT `bp_groups_setup_nav`. In BuddyBoss Platform,
 		// `bp_groups_setup_nav` fires inside parent::setup_nav() BEFORE the built-in
-		// group page tabs (feed, members, activity, etc.) are registered. The built-in
-		// tabs are added after that, and then `groups_setup_nav` fires. Running our
-		// overrides on `bp_groups_setup_nav` means edit_nav() / delete_nav() target
-		// nav items that don't exist yet and silently fail.
+		// group page tabs are registered. The built-in tabs are added after that,
+		// then `groups_setup_nav` fires. Running our overrides on `bp_groups_setup_nav`
+		// means edit_nav() / delete_nav() target nav items that don't exist yet.
 		add_action( 'groups_setup_nav', [ self::class, 'apply_existing_overrides' ], 10 );
 		// bp_actions fires at bp_init priority 11, after bp_setup_nav (priority 6).
-		// Third-party plugins (e.g. buddypress-group-tabs-creator-pro) register their
-		// group nav at bp_actions priority 9, so we cache at priority 10 to capture them.
+		// Third-party plugins register their group nav at bp_actions priority 9,
+		// so we cache at priority 10 to capture them.
 		add_action( 'bp_actions', [ self::class, 'cache_builtin_group_nav_slugs' ], 10 );
 		add_action( 'groups_setup_nav', [ self::class, 'inject_existing_group_subtabs' ], 20 );
 
-		// Inject our saved group tab order into BuddyBoss's appearance settings so
-		// bp_nouveau_set_nav_item_order() (called during template rendering) applies it.
-		// bp_parse_args() fires `bp_after_{filter_key}_parse_args` where the filter key
-		// passed to bp_parse_args() is 'nouveau_appearance_settings'.
+		// Inject our saved group tab order into BuddyBoss's appearance settings
+		// so bp_nouveau_set_nav_item_order() applies it during template rendering.
 		add_filter( 'bp_after_nouveau_appearance_settings_parse_args', [ self::class, 'inject_group_nav_order' ] );
 	}
 
 	/**
-	 * Injects the drag-and-drop saved group tab order into BuddyBoss's appearance
-	 * settings. bp_nouveau_set_nav_item_order() reads group_nav_order from these
-	 * settings during template rendering and applies sequential positions — it runs
-	 * after bp_groups_setup_nav, so this filter is the correct integration point.
+	 * Injects the drag-and-drop saved group tab order into BuddyBoss's appearance settings.
+	 *
+	 * @since 2.0.0
 	 *
 	 * @param mixed $value Raw option value from the DB.
 	 * @return mixed Modified value with group_nav_order injected.
 	 */
 	public static function inject_group_nav_order( mixed $value ): mixed {
-		$saved_order = get_option( 'bbtc_existing_group_tab_order', [] );
+		$saved_order = get_option( 'bdm_tc_existing_group_tab_order', [] );
 		if ( empty( $saved_order ) ) {
 			return $value;
 		}
@@ -63,9 +65,10 @@ class BBTC_Group_Nav {
 	}
 
 	/**
-	 * Reads BuddyBoss's built-in group nav slugs at groups_setup_nav priority 100
-	 * (after all components including bbPress forums/discussions have registered).
-	 * Excludes custom tabs created by this plugin. Stores in transients for admin use.
+	 * Reads BuddyBoss's built-in group nav slugs.
+	 * Stores in transients for use by admin UI (Builtin_Tabs).
+	 *
+	 * @since 2.0.0
 	 */
 	public static function cache_builtin_group_nav_slugs(): void {
 		if ( ! bp_is_group() ) {
@@ -82,14 +85,12 @@ class BBTC_Group_Nav {
 			return;
 		}
 
-		// Group tabs are secondary nav items keyed under the group's own slug.
 		$secondary = $nav->get_secondary( [ 'parent_slug' => $group->slug ] );
 		if ( ! is_array( $secondary ) || empty( $secondary ) ) {
 			return;
 		}
 
-		// Get our own custom tab slugs so we can exclude them from the built-in list.
-		$custom_tabs      = BBTC_DB::get_tabs( 'group', [ 'status' => 'active', 'parent_id' => 0 ] );
+		$custom_tabs      = DB::get_tabs( 'group', [ 'status' => 'active', 'parent_id' => 0 ] );
 		$custom_tab_slugs = array_map( fn( $t ) => $t->slug, $custom_tabs );
 
 		$slugs  = [];
@@ -100,7 +101,6 @@ class BBTC_Group_Nav {
 			if ( '' === $clean_slug ) {
 				continue;
 			}
-			// Skip tabs registered by our own plugin.
 			if ( in_array( $clean_slug, $custom_tab_slugs, true ) ) {
 				continue;
 			}
@@ -109,13 +109,15 @@ class BBTC_Group_Nav {
 		}
 
 		if ( ! empty( $slugs ) ) {
-			set_transient( 'bbtc_builtin_group_nav_v5', $slugs, DAY_IN_SECONDS );
-			set_transient( 'bbtc_builtin_group_nav_labels', $labels, DAY_IN_SECONDS );
+			set_transient( 'bdm_tc_builtin_group_nav_v5', $slugs, DAY_IN_SECONDS );
+			set_transient( 'bdm_tc_builtin_group_nav_labels', $labels, DAY_IN_SECONDS );
 		}
 	}
 
 	/**
 	 * Returns active top-level group tabs. Caches results for the request.
+	 *
+	 * @since 2.0.0
 	 *
 	 * @param string $tab_type 'profile' or 'group'.
 	 * @return array
@@ -125,15 +127,17 @@ class BBTC_Group_Nav {
 			return self::$tabs_cache[ $tab_type ];
 		}
 
-		$tabs = BBTC_DB::get_tabs( $tab_type, [ 'status' => 'active', 'parent_id' => 0 ] );
+		$tabs = DB::get_tabs( $tab_type, [ 'status' => 'active', 'parent_id' => 0 ] );
 		self::$tabs_cache[ $tab_type ] = $tabs;
 
 		return $tabs;
 	}
 
 	/**
-	 * Registers top-level custom group tabs via bp_core_new_nav_item().
+	 * Registers top-level custom group tabs via bp_core_new_subnav_item().
 	 * Hooked to bp_groups_setup_nav at priority 20.
+	 *
+	 * @since 2.0.0
 	 */
 	public static function register_tabs(): void {
 		if ( ! bp_is_group() ) {
@@ -155,16 +159,15 @@ class BBTC_Group_Nav {
 				continue;
 			}
 
-			if ( ! BBTC_Group_Visibility::can_show_tab( (int) $tab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_show_tab( (int) $tab->id, $current_group, $current_user_id ) ) {
 				continue;
 			}
 
-			if ( ! BBTC_Group_Visibility::can_view_tab( (int) $tab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_view_tab( (int) $tab->id, $current_group, $current_user_id ) ) {
 				continue;
 			}
 
-			$label = apply_filters( 'bbtc_tab_label', $tab->label, (int) $tab->id );
-
+			$label  = apply_filters( 'bdm_tc_tab_label', $tab->label, (int) $tab->id );
 			$tab_id = (int) $tab->id;
 
 			$nav_args = [
@@ -182,11 +185,9 @@ class BBTC_Group_Nav {
 			}
 
 			if ( 'url' === $tab->content_source ) {
-				// External URL tab — link directly.
 				$link = ! empty( $tab->tab_link ) ? $tab->tab_link : $tab->external_url;
 				$nav_args['link'] = esc_url( $link );
 			} else {
-				// Content tab — register a proper screen function.
 				$nav_args['screen_function'] = function() use ( $tab_id ) {
 					self::render_screen( $tab_id );
 				};
@@ -201,17 +202,14 @@ class BBTC_Group_Nav {
 	}
 
 	/**
-	 * Sub-tabs of custom group tabs are rendered directly inside render_screen()
-	 * by detecting bp_action_variable(0). BuddyBoss Platform does not dispatch
-	 * to third-level nav items registered via bp_core_new_subnav_item() for
-	 * custom group tabs — the parent tab's screen_function is always called for
-	 * any URL under that tab slug. render_screen() handles sub-tab routing and
-	 * rendering, so no nav registration is needed here.
-	 *
-	 * Sub-tabs of built-in group tabs are handled separately by
-	 * inject_existing_group_subtabs().
+	 * Sub-tabs of custom group tabs are rendered inside render_screen() by detecting
+	 * bp_action_variable(0). BuddyBoss Platform does not dispatch to third-level nav
+	 * items for custom group tabs — the parent tab's screen_function is always called.
+	 * Sub-tabs of built-in group tabs are handled by inject_existing_group_subtabs().
 	 *
 	 * Hooked to bp_groups_setup_nav at priority 30 (kept for future compatibility).
+	 *
+	 * @since 2.0.0
 	 */
 	public static function register_subtabs(): void {
 		// Intentionally empty — see render_screen() for sub-tab rendering logic.
@@ -219,11 +217,9 @@ class BBTC_Group_Nav {
 
 	/**
 	 * Applies admin overrides to built-in BuddyBoss group tabs.
-	 * Hooked to bp_groups_setup_nav at priority 50.
+	 * Hooked to groups_setup_nav at priority 10.
 	 *
-	 * Built-in group tabs (feed, members, photos, etc.) are registered as
-	 * sub-nav items under the group's own primary nav item. To modify them
-	 * we call edit_nav() / delete_nav() with the group's slug as the parent.
+	 * @since 2.0.0
 	 */
 	public static function apply_existing_overrides(): void {
 		if ( ! bp_is_group() ) {
@@ -239,19 +235,18 @@ class BBTC_Group_Nav {
 		$current_user_id = get_current_user_id();
 		$group_slug      = $current_group->slug;
 
-		$overrides = BBTC_DB::get_all_overrides( 'group' );
+		$overrides = DB::get_all_overrides( 'group' );
 
 		foreach ( $overrides as $override ) {
 			$slug  = $override->original_slug;
-			$rules = BBTC_DB::get_rules_for_override( (int) $override->id );
+			$rules = DB::get_rules_for_override( (int) $override->id );
 
-			// Partition rules by type.
 			$avail_rules = array_filter( $rules, fn( $r ) => 'availability' === $r->rule_type );
 			$vis_rules   = array_filter( $rules, fn( $r ) => 'visibility' === $r->rule_type );
 
 			// --- Availability check ------------------------------------------
 			if ( ! empty( $avail_rules ) ) {
-				// Excluded groups always override — check first.
+				// Excluded groups always override.
 				foreach ( $avail_rules as $rule ) {
 					if ( 'excluded_group_id' === $rule->rule_key && (int) $rule->rule_value === (int) $current_group->id ) {
 						$nav->delete_nav( $slug, $group_slug );
@@ -293,7 +288,6 @@ class BBTC_Group_Nav {
 
 					$val = $rule->rule_value;
 
-					// These meta-values mean "do not restrict".
 					if ( in_array( $val, [ 'do_not_modify', 'none_remove' ], true ) ) {
 						$can_view = true;
 						break;
@@ -371,16 +365,16 @@ class BBTC_Group_Nav {
 
 			// --- Default tab -------------------------------------------------
 			if ( ! empty( $override->is_default ) ) {
-				// Set the group's default sub-nav by editing the primary group nav item.
 				$nav->edit_nav( [ 'default_subnav_slug' => $slug ], $group_slug );
 			}
 		}
-
 	}
 
 	/**
 	 * Injects custom sub-tabs into existing built-in BuddyBoss group tabs.
-	 * Hooked to bp_groups_setup_nav at priority 60. Experimental — fails silently.
+	 * Hooked to groups_setup_nav at priority 20.
+	 *
+	 * @since 2.0.0
 	 */
 	public static function inject_existing_group_subtabs(): void {
 		if ( ! bp_is_group() ) {
@@ -391,8 +385,7 @@ class BBTC_Group_Nav {
 		$current_user_id = get_current_user_id();
 		$group_link      = bp_get_group_permalink( $current_group );
 
-		// All active tabs with a parent_existing_slug (sub-tabs of built-in group tabs).
-		$subtabs = BBTC_DB::get_tabs( 'group', [ 'status' => 'active' ] );
+		$subtabs = DB::get_tabs( 'group', [ 'status' => 'active' ] );
 		$subtabs = array_filter(
 			$subtabs,
 			fn( $t ) => ! empty( $t->parent_existing_slug ) && 0 === (int) $t->parent_id
@@ -423,20 +416,20 @@ class BBTC_Group_Nav {
 			if ( empty( $parent_nav ) ) {
 				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					error_log( '[BBTC] Group sub-tab injection failed: parent slug "' . $parent_slug . '" not found in group nav.' );
+					error_log( '[BDM] Group sub-tab injection failed: parent slug "' . $parent_slug . '" not found in group nav.' );
 				}
 				continue;
 			}
 
-			if ( ! BBTC_Group_Visibility::can_show_tab( (int) $subtab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_show_tab( (int) $subtab->id, $current_group, $current_user_id ) ) {
 				continue;
 			}
 
-			if ( ! BBTC_Group_Visibility::can_view_tab( (int) $subtab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_view_tab( (int) $subtab->id, $current_group, $current_user_id ) ) {
 				continue;
 			}
 
-			$label  = apply_filters( 'bbtc_tab_label', $subtab->label, (int) $subtab->id );
+			$label  = apply_filters( 'bdm_tc_tab_label', $subtab->label, (int) $subtab->id );
 			$tab_id = (int) $subtab->id;
 
 			$screen_function = function() use ( $tab_id ) {
@@ -456,11 +449,8 @@ class BBTC_Group_Nav {
 
 	/**
 	 * Renders a custom group tab's content on the front end.
-	 * Called as the screen function for content-type tabs.
 	 *
-	 * If the tab has visible sub-tabs, this renders a BuddyBoss-styled sub-nav
-	 * and the active sub-tab's content. Active sub-tab is detected via
-	 * bp_action_variable(0); defaults to the first visible sub-tab.
+	 * @since 2.0.0
 	 *
 	 * @param int $tab_id The tab ID.
 	 */
@@ -468,7 +458,7 @@ class BBTC_Group_Nav {
 		add_action(
 			'bp_template_content',
 			function() use ( $tab_id ): void {
-				$tab = BBTC_DB::get_tab( $tab_id );
+				$tab = DB::get_tab( $tab_id );
 
 				if ( ! $tab ) {
 					return;
@@ -477,15 +467,13 @@ class BBTC_Group_Nav {
 				$current_group   = groups_get_current_group();
 				$current_user_id = get_current_user_id();
 
-				// Query active sub-tabs of this custom group tab.
-				$all_subtabs = BBTC_DB::get_tabs( 'group', [
+				$all_subtabs = DB::get_tabs( 'group', [
 					'status'    => 'active',
 					'parent_id' => $tab_id,
 					'orderby'   => 'position',
 					'order'     => 'ASC',
 				] );
 
-				// Filter by is_enabled and visibility rules.
 				$visible_subtabs = [];
 				foreach ( $all_subtabs as $st ) {
 					if ( ! $st->is_enabled ) {
@@ -494,10 +482,10 @@ class BBTC_Group_Nav {
 					if ( $st->site_admin_only && ! current_user_can( 'manage_options' ) ) {
 						continue;
 					}
-					if ( ! BBTC_Group_Visibility::can_show_tab( (int) $st->id, $current_group, $current_user_id ) ) {
+					if ( ! Group_Visibility::can_show_tab( (int) $st->id, $current_group, $current_user_id ) ) {
 						continue;
 					}
-					if ( ! BBTC_Group_Visibility::can_view_tab( (int) $st->id, $current_group, $current_user_id ) ) {
+					if ( ! Group_Visibility::can_view_tab( (int) $st->id, $current_group, $current_user_id ) ) {
 						continue;
 					}
 					$visible_subtabs[] = $st;
@@ -508,7 +496,6 @@ class BBTC_Group_Nav {
 					$parent_slug         = $tab->slug;
 					$current_subtab_slug = bp_action_variable( 0 );
 
-					// Find the active sub-tab only if a slug is present in the URL.
 					$active_subtab = null;
 					if ( ! empty( $current_subtab_slug ) ) {
 						foreach ( $visible_subtabs as $st ) {
@@ -519,13 +506,12 @@ class BBTC_Group_Nav {
 						}
 					}
 
-					// Render sub-nav using BuddyBoss nav markup.
-					echo '<nav class="bp-navs group-subnav" id="bbtc-group-subnav" aria-label="' . esc_attr__( 'Group sub-navigation', 'buddyboss-tab-creator' ) . '">';
+					echo '<nav class="bp-navs group-subnav" id="bdm-group-subnav" aria-label="' . esc_attr__( 'Group sub-navigation', 'buddy-modules' ) . '">';
 					echo '<ul>';
 					foreach ( $visible_subtabs as $st ) {
 						$is_current = ( $active_subtab && (int) $st->id === (int) $active_subtab->id );
 						$subtab_url = trailingslashit( $group_link . $parent_slug . '/' . $st->slug );
-						$label      = apply_filters( 'bbtc_tab_label', $st->label, (int) $st->id );
+						$label      = apply_filters( 'bdm_tc_tab_label', $st->label, (int) $st->id );
 						printf(
 							'<li id="nav-%s"%s><a href="%s">%s</a></li>',
 							esc_attr( $st->slug ),
@@ -538,20 +524,17 @@ class BBTC_Group_Nav {
 					echo '</nav>';
 
 					if ( $active_subtab ) {
-						// A sub-tab slug was in the URL — render that sub-tab's content.
-						$content = apply_filters( 'bbtc_tab_content', $active_subtab->content, (int) $active_subtab->id );
+						$content = apply_filters( 'bdm_tc_tab_content', $active_subtab->content, (int) $active_subtab->id );
 						echo wp_kses_post( do_shortcode( $content ) );
 					} else {
-						// No sub-tab slug in URL — show the main tab's own content.
-						$content = apply_filters( 'bbtc_tab_content', $tab->content, $tab_id );
+						$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
 						echo wp_kses_post( do_shortcode( $content ) );
 					}
 
 					return;
 				}
 
-				// No sub-tabs: render the tab's own content.
-				$content = apply_filters( 'bbtc_tab_content', $tab->content, $tab_id );
+				$content = apply_filters( 'bdm_tc_tab_content', $tab->content, $tab_id );
 				echo wp_kses_post( do_shortcode( $content ) );
 			}
 		);

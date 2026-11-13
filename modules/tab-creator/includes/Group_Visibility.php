@@ -1,23 +1,28 @@
 <?php
-defined( 'ABSPATH' ) || exit;
-
 /**
  * Checks group tab availability and visibility on the front end.
- * All methods are static.
+ *
+ * @since 2.0.0
  */
-class BBTC_Group_Visibility {
+
+namespace BuddyModules\TabCreator;
+
+defined( 'ABSPATH' ) || exit;
+
+class Group_Visibility {
 
 	/**
 	 * Determines whether a tab is available on a specific group.
-	 * "Availability" controls which groups show this tab at all.
 	 *
-	 * @param int    $tab_id         The tab ID.
-	 * @param object $current_group  The current group object.
+	 * @since 2.0.0
+	 *
+	 * @param int    $tab_id          The tab ID.
+	 * @param object $current_group   The current group object.
 	 * @param int    $current_user_id The ID of the logged-in user (0 if logged out).
 	 * @return bool
 	 */
 	public static function can_show_tab( int $tab_id, object $current_group, int $current_user_id ): bool {
-		$rules = BBTC_DB::get_rules_for_tab( $tab_id );
+		$rules = DB::get_rules_for_tab( $tab_id );
 
 		$availability_rules = array_filter( $rules, fn( $r ) => 'availability' === $r->rule_type );
 
@@ -25,7 +30,7 @@ class BBTC_Group_Visibility {
 			return true;
 		}
 
-		// Excluded groups always override everything else — check first.
+		// Excluded groups always override everything else.
 		foreach ( $availability_rules as $rule ) {
 			if ( 'excluded_group_id' === $rule->rule_key && (int) $rule->rule_value === (int) $current_group->id ) {
 				return false;
@@ -44,7 +49,7 @@ class BBTC_Group_Visibility {
 			}
 		}
 
-		// Group status rules: if any exist, the group's status must match at least one.
+		// Group status rules.
 		$group_status_rules = array_filter( $availability_rules, fn( $r ) => 'group_status' === $r->rule_key );
 		if ( ! empty( $group_status_rules ) ) {
 			$group_status = $current_group->status ?? '';
@@ -62,7 +67,7 @@ class BBTC_Group_Visibility {
 			}
 		}
 
-		// Group ID rules (Tab Scope — specific groups): if any exist, the group must be in the list.
+		// Group ID rules (specific groups).
 		$group_id_rules = array_filter( $availability_rules, fn( $r ) => 'group_id' === $r->rule_key );
 		if ( ! empty( $group_id_rules ) ) {
 			$id_match = false;
@@ -84,16 +89,16 @@ class BBTC_Group_Visibility {
 
 	/**
 	 * Determines whether the current user can see a tab on a group page.
-	 * "Visibility" controls who (the viewer) can see the tab.
-	 * Returns true if at least one visibility rule passes.
 	 *
-	 * @param int    $tab_id         The tab ID.
-	 * @param object $current_group  The current group object.
+	 * @since 2.0.0
+	 *
+	 * @param int    $tab_id          The tab ID.
+	 * @param object $current_group   The current group object.
 	 * @param int    $current_user_id The ID of the logged-in user (0 if logged out).
 	 * @return bool
 	 */
 	public static function can_view_tab( int $tab_id, object $current_group, int $current_user_id ): bool {
-		$rules = BBTC_DB::get_rules_for_tab( $tab_id );
+		$rules = DB::get_rules_for_tab( $tab_id );
 
 		$visibility_rules = array_filter( $rules, fn( $r ) => 'visibility' === $r->rule_type );
 
