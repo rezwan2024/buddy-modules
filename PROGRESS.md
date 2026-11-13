@@ -2,7 +2,7 @@
 
 Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (see Open questions)
 
-**Current phase: P0** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (planning session, Opus 5.5)
+**Current phase: P1** · Plugin version target: 2.0.0 · Last updated: 2026-11-13 (P0 session, Sonnet 4.6)
 
 ---
 
@@ -12,15 +12,15 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - [x] Decisions agreed (PLAN.md §2)
 - [x] PLAN.md, CLAUDE.md, PROGRESS.md written (in legacy folder, move with it in P0)
 
-## P0 — Repo + scaffold
-- [ ] Backup copy → `/Users/shiblu/Local Sites/prod/plugin-backups/buddyboss-tab-creator-1.0.0-legacy/`
-- [ ] Rename folder `buddyboss-tab-creator/` → `buddy-modules/` (tell Rezwan: the plugin deactivates in WP because the path changes; reactivate the legacy entry so the site keeps working until P7)
-- [ ] After the rename: update the memory note `~/.claude/projects/-Users-shiblu-Local-Sites-prod/memory/buddy-modules-project.md` (and its MEMORY.md line) to the new path `plugins/buddy-modules/`
-- [ ] `git init`, first commit = legacy code as is, branch `dev` (per-repo signing config from CLAUDE.md → Git, key `4130442C8C1832A2`)
-- [ ] Create public repo `rezwan2024/buddy-modules` + push `dev` (after Rezwan confirms)
-- [ ] `package.json`, `package-lock.json`, `webpack.config.js`, `.gitignore`, `.distignore`, `phpcs.xml.dist`
-- [ ] Minimal `src/admin/index.js` + `npm run build` green
-- [ ] Done-when check: repo on GitHub, build green, legacy features still work
+## P0 — Repo + scaffold ✅
+- [x] Backup copy → `/Users/shiblu/Local Sites/prod/plugin-backups/buddyboss-tab-creator-1.0.0-legacy/`
+- [x] Rename folder `buddyboss-tab-creator/` → `buddy-modules/` (plugin deactivated in WP — Rezwan to reactivate the legacy entry)
+- [x] After the rename: update the memory note `~/.claude/projects/-Users-shiblu-Local-Sites-prod/memory/buddy-modules-project.md` to new path `plugins/buddy-modules/`
+- [x] `git init`, first commit = legacy code + scaffold, branch `dev` (key `4130442C8C1832A2`, commit f445960, Verified ✅)
+- [x] Created public repo `rezwan2024/buddy-modules` + pushed `dev`
+- [x] `package.json`, `package-lock.json`, `webpack.config.js`, `.gitignore`, `.distignore`, `phpcs.xml.dist`, `scripts/zip.js`
+- [x] Minimal `src/admin/index.js` + `npm run build` green
+- [x] Done-when check: repo on GitHub ✅, build green ✅, legacy code committed ✅
 
 ## P1 — Core PHP framework
 - [ ] `buddy-modules.php` header/constants/autoloader
@@ -120,6 +120,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 | Date | Phase | Model | Summary |
 |---|---|---|---|
 | 2026-11-13 | Planning | Opus 5.5 | Studied legacy + Platform 3.0. Decisions D1–D16. Wrote PLAN/CLAUDE/PROGRESS. |
+| 2026-11-13 | P0 | Sonnet 4.6 | Backup, folder rename → buddy-modules, git init, scaffold (package.json/webpack/phpcs), src/admin/index.js, npm build green, first GPG-signed commit f445960 Verified, repo rezwan2024/buddy-modules created + dev pushed. |
 
 ## Handoff note for next session
-Start **P0** with Sonnet 4.6. The md files are currently in `plugins/buddyboss-tab-creator/`. They move with the folder rename. Ask Rezwan before: the folder rename (it deactivates the plugin in WP), creating the GitHub repo, and pushing.
+Start **P1** with Sonnet 4.6. Plugin is at `plugins/buddy-modules/`. The legacy Tab Creator plugin is deactivated in WP (Rezwan needs to reactivate it in WP admin so the site keeps working until P7). P1 builds the core PHP framework: buddy-modules.php, Plugin.php, Module/Registry, Admin menu, REST modules controller, Tab Creator stub. The legacy code is still untouched inside the folder and will stay until P7.
