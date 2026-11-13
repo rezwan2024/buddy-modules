@@ -24,7 +24,55 @@ Instructions for every Claude Code session working on this plugin. Read this fil
    - handoff note for the next session
    - open questions
 5. Commit on `dev` (see Git). Push only when Rezwan asks.
-6. After the commit, give Rezwan the next-session prompt and **stop**. Do not continue into the next phase.
+6. After the commit, **always** output the next-session prompt (see template below) and stop. Do not wait for Rezwan to ask — generate it automatically every time.
+
+## Next-session prompt template
+
+After every phase commit, output this block verbatim, filling in the next phase number and scope from PLAN.md. Rezwan pastes it into a new chat to start the next phase.
+
+```
+Buddy Modules plugin — P<N> session.
+
+Plugin: /Users/shiblu/Local Sites/prod/app/public/wp-content/plugins/buddy-modules/
+
+FIRST: Read PROGRESS.md only (find the handoff note). Do NOT re-read CLAUDE.md or PLAN.md in full.
+
+--- CRITICAL RULES ---
+
+Model: Sonnet 4.6 only. Tell Rezwan before coding if on another model.
+One phase per session. After the P<N> commit, output the P<N+1> prompt and stop.
+
+Prefixes — PHP namespace: BuddyModules\; functions/options/hooks: bdm_; constants: BDM_;
+CSS: bdm-admin-* (BEM); REST: buddy-modules/v1; JS global: bdmAdminData; text domain: buddy-modules.
+Never use bb_, bp_, bbm_, bbtc_ for new code.
+
+Build commands (run from plugin root):
+  npm run build          — must be green before every commit
+  npm run lint:js && npm run lint:css
+  php -l <file>          — every touched PHP file
+
+Git: branch dev. Commit message: "P<N>: <what>".
+GPG sign every commit — personal key 4130442C8C1832A2:
+  git config --local user.name "MD. Rezwan Shiblu"
+  git config --local user.email "142478080+rezwan2024@users.noreply.github.com"
+  git config --local user.signingkey 4130442C8C1832A2
+  git config --local commit.gpgsign true
+  git config --local gpg.program /opt/homebrew/bin/gpg
+Tell Rezwan before committing (he enters the GPG passphrase). Never --no-gpg-sign.
+Never commit build/, node_modules/, *.min.js, *.min.css.
+Push only when Rezwan asks.
+
+Browser testing: isolated `playwright` MCP browser only (never playwright-chrome).
+Admin cookies: mint via PHP CLI (see wp-content/CLAUDE.md "Self-service login").
+Foreign admin notices suppressed on BDM pages — BDM notices hook onto bdm_admin_notices.
+apiRequest() builds absolute URL (restRoot + path) — never pass path alone to apiFetch.
+
+--- P<N> SCOPE ---
+
+<paste the phase tasks from PLAN.md §5 P<N> here, numbered>
+
+Done when: <paste the "Done when" line from PLAN.md>
+```
 
 ## Locations
 
