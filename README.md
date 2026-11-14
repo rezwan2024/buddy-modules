@@ -69,12 +69,13 @@ npm run deploy
 
 Local run: `printf 'STATS_TOKEN=localtest\n' > .dev.vars && npm run db:init:local && npm run dev` (http://127.0.0.1:8787).
 
-## Readmes
+## Readmes and docs
 
 | File | Shown where |
 |---|---|
 | `README.md` (this file) | `dev` branch on GitHub |
 | `README.dist.md` | `main` branch and the release zip, as `README.md` (copied by `scripts/dist.js`) |
+| `CLAUDE.md`, `docs/development/PLAN.md`, `docs/development/PROGRESS.md` | Project instructions, plan, and progress/handoff notes for development sessions (`dev` only). |
 | `docs/screenshots/` | Images in `README.dist.md`, loaded from the `dev` branch by URL (not in the zip). Retake from wp-admin at 1440px wide, 2× scale, cropped to the plugin area. |
 | `readme.txt` | WordPress "View details" screen; its `== Changelog ==` becomes the release notes |
 

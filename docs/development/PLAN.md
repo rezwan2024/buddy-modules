@@ -2,7 +2,7 @@
 
 > Planned with Opus 5.5 on 2026-11-13. Coding sessions use Sonnet 4.6.
 > This is an **in-place upgrade** of the legacy `buddyboss-tab-creator` plugin (v1.0.0), not a new build.
-> Read `CLAUDE.md` first, then this file, then `PROGRESS.md`.
+> Read `CLAUDE.md` (repo root) first, then this file, then `docs/development/PROGRESS.md`.
 
 ---
 
@@ -143,7 +143,8 @@ buddy-modules/
 ├── .github/workflows/release.yml  # P9
 ├── package.json  package-lock.json  webpack.config.js
 ├── phpcs.xml.dist  .gitignore  .distignore
-└── CLAUDE.md  PLAN.md  PROGRESS.md   # dev branch only (excluded from build via .distignore)
+├── CLAUDE.md                          # dev branch only (excluded from build via .distignore)
+└── docs/development/PLAN.md, PROGRESS.md   # dev branch only
 ```
 
 ### 4.2 Admin routing (no reload)

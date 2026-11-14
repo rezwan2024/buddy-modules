@@ -80,7 +80,7 @@ jobs:
           for f in buddy-modules.php readme.txt build/admin.js build/admin.asset.php build/admin.css lib/plugin-update-checker/plugin-update-checker.php; do
             unzip -l dist/buddy-modules.zip "buddy-modules/$f" > /dev/null || { echo "::error::$f missing from the zip"; exit 1; }
           done
-          for f in src package.json node_modules .github CLAUDE.md PLAN.md PROGRESS.md; do
+          for f in src package.json node_modules .github CLAUDE.md docs worker; do
             if [ -e "dist/buddy-modules/$f" ]; then echo "::error::$f must not ship"; exit 1; fi
           done
 

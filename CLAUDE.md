@@ -1,6 +1,6 @@
 # CLAUDE.md — Buddy Modules
 
-Instructions for every Claude Code session working on this plugin. Read this file in full, then `PLAN.md` (at least §2 Decisions + the current phase), then `PROGRESS.md`.
+Instructions for every Claude Code session working on this plugin. Read this file in full, then `docs/development/PLAN.md` (at least §2 Decisions + the current phase), then `docs/development/PROGRESS.md`.
 
 ## What this is
 
@@ -9,33 +9,33 @@ Instructions for every Claude Code session working on this plugin. Read this fil
 ## Models
 
 - **Coding sessions: Sonnet 4.6** (`/model claude-sonnet-4-6`). If the session is on another model, tell Rezwan before coding.
-- Planning, re-planning and editing `PLAN.md` / `CLAUDE.md`: Opus 5.5. If a coding session finds the plan wrong or missing something, **stop, write the issue in `PROGRESS.md` → "Open questions"**, and ask Rezwan. Do not redesign silently.
+- Planning, re-planning and editing `docs/development/PLAN.md` / `CLAUDE.md`: Opus 5.5. If a coding session finds the plan wrong or missing something, **stop, write the issue in `docs/development/PROGRESS.md` → "Open questions"**, and ask Rezwan. Do not redesign silently.
 
 ## Session protocol
 
 **One phase per chat session. Never start a second phase in the same session, even if the first finishes early. End the session after the phase commit.**
 
-1. Read **only `PROGRESS.md`** at session start (the handoff note tells you exactly what to do). Do NOT re-read CLAUDE.md or PLAN.md in full — the session prompt already contains the critical rules and phase scope. Only read a specific section of PLAN.md or CLAUDE.md if you need a detail not in the prompt or PROGRESS.md.
-2. Work **only on that phase**. No bonus features, no refactors outside the phase, no "while I'm here" fixes. A side bug goes into `PROGRESS.md` → "Found bugs (not in scope)".
-3. Tick tasks in `PROGRESS.md` as they finish (not at the end), so a cut-off session can resume.
-4. Before ending, run the phase's "Done when" checks, then update `PROGRESS.md`:
+1. Read **only `docs/development/PROGRESS.md`** at session start (the handoff note tells you exactly what to do). Do NOT re-read CLAUDE.md or docs/development/PLAN.md in full — the session prompt already contains the critical rules and phase scope. Only read a specific section of docs/development/PLAN.md or CLAUDE.md if you need a detail not in the prompt or docs/development/PROGRESS.md.
+2. Work **only on that phase**. No bonus features, no refactors outside the phase, no "while I'm here" fixes. A side bug goes into `docs/development/PROGRESS.md` → "Found bugs (not in scope)".
+3. Tick tasks in `docs/development/PROGRESS.md` as they finish (not at the end), so a cut-off session can resume.
+4. Before ending, run the phase's "Done when" checks, then update `docs/development/PROGRESS.md`:
    - task ticks
    - session log line
    - handoff note for the next session
    - open questions
-5. Commit on `dev` (see Git). Push only when Rezwan asks.
+5. Commit on `dev` (see Git) and push it to GitHub right away (Rezwan, 2026-11-14: always push, never leave commits only local).
 6. After the commit, **always** output the next-session prompt (see template below) and stop. Do not wait for Rezwan to ask — generate it automatically every time.
 
 ## Next-session prompt template
 
-After every phase commit, output this block verbatim, filling in the next phase number and scope from PLAN.md. Rezwan pastes it into a new chat to start the next phase.
+After every phase commit, output this block verbatim, filling in the next phase number and scope from docs/development/PLAN.md. Rezwan pastes it into a new chat to start the next phase.
 
 ```
 Buddy Modules plugin — P<N> session.
 
 Plugin (dev checkout): /Users/shiblu/Local Sites/prod/buddy-modules-dev/
 
-FIRST: Read PROGRESS.md only (find the handoff note). Do NOT re-read CLAUDE.md or PLAN.md in full.
+FIRST: Read docs/development/PROGRESS.md only (find the handoff note). Do NOT re-read CLAUDE.md or docs/development/PLAN.md in full.
 
 --- CRITICAL RULES ---
 
@@ -60,7 +60,7 @@ GPG sign every commit — personal key 4130442C8C1832A2:
   git config --local gpg.program /opt/homebrew/bin/gpg
 Tell Rezwan before committing (he enters the GPG passphrase). Never --no-gpg-sign.
 Never commit build/, node_modules/, *.min.js, *.min.css.
-Push only when Rezwan asks.
+Push every commit to GitHub right away (gh auth switch -h github.com -u rezwan2024 → push → check Verified → switch back).
 
 Browser testing: isolated `playwright` MCP browser only (never playwright-chrome).
 Admin cookies: mint via PHP CLI (see wp-content/CLAUDE.md "Self-service login").
@@ -69,19 +69,20 @@ apiRequest() builds absolute URL (restRoot + path) — never pass path alone to 
 
 --- P<N> SCOPE ---
 
-<paste the phase tasks from PLAN.md §5 P<N> here, numbered>
+<paste the phase tasks from docs/development/PLAN.md §5 P<N> here, numbered>
 
-Done when: <paste the "Done when" line from PLAN.md>
+Done when: <paste the "Done when" line from docs/development/PLAN.md>
 ```
 
 ## Locations
 
+- **Project docs**: `CLAUDE.md` stays at the repo root (Claude Code loads it from there); `docs/development/PLAN.md` and `docs/development/PROGRESS.md` hold the plan and the progress/handoff notes. All three are on `dev` only (never in the zip or on `main`).
 - **Dev checkout (git, branch `dev`)**: `/Users/shiblu/Local Sites/prod/buddy-modules-dev/` (moved out of `wp-content/plugins/` in P9, 2026-11-14, so a WordPress update never replaces the working tree).
 - **Installed plugin on prod.local**: `.../wp-content/plugins/buddy-modules/` = the **release zip**, kept up to date through the WP update screen (no `.git`). To test unreleased dev code there, copy the built dist over it (`npm run zip`, then `rsync -a --delete dist/buddy-modules/ <plugins>/buddy-modules/`) and reinstall the latest release afterwards (WP update screen or the release zip). Never move the checkout back into `plugins/` while the release copy is there. The update checker is off in any folder that has `.git` (filter `bdm_update_checker_enabled`).
 - Legacy backup (after P0): `/Users/shiblu/Local Sites/prod/plugin-backups/buddyboss-tab-creator-1.0.0-legacy/`
 - Test site: `http://prod.local` (wp-admin), BuddyBoss Platform 3.7.x active.
 - GitHub: `https://github.com/rezwan2024/buddy-modules` (public). `gh` has two accounts: use **`rezwan2024`** for this repo (`gh auth switch -u rezwan2024` before repo commands, switch back to `rezwan-buddyboss` after).
-- Platform 3.0 reference source: GitHub `buddyboss/buddyboss-platform`, branch `release`, folder `src/js/admin/` (file list in `PLAN.md` §4.4). Read with:
+- Platform 3.0 reference source: GitHub `buddyboss/buddyboss-platform`, branch `release`, folder `src/js/admin/` (file list in `docs/development/PLAN.md` §4.4). Read with:
   `gh api "repos/buddyboss/buddyboss-platform/contents/<path>?ref=release" --jq .content | base64 -d`
 - UI reference screenshots: `/Users/shiblu/Local Sites/prod/.playwright-mcp/bm-study/`
 
@@ -103,7 +104,7 @@ Done when: <paste the "Done when" line from PLAN.md>
 
 ## Architecture rules
 
-- Follow `PLAN.md` §4 exactly: folder structure, REST routes, routing, UI spec.
+- Follow `docs/development/PLAN.md` §4 exactly: folder structure, REST routes, routing, UI spec.
 - **Server API = WP REST** (`register_rest_route`, `WP_REST_Controller` base) with `permission_callback` → `current_user_can( 'manage_options' )`. Every arg gets a `sanitize_callback` + `validate_callback`. The JS side uses `@wordpress/api-fetch` only (no jQuery, no admin-ajax).
 - **Moving legacy code**: keep the logic, change only names/namespaces/table names. Sanitization, rule writing and hook priorities must behave the same as the legacy classes. When unsure, diff against the backup copy.
 - **UI = Platform 3.0 copy**:
@@ -116,7 +117,7 @@ Done when: <paste the "Done when" line from PLAN.md>
 - All user-facing strings go through `__()` (PHP) or `@wordpress/i18n` (JS) with the `buddy-modules` domain.
 - PHP 8.0+, WP 6.4+. Each function/class gets a docblock. `@since 2.0.0` for new code.
 - Escape output, sanitize input, `$wpdb->prepare` every query (keep the legacy `DB` allow-list for `orderby`).
-- No new runtime dependencies beyond those in `PLAN.md` §4.5 without asking.
+- No new runtime dependencies beyond those in `docs/development/PLAN.md` §4.5 without asking.
 
 ## Commands
 
@@ -159,7 +160,7 @@ phpcs: don't `composer install` inside the plugin. Install WPCS once into the sc
   - After push: `gh api repos/rezwan2024/buddy-modules/commits/<sha> --jq '.commit.verification | "\(.verified) \(.reason)"'` returns `true valid`.
   - `gh`: the `rezwan2024` login has scopes `repo, workflow, admin:gpg_key`. Use `gh auth switch -h github.com -u rezwan2024` before repo commands and `gh auth switch -h github.com -u rezwan-buddyboss` after (this gh version has no `-u` on `refresh`).
 - Never commit `node_modules/`, `build/`, `*.zip`, or anything secret. `.distignore` keeps `src/`, md files, configs and `node_modules` out of the dist.
-- Push / create repo / create releases / tags only when Rezwan asks.
+- Push every commit to `dev` on GitHub right away. Releases / tags when Rezwan asks or when a change must reach `main` (only the release workflow writes `main`).
 - **Releasing** (P9): bump the 4 version strings (header, `BDM_VERSION`, `package.json` via `npm version x.y.z --no-git-tag-version`, readme `Stable tag`), add `= x.y.z =` to readme `== Changelog ==`, signed commit, `git push origin dev vX.Y.Z` after `git tag vX.Y.Z`. `.github/workflows/release.yml` builds, publishes `main` + moves the tag + creates the Release. Then `git fetch --tags --force`. Full steps in `README.md`.
 
 ## Debugging with subagents
@@ -175,7 +176,7 @@ phpcs: don't `composer install` inside the plugin. Install WPCS once into the sc
 ## Don'ts
 
 - Don't rebuild features from scratch that exist in the legacy code. Move them.
-- Don't change Tab Creator behaviour or add fields/features. Parity first (`PLAN.md` §3).
+- Don't change Tab Creator behaviour or add fields/features. Parity first (`docs/development/PLAN.md` §3).
 - Don't touch BuddyBoss Platform, theme or other plugins' files.
 - Don't drop or alter legacy `bbtc_*` data.
 - Don't put Platform's brand name or logo in our UI. Use the Buddy Modules logo.
