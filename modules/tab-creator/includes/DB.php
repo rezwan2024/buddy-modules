@@ -2,6 +2,7 @@
 /**
  * All database CRUD for Tab Creator. No other class may call $wpdb directly.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,31 +10,88 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+// This class is the only data layer for the plugin's own bdm_tc_* tables: direct
+// queries are expected, and it keeps its own per-request cache (see clear_cache()).
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+/**
+ * Database access for Tab Creator tabs, overrides and their rules.
+ *
+ * @since 2.0.0
+ */
 class DB {
 
-	private static array $tabs_cache      = [];
-	private static array $rules_cache     = [];
-	private static array $overrides_cache = [];
+	/**
+	 * Cached tab query results for front-end requests.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	private static array $tabs_cache = array();
+
+	/**
+	 * Cached rule rows for tabs and overrides on front-end requests.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	private static array $rules_cache = array();
+
+	/**
+	 * Cached override rows by tab type for front-end requests.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	private static array $overrides_cache = array();
 
 	// -------------------------------------------------------------------------
 	// Table name getters
 	// -------------------------------------------------------------------------
 
+	/**
+	 * Get the tabs table name.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string
+	 */
 	public static function get_tabs_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'bdm_tc_tabs';
 	}
 
+	/**
+	 * Get the tab rules table name.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string
+	 */
 	public static function get_rules_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'bdm_tc_tab_rules';
 	}
 
+	/**
+	 * Get the existing-tab overrides table name.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string
+	 */
 	public static function get_overrides_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'bdm_tc_existing_tab_overrides';
 	}
 
+	/**
+	 * Get the existing-tab override rules table name.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @return string
+	 */
 	public static function get_override_rules_table(): string {
 		global $wpdb;
 		return $wpdb->prefix . 'bdm_tc_existing_tab_override_rules';
@@ -91,7 +149,7 @@ class DB {
 		$result = $wpdb->update(
 			self::get_tabs_table(),
 			$data,
-			[ 'id' => $id ]
+			array( 'id' => $id )
 		);
 
 		self::clear_cache();
@@ -104,7 +162,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int $id
+	 * @param int $id Tab ID.
 	 * @return object|null
 	 */
 	public static function get_tab( int $id ): object|null {
@@ -130,12 +188,12 @@ class DB {
 	 * @param array  $args     Optional query args.
 	 * @return array
 	 */
-	public static function get_tabs( string $tab_type, array $args = [] ): array {
+	public static function get_tabs( string $tab_type, array $args = array() ): array {
 		if ( is_admin() ) {
 			return self::query_tabs( $tab_type, $args );
 		}
 
-		$cache_key = $tab_type . '_' . md5( serialize( $args ) );
+		$cache_key = $tab_type . '_' . md5( wp_json_encode( $args ) );
 
 		if ( isset( self::$tabs_cache[ $cache_key ] ) ) {
 			return self::$tabs_cache[ $cache_key ];
@@ -148,9 +206,15 @@ class DB {
 	}
 
 	/**
+	 * Query tabs by type from the database, without the cache.
+	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $tab_type 'profile' or 'group'.
+	 * @param array  $args     Optional query args.
+	 * @return array
 	 */
-	private static function query_tabs( string $tab_type, array $args = [] ): array {
+	private static function query_tabs( string $tab_type, array $args = array() ): array {
 		global $wpdb;
 
 		$where = $wpdb->prepare( 'tab_type = %s', $tab_type );
@@ -167,7 +231,7 @@ class DB {
 			$where .= $wpdb->prepare( ' AND parent_existing_slug = %s', $args['parent_existing_slug'] );
 		}
 
-		$allowed_orderby = [ 'id', 'label', 'slug', 'position', 'status', 'created_at', 'updated_at' ];
+		$allowed_orderby = array( 'id', 'label', 'slug', 'position', 'status', 'created_at', 'updated_at' );
 		$orderby         = isset( $args['orderby'] ) && in_array( $args['orderby'], $allowed_orderby, true )
 			? $args['orderby']
 			: 'position';
@@ -184,7 +248,9 @@ class DB {
 		);
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-		return $wpdb->get_results( $sql ) ?: [];
+		$results = $wpdb->get_results( $sql );
+
+		return $results ? $results : array();
 	}
 
 	/**
@@ -192,11 +258,11 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $tab_type
-	 * @param array  $args
+	 * @param string $tab_type 'profile' or 'group'.
+	 * @param array  $args     Optional query args.
 	 * @return int
 	 */
-	public static function get_tabs_count( string $tab_type, array $args = [] ): int {
+	public static function get_tabs_count( string $tab_type, array $args = array() ): int {
 		global $wpdb;
 
 		$where = $wpdb->prepare( 'tab_type = %s', $tab_type );
@@ -232,7 +298,7 @@ class DB {
 
 		self::delete_rules_for_tab( $id );
 
-		$result = $wpdb->delete( self::get_tabs_table(), [ 'id' => $id ] );
+		$result = $wpdb->delete( self::get_tabs_table(), array( 'id' => $id ) );
 
 		self::clear_cache();
 
@@ -248,7 +314,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $data
+	 * @param array $data Column => value pairs.
 	 * @return int|false
 	 */
 	public static function insert_rule( array $data ): int|false {
@@ -270,7 +336,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int $tab_id
+	 * @param int $tab_id Tab ID.
 	 * @return array
 	 */
 	public static function get_rules_for_tab( int $tab_id ): array {
@@ -288,7 +354,8 @@ class DB {
 				"SELECT * FROM {$wpdb->prefix}bdm_tc_tab_rules WHERE tab_id = %d",
 				$tab_id
 			)
-		) ?: [];
+		);
+		$results = $results ? $results : array();
 
 		if ( ! is_admin() ) {
 			self::$rules_cache[ $cache_key ] = $results;
@@ -302,13 +369,13 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int $tab_id
+	 * @param int $tab_id Tab ID.
 	 * @return bool
 	 */
 	public static function delete_rules_for_tab( int $tab_id ): bool {
 		global $wpdb;
 
-		$result = $wpdb->delete( self::get_rules_table(), [ 'tab_id' => $tab_id ] );
+		$result = $wpdb->delete( self::get_rules_table(), array( 'tab_id' => $tab_id ) );
 
 		self::clear_cache();
 
@@ -324,9 +391,9 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $tab_type
-	 * @param string $original_slug
-	 * @param array  $data
+	 * @param string $tab_type      'profile' or 'group'.
+	 * @param string $original_slug Slug of the existing tab.
+	 * @param array  $data          Column => value pairs.
 	 * @return int|false Override ID or false on failure.
 	 */
 	public static function insert_or_update_override( string $tab_type, string $original_slug, array $data ): int|false {
@@ -340,7 +407,7 @@ class DB {
 			$result = $wpdb->update(
 				self::get_overrides_table(),
 				$data,
-				[ 'id' => (int) $existing->id ]
+				array( 'id' => (int) $existing->id )
 			);
 
 			self::clear_cache();
@@ -367,8 +434,8 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $tab_type
-	 * @param string $original_slug
+	 * @param string $tab_type      'profile' or 'group'.
+	 * @param string $original_slug Slug of the existing tab.
 	 * @return object|null
 	 */
 	public static function get_override( string $tab_type, string $original_slug ): object|null {
@@ -391,7 +458,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $tab_type
+	 * @param string $tab_type 'profile' or 'group'.
 	 * @return array
 	 */
 	public static function get_all_overrides( string $tab_type ): array {
@@ -405,25 +472,31 @@ class DB {
 			return self::$overrides_cache[ $cache_key ];
 		}
 
-		$results                              = self::query_overrides( $tab_type );
+		$results                             = self::query_overrides( $tab_type );
 		self::$overrides_cache[ $cache_key ] = $results;
 
 		return $results;
 	}
 
 	/**
+	 * Query all overrides for a tab type from the database, without the cache.
+	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $tab_type 'profile' or 'group'.
+	 * @return array
 	 */
 	private static function query_overrides( string $tab_type ): array {
 		global $wpdb;
 
-		return $wpdb->get_results(
+		$results = $wpdb->get_results(
 			$wpdb->prepare(
-				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				"SELECT * FROM {$wpdb->prefix}bdm_tc_existing_tab_overrides WHERE tab_type = %s",
 				$tab_type
 			)
-		) ?: [];
+		);
+
+		return $results ? $results : array();
 	}
 
 	/**
@@ -439,7 +512,7 @@ class DB {
 
 		self::delete_rules_for_override( $id );
 
-		$result = $wpdb->delete( self::get_overrides_table(), [ 'id' => $id ] );
+		$result = $wpdb->delete( self::get_overrides_table(), array( 'id' => $id ) );
 
 		self::clear_cache();
 
@@ -455,7 +528,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param array $data
+	 * @param array $data Column => value pairs.
 	 * @return int|false
 	 */
 	public static function insert_override_rule( array $data ): int|false {
@@ -477,7 +550,7 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int $override_id
+	 * @param int $override_id Override ID.
 	 * @return array
 	 */
 	public static function get_rules_for_override( int $override_id ): array {
@@ -495,7 +568,8 @@ class DB {
 				"SELECT * FROM {$wpdb->prefix}bdm_tc_existing_tab_override_rules WHERE override_id = %d",
 				$override_id
 			)
-		) ?: [];
+		);
+		$results = $results ? $results : array();
 
 		if ( ! is_admin() ) {
 			self::$rules_cache[ $cache_key ] = $results;
@@ -509,13 +583,13 @@ class DB {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param int $override_id
+	 * @param int $override_id Override ID.
 	 * @return bool
 	 */
 	public static function delete_rules_for_override( int $override_id ): bool {
 		global $wpdb;
 
-		$result = $wpdb->delete( self::get_override_rules_table(), [ 'override_id' => $override_id ] );
+		$result = $wpdb->delete( self::get_override_rules_table(), array( 'override_id' => $override_id ) );
 
 		self::clear_cache();
 
@@ -532,8 +606,8 @@ class DB {
 	 * @since 2.0.0
 	 */
 	public static function clear_cache(): void {
-		self::$tabs_cache      = [];
-		self::$rules_cache     = [];
-		self::$overrides_cache = [];
+		self::$tabs_cache      = array();
+		self::$rules_cache     = array();
+		self::$overrides_cache = array();
 	}
 }

@@ -8,6 +8,7 @@
  * PATCH  /buddy-modules/v1/tab-creator/existing-tabs/{slug}       — save override
  * DELETE /buddy-modules/v1/tab-creator/existing-tabs/{slug}       — remove override
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -15,9 +16,19 @@ namespace BuddyModules\TabCreator\REST;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * REST controller for overrides of existing profile and group tabs.
+ *
+ * @since 2.0.0
+ */
 class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 
-	/** @var string REST base. */
+	/**
+	 * REST base.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected $rest_base = 'tab-creator/existing-tabs';
 
 	/**
@@ -30,57 +41,57 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_items' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-					'args'                => [
-						'tab_type' => [
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+					'args'                => array(
+						'tab_type' => array(
 							'required'          => true,
 							'type'              => 'string',
-							'enum'              => [ 'profile', 'group' ],
+							'enum'              => array( 'profile', 'group' ),
 							'sanitize_callback' => 'sanitize_key',
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 
 		// /reorder — before (?P<slug>) to avoid slug matching.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/reorder',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'reorder_items' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-				],
-			]
+					'callback'            => array( $this, 'reorder_items' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+				),
+			)
 		);
 
 		// Single slug.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<slug>[a-z0-9_-]+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_item' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-				],
-				[
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+				),
+				array(
 					'methods'             => 'PATCH',
-					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-				],
-				[
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+				),
+				array(
 					'methods'             => \WP_REST_Server::DELETABLE,
-					'callback'            => [ $this, 'delete_item' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-				],
-			]
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+				),
+			)
 		);
 	}
 
@@ -89,7 +100,7 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response
 	 */
 	public function get_items( $request ): \WP_REST_Response {
@@ -97,7 +108,7 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 		$overrides = \BuddyModules\TabCreator\DB::get_all_overrides( $tab_type );
 
 		// Index overrides by slug for quick lookup.
-		$override_map = [];
+		$override_map = array();
 		foreach ( $overrides as $override ) {
 			$override_map[ $override->original_slug ] = $override;
 		}
@@ -105,14 +116,14 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 		if ( 'profile' === $tab_type ) {
 			$slugs  = \BuddyModules\TabCreator\Builtin_Tabs::get_known_profile_slugs();
 			$labels = \BuddyModules\TabCreator\Builtin_Tabs::get_profile_nav_labels();
-			$order  = get_option( 'bdm_tc_existing_profile_tab_order', [] );
+			$order  = get_option( 'bdm_tc_existing_profile_tab_order', array() );
 		} else {
 			$slugs  = \BuddyModules\TabCreator\Builtin_Tabs::get_known_group_slugs();
 			$labels = \BuddyModules\TabCreator\Builtin_Tabs::get_group_nav_labels();
-			$order  = get_option( 'bdm_tc_existing_group_tab_order', [] );
+			$order  = get_option( 'bdm_tc_existing_group_tab_order', array() );
 		}
 
-		$items = [];
+		$items = array();
 		foreach ( $slugs as $slug ) {
 			$override = $override_map[ $slug ] ?? null;
 			$items[]  = $this->prepare_item( $tab_type, $slug, $labels[ $slug ] ?? $slug, $override );
@@ -120,7 +131,7 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 
 		// Apply saved order if present.
 		if ( ! empty( $order ) ) {
-			$ordered = [];
+			$ordered = array();
 			foreach ( $order as $slug ) {
 				foreach ( $items as $item ) {
 					if ( $item['original_slug'] === $slug ) {
@@ -139,10 +150,10 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 		}
 
 		return rest_ensure_response(
-			[
+			array(
 				'tabs'  => $items,
 				'total' => count( $items ),
-			]
+			)
 		);
 	}
 
@@ -151,7 +162,7 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_item( $request ) {
@@ -179,19 +190,19 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function update_item( $request ) {
-		$body     = $request->get_json_params() ?? [];
+		$body     = $request->get_json_params() ?? array();
 		$tab_type = sanitize_key( $body['tab_type'] ?? $request->get_param( 'tab_type' ) ?? '' );
 		$slug     = sanitize_key( $request->get_param( 'slug' ) );
 
-		if ( ! in_array( $tab_type, [ 'profile', 'group' ], true ) ) {
+		if ( ! in_array( $tab_type, array( 'profile', 'group' ), true ) ) {
 			return $this->error( 'bdm_tc_invalid_type', __( 'tab_type must be profile or group.', 'buddy-modules' ) );
 		}
 
-		$fields = [
+		$fields = array(
 			'label_override'    => isset( $body['label_override'] ) ? sanitize_text_field( $body['label_override'] ) : null,
 			'position_override' => isset( $body['position_override'] ) ? (int) $body['position_override'] : null,
 			'is_enabled'        => isset( $body['is_enabled'] ) ? (int) $body['is_enabled'] : null,
@@ -200,8 +211,8 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 			'site_admin_only'   => isset( $body['site_admin_only'] ) ? (int) $body['site_admin_only'] : null,
 			'tab_link'          => isset( $body['tab_link'] ) ? esc_url_raw( $body['tab_link'] ) : null,
 			'item_css_id'       => isset( $body['item_css_id'] ) ? sanitize_html_class( $body['item_css_id'] ) : null,
-			'rules'             => (array) ( $body['rules'] ?? [] ),
-		];
+			'rules'             => (array) ( $body['rules'] ?? array() ),
+		);
 
 		// Strip null fields so they don't clobber existing values.
 		$fields = array_filter( $fields, fn( $v ) => null !== $v );
@@ -225,27 +236,27 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function delete_item( $request ) {
-		$body     = $request->get_json_params() ?? [];
+		$body     = $request->get_json_params() ?? array();
 		$tab_type = sanitize_key( $body['tab_type'] ?? $request->get_param( 'tab_type' ) ?? '' );
 		$slug     = sanitize_key( $request->get_param( 'slug' ) );
 
-		if ( ! in_array( $tab_type, [ 'profile', 'group' ], true ) ) {
+		if ( ! in_array( $tab_type, array( 'profile', 'group' ), true ) ) {
 			return $this->error( 'bdm_tc_invalid_type', __( 'tab_type must be profile or group.', 'buddy-modules' ) );
 		}
 
 		$override = \BuddyModules\TabCreator\DB::get_override( $tab_type, $slug );
 
 		if ( ! $override ) {
-			return rest_ensure_response( [ 'deleted' => false ] );
+			return rest_ensure_response( array( 'deleted' => false ) );
 		}
 
 		$deleted = \BuddyModules\TabCreator\DB::delete_override( (int) $override->id );
 
-		return rest_ensure_response( [ 'deleted' => $deleted ] );
+		return rest_ensure_response( array( 'deleted' => $deleted ) );
 	}
 
 	/**
@@ -253,21 +264,21 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function reorder_items( $request ) {
-		$body     = $request->get_json_params() ?? [];
+		$body     = $request->get_json_params() ?? array();
 		$tab_type = sanitize_key( $body['tab_type'] ?? '' );
-		$slugs    = array_map( 'sanitize_key', (array) ( $body['slugs'] ?? [] ) );
+		$slugs    = array_map( 'sanitize_key', (array) ( $body['slugs'] ?? array() ) );
 
-		if ( ! in_array( $tab_type, [ 'profile', 'group' ], true ) ) {
+		if ( ! in_array( $tab_type, array( 'profile', 'group' ), true ) ) {
 			return $this->error( 'bdm_tc_invalid_type', __( 'tab_type must be profile or group.', 'buddy-modules' ) );
 		}
 
 		$saved = \BuddyModules\TabCreator\Tab_Service::save_existing_tab_order( $tab_type, $slugs );
 
-		return rest_ensure_response( [ 'reordered' => $saved ] );
+		return rest_ensure_response( array( 'reordered' => $saved ) );
 	}
 
 	// -------------------------------------------------------------------------
@@ -279,14 +290,14 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string      $tab_type
-	 * @param string      $slug
-	 * @param string      $default_label
+	 * @param string      $tab_type      'profile' or 'group'.
+	 * @param string      $slug          Slug of the existing tab.
+	 * @param string      $default_label Default label of the existing tab.
 	 * @param object|null $override      DB row or null.
 	 * @return array
 	 */
 	private function prepare_item( string $tab_type, string $slug, string $default_label, ?object $override ): array {
-		$item = [
+		$item = array(
 			'original_slug'     => $slug,
 			'tab_type'          => $tab_type,
 			'default_label'     => $default_label,
@@ -299,13 +310,13 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 			'tab_link'          => null,
 			'item_css_id'       => null,
 			'override_id'       => null,
-			'rules'             => [],
-		];
+			'rules'             => array(),
+		);
 
 		if ( $override ) {
 			$item['override_id']       = (int) $override->id;
 			$item['label_override']    = $override->label_override;
-			$item['position_override'] = $override->position_override !== null ? (int) $override->position_override : null;
+			$item['position_override'] = null !== $override->position_override ? (int) $override->position_override : null;
 			$item['is_enabled']        = (int) $override->is_enabled;
 			$item['is_hidden']         = (int) $override->is_hidden;
 			$item['is_default']        = (int) $override->is_default;
@@ -325,11 +336,11 @@ class Existing_Tabs_Controller extends \BuddyModules\REST\Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $slug
+	 * @param string $slug Slug of the existing tab.
 	 * @return string 'profile'|'group'|''
 	 */
 	private function infer_tab_type_from_slug( string $slug ): string {
-		$group_only = [ 'feed', 'subgroups', 'photos', 'albums', 'videos', 'documents', 'messages', 'manage' ];
+		$group_only = array( 'feed', 'subgroups', 'photos', 'albums', 'videos', 'documents', 'messages', 'manage' );
 
 		if ( in_array( $slug, $group_only, true ) ) {
 			return 'group';

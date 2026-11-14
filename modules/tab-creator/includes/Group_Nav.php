@@ -2,6 +2,7 @@
 /**
  * Registers custom group tabs and sub-tabs on the BuddyBoss front end.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,10 +10,20 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Registers custom group tabs and sub-tabs and applies overrides to existing group tabs.
+ *
+ * @since 2.0.0
+ */
 class Group_Nav {
 
-	/** @var array Cached top-level group tabs keyed by tab_type. */
-	private static array $tabs_cache = [];
+	/**
+	 * Cached top-level group tabs keyed by tab_type.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	private static array $tabs_cache = array();
 
 	/**
 	 * Registers all hooks.
@@ -24,8 +35,8 @@ class Group_Nav {
 		// user or a displayed profile), so logged-out visitors never got custom
 		// group tabs. `groups_setup_nav` fires on every single-group request, after
 		// the built-in group tabs exist; run before the overrides at priority 10.
-		add_action( 'groups_setup_nav', [ self::class, 'register_tabs' ], 5 );
-		add_action( 'groups_setup_nav', [ self::class, 'register_subtabs' ], 6 );
+		add_action( 'groups_setup_nav', array( self::class, 'register_tabs' ), 5 );
+		add_action( 'groups_setup_nav', array( self::class, 'register_subtabs' ), 6 );
 
 		// apply_existing_overrides and inject_existing_group_subtabs must run on
 		// `groups_setup_nav`, NOT `bp_groups_setup_nav`. In BuddyBoss Platform,
@@ -33,16 +44,16 @@ class Group_Nav {
 		// group page tabs are registered. The built-in tabs are added after that,
 		// then `groups_setup_nav` fires. Running our overrides on `bp_groups_setup_nav`
 		// means edit_nav() / delete_nav() target nav items that don't exist yet.
-		add_action( 'groups_setup_nav', [ self::class, 'apply_existing_overrides' ], 10 );
+		add_action( 'groups_setup_nav', array( self::class, 'apply_existing_overrides' ), 10 );
 		// bp_actions fires at bp_init priority 11, after bp_setup_nav (priority 6).
 		// Third-party plugins register their group nav at bp_actions priority 9,
 		// so we cache at priority 10 to capture them.
-		add_action( 'bp_actions', [ self::class, 'cache_builtin_group_nav_slugs' ], 10 );
-		add_action( 'groups_setup_nav', [ self::class, 'inject_existing_group_subtabs' ], 20 );
+		add_action( 'bp_actions', array( self::class, 'cache_builtin_group_nav_slugs' ), 10 );
+		add_action( 'groups_setup_nav', array( self::class, 'inject_existing_group_subtabs' ), 20 );
 
 		// Inject our saved group tab order into BuddyBoss's appearance settings
 		// so bp_nouveau_set_nav_item_order() applies it during template rendering.
-		add_filter( 'bp_after_nouveau_appearance_settings_parse_args', [ self::class, 'inject_group_nav_order' ] );
+		add_filter( 'bp_after_nouveau_appearance_settings_parse_args', array( self::class, 'inject_group_nav_order' ) );
 	}
 
 	/**
@@ -54,13 +65,13 @@ class Group_Nav {
 	 * @return mixed Modified value with group_nav_order injected.
 	 */
 	public static function inject_group_nav_order( mixed $value ): mixed {
-		$saved_order = get_option( 'bdm_tc_existing_group_tab_order', [] );
+		$saved_order = get_option( 'bdm_tc_existing_group_tab_order', array() );
 		if ( empty( $saved_order ) ) {
 			return $value;
 		}
 
 		if ( ! is_array( $value ) ) {
-			$value = [];
+			$value = array();
 		}
 
 		$value['group_nav_order'] = $saved_order;
@@ -89,16 +100,22 @@ class Group_Nav {
 			return;
 		}
 
-		$secondary = $nav->get_secondary( [ 'parent_slug' => $group->slug ] );
+		$secondary = $nav->get_secondary( array( 'parent_slug' => $group->slug ) );
 		if ( ! is_array( $secondary ) || empty( $secondary ) ) {
 			return;
 		}
 
-		$custom_tabs      = DB::get_tabs( 'group', [ 'status' => 'active', 'parent_id' => 0 ] );
+		$custom_tabs      = DB::get_tabs(
+			'group',
+			array(
+				'status'    => 'active',
+				'parent_id' => 0,
+			)
+		);
 		$custom_tab_slugs = array_map( fn( $t ) => $t->slug, $custom_tabs );
 
-		$slugs  = [];
-		$labels = [];
+		$slugs  = array();
+		$labels = array();
 		foreach ( $secondary as $item ) {
 			$data       = is_object( $item ) ? (array) $item : (array) $item;
 			$clean_slug = sanitize_key( (string) ( $data['slug'] ?? '' ) );
@@ -131,7 +148,13 @@ class Group_Nav {
 			return self::$tabs_cache[ $tab_type ];
 		}
 
-		$tabs = DB::get_tabs( $tab_type, [ 'status' => 'active', 'parent_id' => 0 ] );
+		$tabs                          = DB::get_tabs(
+			$tab_type,
+			array(
+				'status'    => 'active',
+				'parent_id' => 0,
+			)
+		);
 		self::$tabs_cache[ $tab_type ] = $tabs;
 
 		return $tabs;
@@ -163,7 +186,7 @@ class Group_Nav {
 				continue;
 			}
 
-			if ( ! Group_Visibility::can_show_tab( (int) $tab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_show_tab( (int) $tab->id, $current_group ) ) {
 				continue;
 			}
 
@@ -174,7 +197,7 @@ class Group_Nav {
 			$label  = apply_filters( 'bdm_tc_tab_label', $tab->label, (int) $tab->id );
 			$tab_id = (int) $tab->id;
 
-			$nav_args = [
+			$nav_args = array(
 				'name'            => $label,
 				'slug'            => $tab->slug,
 				'position'        => (int) $tab->position + 100,
@@ -184,17 +207,17 @@ class Group_Nav {
 				// Same access as the built-in group tabs: non-members can't open
 				// custom tab content on private/hidden groups.
 				'user_has_access' => (bool) ( $current_group->user_has_access ?? false ),
-			];
+			);
 
 			if ( ! empty( $tab->item_css_id ) ) {
 				$nav_args['item_css_id'] = $tab->item_css_id;
 			}
 
 			if ( 'url' === $tab->content_source ) {
-				$link = ! empty( $tab->tab_link ) ? $tab->tab_link : $tab->external_url;
+				$link             = ! empty( $tab->tab_link ) ? $tab->tab_link : $tab->external_url;
 				$nav_args['link'] = esc_url( $link );
 			} else {
-				$nav_args['screen_function'] = function() use ( $tab_id ) {
+				$nav_args['screen_function'] = function () use ( $tab_id ) {
 					self::render_screen( $tab_id );
 				};
 
@@ -270,7 +293,7 @@ class Group_Nav {
 						$passes = false;
 						break;
 					}
-					if ( 'group_status' === $rule->rule_key && $rule->rule_value === ( $current_group->status ?? '' ) ) {
+					if ( 'group_status' === $rule->rule_key && ( $current_group->status ?? '' ) === $rule->rule_value ) {
 						$passes = true;
 					}
 					if ( 'group_id' === $rule->rule_key && (int) $rule->rule_value === (int) $current_group->id ) {
@@ -294,7 +317,7 @@ class Group_Nav {
 
 					$val = $rule->rule_value;
 
-					if ( in_array( $val, [ 'do_not_modify', 'none_remove' ], true ) ) {
+					if ( in_array( $val, array( 'do_not_modify', 'none_remove' ), true ) ) {
 						$can_view = true;
 						break;
 					}
@@ -351,27 +374,27 @@ class Group_Nav {
 
 			// --- Label override ----------------------------------------------
 			if ( ! empty( $override->label_override ) ) {
-				$nav->edit_nav( [ 'name' => $override->label_override ], $slug, $group_slug );
+				$nav->edit_nav( array( 'name' => $override->label_override ), $slug, $group_slug );
 			}
 
 			// --- Position override -------------------------------------------
 			if ( null !== $override->position_override ) {
-				$nav->edit_nav( [ 'position' => (int) $override->position_override ], $slug, $group_slug );
+				$nav->edit_nav( array( 'position' => (int) $override->position_override ), $slug, $group_slug );
 			}
 
 			// --- Tab link override -------------------------------------------
 			if ( ! empty( $override->tab_link ) ) {
-				$nav->edit_nav( [ 'link' => esc_url( $override->tab_link ) ], $slug, $group_slug );
+				$nav->edit_nav( array( 'link' => esc_url( $override->tab_link ) ), $slug, $group_slug );
 			}
 
 			// --- Item CSS ID override ----------------------------------------
 			if ( ! empty( $override->item_css_id ) ) {
-				$nav->edit_nav( [ 'css_id' => $override->item_css_id ], $slug, $group_slug );
+				$nav->edit_nav( array( 'css_id' => $override->item_css_id ), $slug, $group_slug );
 			}
 
 			// --- Default tab -------------------------------------------------
 			if ( ! empty( $override->is_default ) ) {
-				$nav->edit_nav( [ 'default_subnav_slug' => $slug ], $group_slug );
+				$nav->edit_nav( array( 'default_subnav_slug' => $slug ), $group_slug );
 			}
 		}
 	}
@@ -391,7 +414,7 @@ class Group_Nav {
 		$current_user_id = get_current_user_id();
 		$group_link      = bp_get_group_permalink( $current_group );
 
-		$subtabs = DB::get_tabs( 'group', [ 'status' => 'active' ] );
+		$subtabs = DB::get_tabs( 'group', array( 'status' => 'active' ) );
 		$subtabs = array_filter(
 			$subtabs,
 			fn( $t ) => ! empty( $t->parent_existing_slug ) && 0 === (int) $t->parent_id
@@ -418,7 +441,12 @@ class Group_Nav {
 			$parent_slug = $subtab->parent_existing_slug;
 
 			// Safety check: verify parent nav item exists in group nav.
-			$parent_nav = $nav->get_secondary( [ 'parent_slug' => $current_group->slug, 'slug' => $parent_slug ] );
+			$parent_nav = $nav->get_secondary(
+				array(
+					'parent_slug' => $current_group->slug,
+					'slug'        => $parent_slug,
+				)
+			);
 			if ( empty( $parent_nav ) ) {
 				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 					// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -427,7 +455,7 @@ class Group_Nav {
 				continue;
 			}
 
-			if ( ! Group_Visibility::can_show_tab( (int) $subtab->id, $current_group, $current_user_id ) ) {
+			if ( ! Group_Visibility::can_show_tab( (int) $subtab->id, $current_group ) ) {
 				continue;
 			}
 
@@ -438,18 +466,20 @@ class Group_Nav {
 			$label  = apply_filters( 'bdm_tc_tab_label', $subtab->label, (int) $subtab->id );
 			$tab_id = (int) $subtab->id;
 
-			$screen_function = function() use ( $tab_id ) {
+			$screen_function = function () use ( $tab_id ) {
 				self::render_screen( $tab_id );
 			};
 
-			bp_core_new_subnav_item( [
-				'name'            => $label,
-				'slug'            => $subtab->slug,
-				'parent_slug'     => $parent_slug,
-				'parent_url'      => trailingslashit( $group_link . $parent_slug ),
-				'position'        => (int) $subtab->position,
-				'screen_function' => $screen_function,
-			] );
+			bp_core_new_subnav_item(
+				array(
+					'name'            => $label,
+					'slug'            => $subtab->slug,
+					'parent_slug'     => $parent_slug,
+					'parent_url'      => trailingslashit( $group_link . $parent_slug ),
+					'position'        => (int) $subtab->position,
+					'screen_function' => $screen_function,
+				)
+			);
 		}
 	}
 
@@ -463,7 +493,7 @@ class Group_Nav {
 	public static function render_screen( int $tab_id ): void {
 		add_action(
 			'bp_template_content',
-			function() use ( $tab_id ): void {
+			function () use ( $tab_id ): void {
 				$tab = DB::get_tab( $tab_id );
 
 				if ( ! $tab ) {
@@ -473,14 +503,17 @@ class Group_Nav {
 				$current_group   = groups_get_current_group();
 				$current_user_id = get_current_user_id();
 
-				$all_subtabs = DB::get_tabs( 'group', [
-					'status'    => 'active',
-					'parent_id' => $tab_id,
-					'orderby'   => 'position',
-					'order'     => 'ASC',
-				] );
+				$all_subtabs = DB::get_tabs(
+					'group',
+					array(
+						'status'    => 'active',
+						'parent_id' => $tab_id,
+						'orderby'   => 'position',
+						'order'     => 'ASC',
+					)
+				);
 
-				$visible_subtabs = [];
+				$visible_subtabs = array();
 				foreach ( $all_subtabs as $st ) {
 					if ( ! $st->is_enabled ) {
 						continue;
@@ -488,7 +521,7 @@ class Group_Nav {
 					if ( $st->site_admin_only && ! current_user_can( 'manage_options' ) ) {
 						continue;
 					}
-					if ( ! Group_Visibility::can_show_tab( (int) $st->id, $current_group, $current_user_id ) ) {
+					if ( ! Group_Visibility::can_show_tab( (int) $st->id, $current_group ) ) {
 						continue;
 					}
 					if ( ! Group_Visibility::can_view_tab( (int) $st->id, $current_group, $current_user_id ) ) {
@@ -515,14 +548,14 @@ class Group_Nav {
 					// Same markup/classes as the theme's own sub-nav (members/single/
 					// parts/item-subnav.php), so it gets the theme's button styling.
 					// Only the sub-tabs are listed; the tab itself is in the main nav.
-					$items = [];
+					$items = array();
 					foreach ( $visible_subtabs as $st ) {
-						$items[] = [
+						$items[] = array(
 							'slug'    => $st->slug,
 							'url'     => trailingslashit( $group_link . $parent_slug . '/' . $st->slug ),
 							'label'   => apply_filters( 'bdm_tc_tab_label', $st->label, (int) $st->id ),
 							'current' => $active_subtab && (int) $st->id === (int) $active_subtab->id,
-						];
+						);
 					}
 
 					echo '<nav class="bp-navs bp-subnavs no-ajax group-subnav bb-subnav-plain" id="bdm-group-subnav" role="navigation" aria-label="' . esc_attr__( 'Group sub-navigation', 'buddy-modules' ) . '">';
@@ -556,6 +589,7 @@ class Group_Nav {
 			}
 		);
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- BuddyBoss Platform's own template filter.
 		bp_core_load_template( apply_filters( 'bp_core_template_plugin', 'groups/single/plugins' ) );
 	}
 }

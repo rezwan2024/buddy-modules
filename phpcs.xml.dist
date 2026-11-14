@@ -13,14 +13,20 @@
 	<arg name="basepath" value="."/>
 	<arg value="sp"/>
 
+	<!-- PHP compatibility (same as BuddyBoss Platform's ruleset). -->
+	<rule ref="PHPCompatibilityWP"/>
+
 	<rule ref="WordPress">
 		<exclude name="WordPress.Files.FileName"/>
+		<!-- Same exclusion as BuddyBoss Platform: table names are interpolated, values are prepared. -->
+		<exclude name="WordPress.DB.PreparedSQL.InterpolatedNotPrepared"/>
 	</rule>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="bdm"/>
+				<element value="bdm_"/>
+				<element value="BDM_"/>
 				<element value="BuddyModules"/>
 			</property>
 		</properties>

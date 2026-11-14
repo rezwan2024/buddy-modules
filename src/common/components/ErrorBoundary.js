@@ -32,7 +32,12 @@ export class ErrorBoundary extends Component {
 			return (
 				<div className="bdm-admin-error-boundary notice notice-error">
 					<p>
-						<strong>{ __( 'Buddy Modules encountered an error.', 'buddy-modules' ) }</strong>
+						<strong>
+							{ __(
+								'Buddy Modules encountered an error.',
+								'buddy-modules'
+							) }
+						</strong>
 					</p>
 					{ this.state.message && (
 						<p>
@@ -40,7 +45,10 @@ export class ErrorBoundary extends Component {
 						</p>
 					) }
 					<p>
-						{ __( 'Please reload the page. If the problem persists, deactivate and reactivate the plugin.', 'buddy-modules' ) }
+						{ __(
+							'Please reload the page. If the problem persists, deactivate and reactivate the plugin.',
+							'buddy-modules'
+						) }
 					</p>
 				</div>
 			);

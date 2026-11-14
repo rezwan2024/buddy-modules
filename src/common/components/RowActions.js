@@ -17,32 +17,45 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
  * @param {Array}  props.actions List of { key, label, icon, onClick, isDestructive? }.
  *                               `icon` is a bb-icons-rl-* class name.
  * @param {string} props.label   Accessible label for the toggle button.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The row actions.
  */
 export function RowActions( { actions, label } ) {
 	return (
 		<DropdownMenu
-			icon={ <i className="bb-icons-rl bb-icons-rl-dots-three" aria-hidden="true" /> }
+			icon={
+				<i
+					className="bb-icons-rl bb-icons-rl-dots-three"
+					aria-hidden="true"
+				/>
+			}
 			label={ label || __( 'More options', 'buddy-modules' ) }
 			className="bdm-admin-row-menu"
 			toggleProps={ { className: 'bdm-admin-row-menu__toggle' } }
-			popoverProps={ { className: 'bdm-admin-row-menu__popover', placement: 'bottom-end' } }
+			popoverProps={ {
+				className: 'bdm-admin-row-menu__popover',
+				placement: 'bottom-end',
+			} }
 		>
-			{ function( { onClose } ) {
+			{ function ( { onClose } ) {
 				return (
 					<MenuGroup>
-						{ actions.map( function( action ) {
+						{ actions.map( function ( action ) {
 							return (
 								<MenuItem
 									key={ action.key }
 									className="bdm-admin-row-menu__item"
 									isDestructive={ !! action.isDestructive }
-									onClick={ function() {
+									onClick={ function () {
 										onClose();
 										action.onClick();
 									} }
 								>
-									<i className={ 'bb-icons-rl ' + action.icon } aria-hidden="true" />
+									<i
+										className={
+											'bb-icons-rl ' + action.icon
+										}
+										aria-hidden="true"
+									/>
 									{ action.label }
 								</MenuItem>
 							);

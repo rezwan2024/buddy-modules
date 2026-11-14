@@ -26,23 +26,23 @@
  *
  * @param {Array}  rules   Tab / override rules array from REST.
  * @param {string} tabType 'profile' or 'group'.
- * @returns {Object}
+ * @return {Object} Rule state for the editor form.
  */
 export function parseRules( rules, tabType ) {
-	var out = {
-		availability:      [],
-		associated_users:  [],
-		enabled_for:       [],
+	const out = {
+		availability: [],
+		associated_users: [],
+		enabled_for: [],
 		associated_groups: [],
-		excluded_groups:   [],
-		visibility:        [],
+		excluded_groups: [],
+		visibility: [],
 	};
 
 	if ( ! Array.isArray( rules ) ) {
 		return out;
 	}
 
-	rules.forEach( function( r ) {
+	rules.forEach( function ( r ) {
 		if ( 'availability' === r.rule_type ) {
 			if ( 'scope' === r.rule_key ) {
 				if ( 'profile' === tabType ) {
@@ -51,29 +51,27 @@ export function parseRules( rules, tabType ) {
 					} else if ( 'none' === r.rule_value ) {
 						out.availability.push( 'none_wp' );
 					}
-				} else {
-					if ( 'all' === r.rule_value ) {
-						out.enabled_for.push( 'all' );
-					} else if ( 'none' === r.rule_value ) {
-						out.enabled_for.push( 'none' );
-					}
+				} else if ( 'all' === r.rule_value ) {
+					out.enabled_for.push( 'all' );
+				} else if ( 'none' === r.rule_value ) {
+					out.enabled_for.push( 'none' );
 				}
 			} else if ( 'role' === r.rule_key && 'profile' === tabType ) {
 				out.availability.push( r.rule_value );
 			} else if ( 'user_id' === r.rule_key ) {
-				var uid = parseInt( r.rule_value, 10 );
+				const uid = parseInt( r.rule_value, 10 );
 				if ( uid > 0 ) {
 					out.associated_users.push( uid );
 				}
 			} else if ( 'group_status' === r.rule_key ) {
 				out.enabled_for.push( r.rule_value );
 			} else if ( 'group_id' === r.rule_key ) {
-				var gid = parseInt( r.rule_value, 10 );
+				const gid = parseInt( r.rule_value, 10 );
 				if ( gid > 0 ) {
 					out.associated_groups.push( gid );
 				}
 			} else if ( 'excluded_group_id' === r.rule_key ) {
-				var eid = parseInt( r.rule_value, 10 );
+				const eid = parseInt( r.rule_value, 10 );
 				if ( eid > 0 ) {
 					out.excluded_groups.push( eid );
 				}
@@ -93,19 +91,30 @@ export function parseRules( rules, tabType ) {
  *
  * @since 2.0.0
  *
- * @param {Object} formRules  Structured rules from form state.
- * @param {number[]} associatedUserIds   User IDs for associated_users.
- * @param {number[]} associatedGroupIds  Group IDs for associated_groups.
- * @param {number[]} excludedGroupIds    Group IDs for excluded_groups.
- * @returns {Object}
+ * @param {Object}   formRules          Structured rules from form state.
+ * @param {number[]} associatedUserIds  User IDs for associated_users.
+ * @param {number[]} associatedGroupIds Group IDs for associated_groups.
+ * @param {number[]} excludedGroupIds   Group IDs for excluded_groups.
+ * @return {Object} Rules payload for the REST request.
  */
-export function serializeRules( formRules, associatedUserIds, associatedGroupIds, excludedGroupIds ) {
-	return {
-		availability:      formRules.availability      || [],
-		associated_users:  associatedUserIds           || [],
-		enabled_for:       formRules.enabled_for       || [],
-		associated_groups: associatedGroupIds          || [],
-		excluded_groups:   excludedGroupIds            || [],
-		visibility:        formRules.visibility        || [],
+export function serializeRules(
+	formRules,
+	associatedUserIds,
+	associatedGroupIds,
+	excludedGroupIds
+) {
+	const rules = {
+		availability: formRules.availability || [],
+		associated_users: associatedUserIds || [],
+		enabled_for: formRules.enabled_for || [],
+		associated_groups: associatedGroupIds || [],
+		excluded_groups: excludedGroupIds || [],
 	};
+
+	// Visibility has no field in the editors: leave it out so the server keeps the stored rules.
+	if ( Array.isArray( formRules.visibility ) ) {
+		rules.visibility = formRules.visibility;
+	}
+
+	return rules;
 }

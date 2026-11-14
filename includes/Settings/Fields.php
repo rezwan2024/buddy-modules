@@ -5,6 +5,7 @@
  * Modules call the static registration methods to declare their settings schema.
  * The schema is in-memory only; values live in the WP option bdm_settings_{module}.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -12,10 +13,20 @@ namespace BuddyModules\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Static registry of module settings panels, sections and fields.
+ *
+ * @since 2.0.0
+ */
 class Fields {
 
-	/** @var array<string, array> In-memory registry keyed by module ID. */
-	private static array $registry = [];
+	/**
+	 * In-memory registry keyed by module ID.
+	 *
+	 * @since 2.0.0
+	 * @var array<string, array>
+	 */
+	private static array $registry = array();
 
 	/**
 	 * Register a settings panel for a module.
@@ -25,6 +36,8 @@ class Fields {
 	 * @param string $module   Module ID (e.g. 'tab-creator').
 	 * @param string $panel_id Unique panel slug within the module.
 	 * @param array  $args {
+	 *     Panel arguments.
+	 *
 	 *     @type string $label Human-readable panel title.
 	 *     @type string $icon  Optional icon: BuddyBoss line icon (e.g. 'bb-icons-rl-user') or dashicons class (e.g. 'dashicons-menu-alt').
 	 * }
@@ -43,6 +56,8 @@ class Fields {
 	 * @param string $panel_id   Panel slug.
 	 * @param string $section_id Unique section slug within the panel.
 	 * @param array  $args {
+	 *     Section arguments.
+	 *
 	 *     @type string $label       Section heading (optional).
 	 *     @type string $description Section description (optional).
 	 * }
@@ -62,6 +77,8 @@ class Fields {
 	 * @param string $section_id Section slug.
 	 * @param string $field_id   Unique field slug within the module.
 	 * @param array  $args {
+	 *     Field arguments.
+	 *
 	 *     @type string $type        Field type: toggle|text|textarea|select|radio|checkbox_list|number|url.
 	 *     @type string $label       Field label shown in the UI.
 	 *     @type string $description Help text (optional).
@@ -83,22 +100,22 @@ class Fields {
 	 * @return array
 	 */
 	public static function get_schema( string $module ): array {
-		$result = [];
-		$panels = self::$registry[ $module ]['panels'] ?? [];
+		$result = array();
+		$panels = self::$registry[ $module ]['panels'] ?? array();
 
 		foreach ( $panels as $panel_id => $panel ) {
 			$panel_data             = $panel;
 			$panel_data['id']       = $panel_id;
-			$panel_data['sections'] = [];
+			$panel_data['sections'] = array();
 
-			$sections = self::$registry[ $module ]['sections'][ $panel_id ] ?? [];
+			$sections = self::$registry[ $module ]['sections'][ $panel_id ] ?? array();
 
 			foreach ( $sections as $section_id => $section ) {
 				$section_data           = $section;
 				$section_data['id']     = $section_id;
-				$section_data['fields'] = [];
+				$section_data['fields'] = array();
 
-				$fields = self::$registry[ $module ]['fields'][ $panel_id ][ $section_id ] ?? [];
+				$fields = self::$registry[ $module ]['fields'][ $panel_id ][ $section_id ] ?? array();
 
 				foreach ( $fields as $field_id => $field ) {
 					$field['id']              = $field_id;
@@ -123,7 +140,7 @@ class Fields {
 	 * @return array<string, array>
 	 */
 	public static function get_panels( string $module ): array {
-		return self::$registry[ $module ]['panels'] ?? [];
+		return self::$registry[ $module ]['panels'] ?? array();
 	}
 
 	/**
@@ -136,11 +153,11 @@ class Fields {
 	 * @return array<string, array>
 	 */
 	public static function get_flat_fields( string $module, string $panel_id ): array {
-		$result   = [];
-		$sections = self::$registry[ $module ]['sections'][ $panel_id ] ?? [];
+		$result   = array();
+		$sections = self::$registry[ $module ]['sections'][ $panel_id ] ?? array();
 
 		foreach ( array_keys( $sections ) as $section_id ) {
-			$fields = self::$registry[ $module ]['fields'][ $panel_id ][ $section_id ] ?? [];
+			$fields = self::$registry[ $module ]['fields'][ $panel_id ][ $section_id ] ?? array();
 			foreach ( $fields as $field_id => $field ) {
 				$result[ $field_id ] = $field;
 			}
@@ -173,7 +190,7 @@ class Fields {
 				return sanitize_key( (string) $value );
 			case 'checkbox_list':
 				if ( ! is_array( $value ) ) {
-					return [];
+					return array();
 				}
 				return array_map( 'sanitize_key', $value );
 			case 'text':
@@ -182,14 +199,20 @@ class Fields {
 		}
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Create the empty registry entry for a module if it does not exist yet.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $module Module ID.
+	 */
 	private static function ensure( string $module ): void {
 		if ( ! isset( self::$registry[ $module ] ) ) {
-			self::$registry[ $module ] = [
-				'panels'   => [],
-				'sections' => [],
-				'fields'   => [],
-			];
+			self::$registry[ $module ] = array(
+				'panels'   => array(),
+				'sections' => array(),
+				'fields'   => array(),
+			);
 		}
 	}
 }

@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  *
  * @param {Object}   props
  * @param {Function} props.navigate Navigate to a new route.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The header.
  */
 export function Header( { navigate } ) {
 	function handleTitleClick( e ) {
@@ -27,7 +27,10 @@ export function Header( { navigate } ) {
 				type="button"
 				className="bdm-admin-header__title"
 				onClick={ handleTitleClick }
-				aria-label={ __( 'Buddy Modules — back to dashboard', 'buddy-modules' ) }
+				aria-label={ __(
+					'Buddy Modules — back to dashboard',
+					'buddy-modules'
+				) }
 			>
 				{ __( 'Buddy Modules', 'buddy-modules' ) }
 			</button>

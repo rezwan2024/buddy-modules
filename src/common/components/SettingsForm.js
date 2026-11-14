@@ -15,7 +15,6 @@ import {
 	RadioControl,
 	CheckboxControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 // ── Field renderers ───────────────────────────────────────────────────────────
 
@@ -28,7 +27,7 @@ import { __ } from '@wordpress/i18n';
  * @param {Object}   props.field    Field schema (id, type, options, …).
  * @param {*}        props.value    Current value.
  * @param {Function} props.onChange Called with the new value.
- * @returns {JSX.Element|null}
+ * @return {JSX.Element|null} The field control, or null for an unknown field type.
  */
 function FieldInput( { field, value, onChange } ) {
 	switch ( field.type ) {
@@ -45,8 +44,14 @@ function FieldInput( { field, value, onChange } ) {
 			return (
 				<TextControl
 					type="number"
-					value={ null !== value && undefined !== value ? String( value ) : '' }
-					onChange={ function( v ) { onChange( v ); } }
+					value={
+						null !== value && undefined !== value
+							? String( value )
+							: ''
+					}
+					onChange={ function ( v ) {
+						onChange( v );
+					} }
 					__nextHasNoMarginBottom
 				/>
 			);
@@ -92,21 +97,27 @@ function FieldInput( { field, value, onChange } ) {
 		case 'checkbox_list':
 			return (
 				<div className="bdm-admin-settings-form__checkbox-list">
-					{ ( field.options || [] ).map( function( opt ) {
-						var checked = Array.isArray( value ) && value.includes( opt.value );
+					{ ( field.options || [] ).map( function ( opt ) {
+						const checked =
+							Array.isArray( value ) &&
+							value.includes( opt.value );
 						return (
 							<CheckboxControl
 								key={ opt.value }
 								label={ opt.label }
 								checked={ checked }
-								onChange={ function( isChecked ) {
-									var next = Array.isArray( value ) ? value.slice() : [];
+								onChange={ function ( isChecked ) {
+									let next = Array.isArray( value )
+										? value.slice()
+										: [];
 									if ( isChecked ) {
 										if ( ! next.includes( opt.value ) ) {
 											next.push( opt.value );
 										}
 									} else {
-										next = next.filter( function( v ) { return v !== opt.value; } );
+										next = next.filter( function ( v ) {
+											return v !== opt.value;
+										} );
 									}
 									onChange( next );
 								} }
@@ -140,7 +151,7 @@ function FieldInput( { field, value, onChange } ) {
  * @param {Array}    props.sections Array of section objects with nested fields.
  * @param {Object}   props.values   Current field values keyed by field ID.
  * @param {Function} props.onChange Called with ( fieldId, newValue ) on change.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The settings form.
  */
 export function SettingsForm( { sections, values, onChange } ) {
 	if ( ! sections || ! sections.length ) {
@@ -149,7 +160,7 @@ export function SettingsForm( { sections, values, onChange } ) {
 
 	return (
 		<div className="bdm-admin-settings-form">
-			{ sections.map( function( section ) {
+			{ sections.map( function ( section ) {
 				return (
 					<div
 						key={ section.id }
@@ -167,13 +178,14 @@ export function SettingsForm( { sections, values, onChange } ) {
 						) }
 
 						<div className="bdm-admin-settings-form__fields">
-							{ ( section.fields || [] ).map( function( field ) {
+							{ ( section.fields || [] ).map( function ( field ) {
 								return (
 									<div
 										key={ field.id }
 										className={
 											'bdm-admin-settings-form__row' +
-											' bdm-admin-settings-form__row--' + field.type
+											' bdm-admin-settings-form__row--' +
+											field.type
 										}
 									>
 										<div className="bdm-admin-settings-form__meta">
@@ -190,7 +202,7 @@ export function SettingsForm( { sections, values, onChange } ) {
 											<FieldInput
 												field={ field }
 												value={ values[ field.id ] }
-												onChange={ function( val ) {
+												onChange={ function ( val ) {
 													onChange( field.id, val );
 												} }
 											/>

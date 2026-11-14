@@ -5,6 +5,7 @@
  * Labels and slugs are cached from the front end via transients. These helpers
  * are used by the REST controllers and the legacy admin list screens.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -12,6 +13,11 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Helpers that list the built-in BuddyBoss profile and group nav tabs.
+ *
+ * @since 2.0.0
+ */
 class Builtin_Tabs {
 
 	// -------------------------------------------------------------------------
@@ -36,7 +42,7 @@ class Builtin_Tabs {
 		}
 
 		// Fallback: derive from active components (owner-only tabs excluded).
-		$slugs = [];
+		$slugs = array();
 
 		if ( function_exists( 'bp_is_active' ) ) {
 			if ( bp_is_active( 'activity' ) ) {
@@ -99,16 +105,16 @@ class Builtin_Tabs {
 			return $cached;
 		}
 
-		return [
-			'activity' => __( 'Timeline',    'buddy-modules' ),
-			'profile'  => __( 'Profile',     'buddy-modules' ),
+		return array(
+			'activity' => __( 'Timeline', 'buddy-modules' ),
+			'profile'  => __( 'Profile', 'buddy-modules' ),
 			'friends'  => __( 'Connections', 'buddy-modules' ),
-			'groups'   => __( 'Groups',      'buddy-modules' ),
-			'forums'   => __( 'Forums',      'buddy-modules' ),
-			'media'    => __( 'Photos',      'buddy-modules' ),
-			'video'    => __( 'Videos',      'buddy-modules' ),
-			'document' => __( 'Documents',   'buddy-modules' ),
-		];
+			'groups'   => __( 'Groups', 'buddy-modules' ),
+			'forums'   => __( 'Forums', 'buddy-modules' ),
+			'media'    => __( 'Photos', 'buddy-modules' ),
+			'video'    => __( 'Videos', 'buddy-modules' ),
+			'document' => __( 'Documents', 'buddy-modules' ),
+		);
 	}
 
 	// -------------------------------------------------------------------------
@@ -130,7 +136,7 @@ class Builtin_Tabs {
 			return (array) apply_filters( 'bdm_tc_known_group_nav_slugs', $cached );
 		}
 
-		$slugs = [ 'feed', 'members' ];
+		$slugs = array( 'feed', 'members' );
 
 		if ( function_exists( 'bp_is_active' ) ) {
 			if ( bp_is_active( 'groups' ) ) {
@@ -176,6 +182,6 @@ class Builtin_Tabs {
 			return $cached;
 		}
 
-		return [];
+		return array();
 	}
 }

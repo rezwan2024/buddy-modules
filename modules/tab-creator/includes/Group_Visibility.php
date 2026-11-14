@@ -2,6 +2,7 @@
 /**
  * Checks group tab availability and visibility on the front end.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,6 +10,11 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Availability and visibility checks for custom group tabs.
+ *
+ * @since 2.0.0
+ */
 class Group_Visibility {
 
 	/**
@@ -18,10 +24,9 @@ class Group_Visibility {
 	 *
 	 * @param int    $tab_id          The tab ID.
 	 * @param object $current_group   The current group object.
-	 * @param int    $current_user_id The ID of the logged-in user (0 if logged out).
 	 * @return bool
 	 */
-	public static function can_show_tab( int $tab_id, object $current_group, int $current_user_id ): bool {
+	public static function can_show_tab( int $tab_id, object $current_group ): bool {
 		$rules = DB::get_rules_for_tab( $tab_id );
 
 		$availability_rules = array_filter( $rules, fn( $r ) => 'availability' === $r->rule_type );
@@ -130,7 +135,7 @@ class Group_Visibility {
 
 					case 'members':
 						if ( $current_user_id > 0 && function_exists( 'groups_is_user_member' ) ) {
-							if ( groups_is_user_member( (int) $current_group->id, $current_user_id ) ) {
+							if ( groups_is_user_member( $current_user_id, (int) $current_group->id ) ) {
 								return true;
 							}
 						}
@@ -138,7 +143,7 @@ class Group_Visibility {
 
 					case 'mods':
 						if ( $current_user_id > 0 && function_exists( 'groups_is_user_mod' ) ) {
-							if ( groups_is_user_mod( (int) $current_group->id, $current_user_id ) ) {
+							if ( groups_is_user_mod( $current_user_id, (int) $current_group->id ) ) {
 								return true;
 							}
 						}
@@ -146,7 +151,7 @@ class Group_Visibility {
 
 					case 'admins':
 						if ( $current_user_id > 0 && function_exists( 'groups_is_user_admin' ) ) {
-							if ( groups_is_user_admin( (int) $current_group->id, $current_user_id ) ) {
+							if ( groups_is_user_admin( $current_user_id, (int) $current_group->id ) ) {
 								return true;
 							}
 						}

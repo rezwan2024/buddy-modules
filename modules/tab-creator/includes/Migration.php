@@ -2,6 +2,7 @@
 /**
  * One-time migration of legacy bbtc_* data to bdm_tc_* tables and options.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,6 +10,11 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Copies legacy Tab Creator data into the Buddy Modules tables and options once.
+ *
+ * @since 2.0.0
+ */
 class Migration {
 
 	const DONE_OPTION      = 'bdm_tc_migration_done';
@@ -29,7 +35,7 @@ class Migration {
 
 		// If the legacy tabs table doesn't exist there is nothing to migrate.
 		$legacy_tabs = $wpdb->prefix . 'bbtc_tabs';
-		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $legacy_tabs ) ) !== $legacy_tabs ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $legacy_tabs ) ) !== $legacy_tabs ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-time migration check.
 			update_option( self::DONE_OPTION, '1', false );
 			return;
 		}
@@ -50,19 +56,19 @@ class Migration {
 	private static function copy_tables(): void {
 		global $wpdb;
 
-		$map = [
-			$wpdb->prefix . 'bbtc_tabs'                        => DB::get_tabs_table(),
-			$wpdb->prefix . 'bbtc_tab_rules'                   => DB::get_rules_table(),
-			$wpdb->prefix . 'bbtc_existing_tab_overrides'      => DB::get_overrides_table(),
+		$map = array(
+			$wpdb->prefix . 'bbtc_tabs'                   => DB::get_tabs_table(),
+			$wpdb->prefix . 'bbtc_tab_rules'              => DB::get_rules_table(),
+			$wpdb->prefix . 'bbtc_existing_tab_overrides' => DB::get_overrides_table(),
 			$wpdb->prefix . 'bbtc_existing_tab_override_rules' => DB::get_override_rules_table(),
-		];
+		);
 
 		foreach ( $map as $src => $dst ) {
 			// Skip if source table doesn't exist.
-			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $src ) ) !== $src ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			if ( $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $src ) ) !== $src ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-time migration check.
 				continue;
 			}
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-time copy of the legacy tables.
 			$wpdb->query( "INSERT IGNORE INTO {$dst} SELECT * FROM {$src}" );
 		}
 	}
@@ -74,10 +80,10 @@ class Migration {
 	 * @since 2.0.0
 	 */
 	private static function copy_options(): void {
-		$options = [
+		$options = array(
 			'bbtc_existing_profile_tab_order' => 'bdm_tc_existing_profile_tab_order',
 			'bbtc_existing_group_tab_order'   => 'bdm_tc_existing_group_tab_order',
-		];
+		);
 
 		foreach ( $options as $src => $dst ) {
 			$src_value = get_option( $src );
@@ -95,13 +101,13 @@ class Migration {
 	 */
 	public static function register_notices(): void {
 		if ( get_transient( self::NOTICE_TRANSIENT ) ) {
-			add_action( 'bdm_admin_notices', [ self::class, 'show_migration_notice' ] );
+			add_action( 'bdm_admin_notices', array( self::class, 'show_migration_notice' ) );
 		}
 
 		// Warn if the legacy plugin is still active alongside Buddy Modules.
-		$active_plugins = (array) get_option( 'active_plugins', [] );
+		$active_plugins = (array) get_option( 'active_plugins', array() );
 		if ( in_array( 'buddyboss-tab-creator/buddyboss-tab-creator.php', $active_plugins, true ) ) {
-			add_action( 'bdm_admin_notices', [ self::class, 'show_legacy_guard_notice' ] );
+			add_action( 'bdm_admin_notices', array( self::class, 'show_legacy_guard_notice' ) );
 		}
 	}
 

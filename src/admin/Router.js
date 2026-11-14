@@ -15,10 +15,10 @@ import { ModuleScreen } from './screens/ModuleScreen';
  *
  * @since 2.0.0
  *
- * @param {Object}   props
+ * @param {Object}                                                                          props
  * @param {{ module: string|null, panel: string|null, view: string|null, id: number|null }} props.route
- * @param {Function} props.navigate
- * @returns {JSX.Element}
+ * @param {Function}                                                                        props.navigate
+ * @return {JSX.Element} The router.
  */
 export function Router( { route, navigate } ) {
 	// No module selected → Dashboard.

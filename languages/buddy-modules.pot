@@ -1,0 +1,757 @@
+# Copyright (C) 2026 MD. Rezwan Shiblu
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Buddy Modules 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/buddy-modules\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-14T00:10:22+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: buddy-modules\n"
+
+#. Plugin Name of the plugin
+#: buddy-modules.php:3
+#: includes/admin/Menu.php:53
+#: includes/admin/Menu.php:54
+#: includes/Plugin.php:143
+#: src/common/components/Header.js:35
+msgid "Buddy Modules"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: buddy-modules.php:4
+msgid "https://github.com/rezwan2024/buddy-modules"
+msgstr ""
+
+#. Description of the plugin
+#: buddy-modules.php:5
+msgid "A module host for BuddyBoss sites. Includes Profile and Group Tab Creator and future modules."
+msgstr ""
+
+#. Author of the plugin
+#: buddy-modules.php:9
+msgid "MD. Rezwan Shiblu"
+msgstr ""
+
+#: includes/Modules/Registry.php:137
+#: includes/Modules/Registry.php:172
+#: includes/REST/Modules_Controller.php:102
+msgid "Module not found."
+msgstr ""
+
+#. translators: %s: module label
+#: includes/Modules/Registry.php:145
+#, php-format
+msgid "%s requires additional BuddyBoss components to be active."
+msgstr ""
+
+#: includes/Plugin.php:144
+msgid "requires BuddyBoss Platform version 2.8 or higher to be installed and active."
+msgstr ""
+
+#: includes/REST/Modules_Controller.php:129
+msgid "Whether the module should be active."
+msgstr ""
+
+#: includes/REST/Settings_Controller.php:132
+msgid "Invalid panel."
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:109
+msgid "Timeline"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:110
+msgid "Profile"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:111
+msgid "Connections"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:112
+msgid "Groups"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:113
+msgid "Forums"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:114
+msgid "Photos"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:115
+msgid "Videos"
+msgstr ""
+
+#: modules/tab-creator/includes/Builtin_Tabs.php:116
+msgid "Documents"
+msgstr ""
+
+#: modules/tab-creator/includes/Group_Nav.php:561
+msgid "Group sub-navigation"
+msgstr ""
+
+#: modules/tab-creator/includes/Migration.php:123
+msgid "Tab Creator: your existing tabs and settings have been migrated to Buddy Modules successfully."
+msgstr ""
+
+#: modules/tab-creator/includes/Migration.php:137
+msgid "BuddyBoss Tab Creator is still active."
+msgstr ""
+
+#: modules/tab-creator/includes/Migration.php:138
+msgid "Please deactivate it — Buddy Modules now manages all profile and group tabs."
+msgstr ""
+
+#: modules/tab-creator/includes/Module.php:135
+msgid "Profile Tabs"
+msgstr ""
+
+#: modules/tab-creator/includes/Module.php:146
+msgid "Group Tabs"
+msgstr ""
+
+#: modules/tab-creator/includes/Module.php:157
+msgid "Profile Built-in Tabs"
+msgstr ""
+
+#: modules/tab-creator/includes/Module.php:168
+msgid "Group Built-in Tabs"
+msgstr ""
+
+#: modules/tab-creator/includes/REST/Existing_Tabs_Controller.php:177
+msgid "tab_type is required."
+msgstr ""
+
+#: modules/tab-creator/includes/REST/Existing_Tabs_Controller.php:202
+#: modules/tab-creator/includes/REST/Existing_Tabs_Controller.php:248
+#: modules/tab-creator/includes/REST/Existing_Tabs_Controller.php:276
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:178
+msgid "tab_type must be profile or group."
+msgstr ""
+
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:160
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:206
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:233
+msgid "Tab not found."
+msgstr ""
+
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:270
+msgid "Invalid bulk action."
+msgstr ""
+
+#: modules/tab-creator/includes/REST/Tabs_Controller.php:274
+msgid "No tab IDs provided."
+msgstr ""
+
+#: modules/tab-creator/includes/Tab_Service.php:43
+msgid "Tab label is required."
+msgstr ""
+
+#: modules/tab-creator/includes/Tab_Service.php:121
+msgid "Failed to save tab. Please try again."
+msgstr ""
+
+#: modules/tab-creator/includes/Tab_Service.php:156
+msgid "Subtab label is required."
+msgstr ""
+
+#: modules/tab-creator/includes/Tab_Service.php:196
+msgid "Failed to save subtab. Please try again."
+msgstr ""
+
+#: modules/tab-creator/includes/Tab_Service.php:265
+msgid "Failed to save override. Please try again."
+msgstr ""
+
+#. translators: %s: tab slug.
+#: modules/tab-creator/includes/Tab_Service.php:386
+#, php-format
+msgid "The slug \"%s\" is used by a built-in BuddyBoss tab. Please choose another slug."
+msgstr ""
+
+#. translators: %s: tab slug.
+#: modules/tab-creator/includes/Tab_Service.php:400
+#, php-format
+msgid "Another tab already uses the slug \"%s\". Please choose another slug."
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:50
+msgid "General"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:148
+msgid "Module activated."
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:149
+msgid "Module deactivated."
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:159
+msgid "Could not update the module. Please try again."
+msgstr ""
+
+#. translators: %s: module label
+#: src/admin/screens/Dashboard.js:212
+#: src/admin/screens/Dashboard.js:219
+msgid "Settings"
+msgstr ""
+
+#. translators: %s: module label
+#: src/admin/screens/Dashboard.js:229
+#, js-format
+msgid "Toggle %s"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:301
+msgid "Filter modules"
+msgstr ""
+
+#. translators: %d: total module count
+#: src/admin/screens/Dashboard.js:315
+#: src/admin/screens/Dashboard.js:372
+msgid "All"
+msgstr ""
+
+#. translators: %d: active module count
+#: src/admin/screens/Dashboard.js:333
+#: src/tab-creator/components/TabEditor.js:631
+#: src/tab-creator/components/TabsList.js:459
+msgid "Active"
+msgstr ""
+
+#. translators: %d: inactive module count
+#: src/admin/screens/Dashboard.js:351
+#: src/tab-creator/components/TabEditor.js:635
+#: src/tab-creator/components/TabsList.js:463
+msgid "Inactive"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:366
+msgid "Filter by category"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:414
+msgid "No modules match the current filter."
+msgstr ""
+
+#: src/common/components/ErrorBoundary.js:36
+msgid "Buddy Modules encountered an error."
+msgstr ""
+
+#: src/common/components/ErrorBoundary.js:48
+msgid "Please reload the page. If the problem persists, deactivate and reactivate the plugin."
+msgstr ""
+
+#: src/common/components/Header.js:30
+msgid "Buddy Modules — back to dashboard"
+msgstr ""
+
+#: src/common/components/RowActions.js:31
+msgid "More options"
+msgstr ""
+
+#: src/common/components/SideNavigation.js:43
+msgid "Module panels"
+msgstr ""
+
+#: src/common/components/SideNavigation.js:54
+msgid "Back to Modules"
+msgstr ""
+
+#: src/common/components/Toast.js:30
+msgid "Notifications"
+msgstr ""
+
+#: src/common/components/Toast.js:46
+msgid "Dismiss"
+msgstr ""
+
+#: src/common/hooks/useAutosave.js:63
+msgid "Saving…"
+msgstr ""
+
+#: src/common/hooks/useAutosave.js:76
+msgid "Saved"
+msgstr ""
+
+#: src/common/hooks/useAutosave.js:82
+msgid "Error saving settings."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:69
+msgid "Override reset."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:73
+msgid "Could not reset override."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:98
+msgid "Edit Built-in Tab"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:114
+msgid "Reset Override"
+msgstr ""
+
+#. translators: %s is the tab label.
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:122
+#, js-format
+msgid "Reset \"%s\" to its default settings?"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:136
+#: src/tab-creator/components/ExistingTabEditor.js:302
+#: src/tab-creator/components/ExistingTabEditor.js:428
+#: src/tab-creator/components/TabCreatorPanel.js:139
+#: src/tab-creator/components/TabEditor.js:569
+#: src/tab-creator/components/TabEditor.js:959
+#: src/tab-creator/components/TabEditor.js:1029
+msgid "Cancel"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabCreatorPanel.js:145
+#: src/tab-creator/components/ExistingTabsList.js:329
+msgid "Reset"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:135
+msgid "Failed to load tab settings."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:212
+msgid "Settings saved."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:220
+msgid "Could not save settings. Please try again."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:241
+#: src/tab-creator/components/TabEditor.js:384
+msgid "Discard unsaved changes?"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:256
+#: src/tab-creator/components/TabEditor.js:523
+msgid "All Members"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:259
+#: src/tab-creator/components/TabEditor.js:526
+msgid "None (hide from everyone)"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:268
+#: src/tab-creator/components/TabEditor.js:535
+msgid "All Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:269
+#: src/tab-creator/components/TabEditor.js:536
+msgid "Public Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:270
+#: src/tab-creator/components/TabEditor.js:537
+msgid "Private Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:271
+#: src/tab-creator/components/TabEditor.js:538
+msgid "Hidden Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:272
+#: src/tab-creator/components/TabEditor.js:539
+msgid "None"
+msgstr ""
+
+#. translators: %s is the tab's default label.
+#: src/tab-creator/components/ExistingTabEditor.js:296
+#, js-format
+msgid "Override: %s"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:310
+#: src/tab-creator/components/ExistingTabEditor.js:436
+msgid "Save Settings"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:324
+msgid "Label Override"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:326
+msgid "Leave blank to use the default label."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:341
+msgid "Hide Tab"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:343
+msgid "Hide this tab from the navigation."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:357
+msgid "Availability Override"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:374
+#: src/tab-creator/components/TabEditor.js:761
+msgid "Enabled For"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:390
+#: src/tab-creator/components/TabEditor.js:781
+msgid "Associated Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:398
+#: src/tab-creator/components/ExistingTabEditor.js:416
+#: src/tab-creator/components/TabEditor.js:793
+#: src/tab-creator/components/TabEditor.js:815
+msgid "Search groups…"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:408
+#: src/tab-creator/components/TabEditor.js:803
+msgid "Excluded Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:58
+msgid "Failed to load existing tabs."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:114
+#: src/tab-creator/components/TabsList.js:146
+msgid "Could not save order."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:139
+msgid "No built-in tabs found."
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:151
+#: src/tab-creator/components/TabEditor.js:592
+#: src/tab-creator/components/TabEditor.js:1000
+#: src/tab-creator/components/TabsList.js:313
+msgid "Label"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:154
+msgid "Override"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:157
+msgid "Visibility"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:160
+#: src/tab-creator/components/ExistingTabsList.js:286
+msgid "Default"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:164
+#: src/tab-creator/components/TabsList.js:326
+msgid "Actions"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:214
+#: src/tab-creator/components/TabsList.js:375
+msgid "Drag to reorder"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:255
+#: src/tab-creator/components/TabsList.js:435
+msgid "Custom"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:269
+msgid "Hidden"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:276
+msgid "Visible"
+msgstr ""
+
+#. translators: %s is the tab label.
+#. translators: %s is the sub-tab label.
+#: src/tab-creator/components/ExistingTabsList.js:301
+#: src/tab-creator/components/TabEditor.js:889
+#: src/tab-creator/components/TabsList.js:479
+#, js-format
+msgid "More options for %s"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:310
+#: src/tab-creator/components/TabEditor.js:898
+#: src/tab-creator/components/TabsList.js:488
+msgid "Edit"
+msgstr ""
+
+#: src/tab-creator/components/RoleSelect.js:48
+msgid "None selected"
+msgstr ""
+
+#. translators: %d is the number of selected roles/options.
+#: src/tab-creator/components/RoleSelect.js:58
+#, js-format
+msgid "%d selected"
+msgstr ""
+
+#: src/tab-creator/components/SearchSelect.js:134
+msgid "Remove"
+msgstr ""
+
+#: src/tab-creator/components/SearchSelect.js:157
+msgid "Search…"
+msgstr ""
+
+#: src/tab-creator/components/SearchSelect.js:189
+msgid "No results found."
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:67
+msgid "Tab deleted."
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:71
+msgid "Could not delete tab."
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:87
+msgid "Edit Tab"
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:88
+#: src/tab-creator/components/TabsList.js:234
+msgid "Add Tab"
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:117
+msgid "Delete Tab"
+msgstr ""
+
+#. translators: %s is the tab label.
+#: src/tab-creator/components/TabCreatorPanel.js:125
+#, js-format
+msgid "Delete \"%s\"? This cannot be undone."
+msgstr ""
+
+#: src/tab-creator/components/TabCreatorPanel.js:148
+#: src/tab-creator/components/TabEditor.js:911
+#: src/tab-creator/components/TabsList.js:259
+#: src/tab-creator/components/TabsList.js:504
+msgid "Delete"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:176
+msgid "Failed to load tab."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:296
+msgid "Label is required."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:351
+msgid "Tab created."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:352
+msgid "Tab saved."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:363
+msgid "Could not save tab. Please try again."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:478
+msgid "Subtab saved."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:481
+msgid "Could not save subtab."
+msgstr ""
+
+#. translators: %s is the subtab label.
+#: src/tab-creator/components/TabEditor.js:493
+#, js-format
+msgid "Delete \"%s\"?"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:508
+msgid "Subtab deleted."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:512
+msgid "Could not delete subtab."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:560
+msgid "Add New Tab"
+msgstr ""
+
+#. translators: %s is the tab label.
+#: src/tab-creator/components/TabEditor.js:563
+#, js-format
+msgid "Edit Tab: %s"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:577
+#: src/tab-creator/components/TabEditor.js:967
+msgid "Save Tab"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:604
+#: src/tab-creator/components/TabEditor.js:1005
+msgid "Slug"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:606
+msgid "URL-friendly identifier. Auto-generated from label; edit to override."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:619
+#: src/tab-creator/components/TabsList.js:319
+msgid "Status"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:642
+msgid "Content Source"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:654
+msgid "Custom Content"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:658
+#: src/tab-creator/components/TabEditor.js:683
+msgid "External URL"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:666
+#: src/tab-creator/components/TabEditor.js:1015
+msgid "Content"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:700
+msgid "Open in New Tab"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:703
+msgid "Open the external URL in a new browser tab."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:718
+msgid "Availability"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:720
+msgid "Control who can see this tab on a member's profile."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:738
+msgid "Associated Users"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:740
+msgid "The tab appears on these members' profiles only."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:750
+msgid "Search users…"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:763
+msgid "Enable this tab only for selected group types."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:783
+msgid "Show the tab only in these groups."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:805
+msgid "Hide the tab in these groups."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:829
+#: src/tab-creator/components/TabsList.js:322
+msgid "Sub-tabs"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:842
+msgid "Add Sub-tab"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:848
+msgid "No sub-tabs yet."
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:1032
+msgid "Save"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:59
+msgid "Failed to load tabs."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:113
+msgid "Could not update status."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:185
+msgid "Delete the selected tabs? This cannot be undone."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:203
+msgid "Action applied."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:207
+msgid "Bulk action failed."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:250
+msgid "Bulk Actions"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:253
+msgid "Activate"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:256
+msgid "Deactivate"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:267
+msgid "Apply"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:282
+msgid "No tabs found. Add your first tab."
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:306
+msgid "Select all"
+msgstr ""
+
+#: src/tab-creator/components/TabsList.js:316
+msgid "Type"
+msgstr ""
+
+#. translators: %s is the tab label.
+#: src/tab-creator/components/TabsList.js:407
+#, js-format
+msgid "Select %s"
+msgstr ""

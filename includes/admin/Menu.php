@@ -6,6 +6,7 @@
  * using the custom_menu_order / menu_order filters, mirroring the technique
  * BuddyBoss Membership uses.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -13,12 +14,22 @@ namespace BuddyModules\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Top-level Buddy Modules admin menu.
+ *
+ * @since 2.0.0
+ */
 class Menu {
 
 	/** WP admin page slug. */
 	const SLUG = 'buddy-modules';
 
-	/** Hook suffix returned by add_menu_page(). @var string */
+	/**
+	 * Hook suffix returned by add_menu_page().
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	private string $hook_suffix = '';
 
 	/**
@@ -27,9 +38,9 @@ class Menu {
 	 * @since 2.0.0
 	 */
 	public function register(): void {
-		add_action( 'admin_menu', [ $this, 'add_menu' ] );
+		add_action( 'admin_menu', array( $this, 'add_menu' ) );
 		add_filter( 'custom_menu_order', '__return_true' );
-		add_filter( 'menu_order', [ $this, 'reorder_menu' ], 20 );
+		add_filter( 'menu_order', array( $this, 'reorder_menu' ), 20 );
 	}
 
 	/**
@@ -43,7 +54,7 @@ class Menu {
 			__( 'Buddy Modules', 'buddy-modules' ),
 			'manage_options',
 			self::SLUG,
-			[ Page::class, 'render' ],
+			array( Page::class, 'render' ),
 			'dashicons-layout',
 			4
 		);
@@ -67,7 +78,7 @@ class Menu {
 		$bb_pos = array_search( $bb_slug, $order, true );
 
 		if ( false !== $bb_pos ) {
-			array_splice( $order, $bb_pos + 1, 0, [ $our_slug ] );
+			array_splice( $order, $bb_pos + 1, 0, array( $our_slug ) );
 		} else {
 			// BuddyBoss Platform not found — append near top.
 			array_unshift( $order, $our_slug );

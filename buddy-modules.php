@@ -12,15 +12,16 @@
  * Text Domain:       buddy-modules
  * Domain Path:       /languages
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 define( 'BDM_VERSION', '2.0.0' );
-define( 'BDM_FILE',    __FILE__ );
-define( 'BDM_DIR',     plugin_dir_path( __FILE__ ) );
-define( 'BDM_URL',     plugin_dir_url( __FILE__ ) );
+define( 'BDM_FILE', __FILE__ );
+define( 'BDM_DIR', plugin_dir_path( __FILE__ ) );
+define( 'BDM_URL', plugin_dir_url( __FILE__ ) );
 
 require_once BDM_DIR . 'includes/Autoloader.php';
 ( new BuddyModules\Autoloader() )->register();

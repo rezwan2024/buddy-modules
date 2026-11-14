@@ -5,7 +5,7 @@
 .bdm-admin-module-screen {
 	display: flex;
 	align-items: stretch;
-	min-height: calc( 100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height} );
+	min-height: calc(100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height});
 	background: $bdm-bg-page;
 
 	&__loading {
@@ -129,6 +129,11 @@
 	&__back-icon {
 		font-size: 16px;
 		line-height: 1;
+
+		// "Back" points right in right-to-left languages.
+		.rtl & {
+			transform: scaleX(-1);
+		}
 	}
 
 	&__list {
@@ -174,6 +179,11 @@
 		color: $bdm-text;
 		background: $bdm-bg-base;
 		box-shadow: $bdm-shadow-nav-active;
+
+		// Keep the keyboard focus ring on the active item too.
+		&:focus-visible {
+			box-shadow: 0 0 0 2px $bdm-brand;
+		}
 	}
 
 	&__icon {
@@ -182,7 +192,7 @@
 		height: 20px;
 		font-size: 20px;
 		line-height: 1;
-		color: currentColor;
+		color: currentcolor;
 
 		&.dashicons {
 			font-size: 18px;

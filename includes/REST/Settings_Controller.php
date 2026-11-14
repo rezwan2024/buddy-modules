@@ -9,6 +9,7 @@
  * Settings are stored in the WP option bdm_settings_{module} as a nested
  * array: { panel_id: { field_id: value } }.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -18,9 +19,19 @@ use BuddyModules\Settings\Fields;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * REST controller that reads and saves module settings.
+ *
+ * @since 2.0.0
+ */
 class Settings_Controller extends Controller {
 
-	/** @var string */
+	/**
+	 * REST base.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected $rest_base = 'settings';
 
 	/**
@@ -32,41 +43,41 @@ class Settings_Controller extends Controller {
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<module>[\w-]+)',
-			[
-				[
+			array(
+				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'callback'            => [ $this, 'get_item' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-					'args'                => [
-						'module' => [
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+					'args'                => array(
+						'module' => array(
 							'type'              => 'string',
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
-						],
-					],
-				],
-				[
+						),
+					),
+				),
+				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'callback'            => [ $this, 'update_item' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
-					'args'                => [
-						'module' => [
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'permission_callback' ),
+					'args'                => array(
+						'module'   => array(
 							'type'              => 'string',
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
-						],
-						'panel' => [
+						),
+						'panel'    => array(
 							'type'              => 'string',
 							'required'          => true,
 							'sanitize_callback' => 'sanitize_key',
-						],
-						'settings' => [
+						),
+						'settings' => array(
 							'type'     => 'object',
 							'required' => true,
-						],
-					],
-				],
-			]
+						),
+					),
+				),
+			)
 		);
 	}
 
@@ -75,23 +86,23 @@ class Settings_Controller extends Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function get_item( $request ) {
 		$module = $request->get_param( 'module' );
 		$schema = Fields::get_schema( $module );
-		$values = get_option( 'bdm_settings_' . $module, [] );
+		$values = get_option( 'bdm_settings_' . $module, array() );
 
 		if ( ! is_array( $values ) ) {
-			$values = [];
+			$values = array();
 		}
 
 		return rest_ensure_response(
-			[
+			array(
 				'panels' => $schema,
 				'values' => $values,
-			]
+			)
 		);
 	}
 
@@ -102,7 +113,7 @@ class Settings_Controller extends Controller {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param \WP_REST_Request $request
+	 * @param \WP_REST_Request $request Full details about the request.
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function update_item( $request ) {
@@ -111,7 +122,7 @@ class Settings_Controller extends Controller {
 		$settings = $request->get_param( 'settings' );
 
 		if ( ! is_array( $settings ) ) {
-			$settings = [];
+			$settings = array();
 		}
 
 		$panels = Fields::get_panels( $module );
@@ -124,13 +135,13 @@ class Settings_Controller extends Controller {
 		}
 
 		$flat    = Fields::get_flat_fields( $module, $panel );
-		$current = get_option( 'bdm_settings_' . $module, [] );
+		$current = get_option( 'bdm_settings_' . $module, array() );
 
 		if ( ! is_array( $current ) ) {
-			$current = [];
+			$current = array();
 		}
 
-		$sanitized = $current[ $panel ] ?? [];
+		$sanitized = $current[ $panel ] ?? array();
 
 		foreach ( $flat as $field_id => $field ) {
 			if ( array_key_exists( $field_id, $settings ) ) {
@@ -145,10 +156,10 @@ class Settings_Controller extends Controller {
 		update_option( 'bdm_settings_' . $module, $current );
 
 		return rest_ensure_response(
-			[
+			array(
 				'panel'    => $panel,
 				'settings' => $sanitized,
-			]
+			)
 		);
 	}
 }

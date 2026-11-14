@@ -18,25 +18,25 @@ import { useToast } from './useToast';
  *
  * @param {string} module Module ID (e.g. 'tab-creator').
  * @param {string} panel  Panel slug (e.g. 'profile-tabs').
- * @returns {Function} save( settings ) — call with the full panel settings object.
+ * @return {Function} save( settings ) — call with the full panel settings object.
  */
 export function useAutosave( module, panel ) {
 	const { addToast, removeToast } = useToast();
 
 	// Use refs so the stable save() closure always reads the latest values.
-	const addToastRef    = useRef( addToast );
+	const addToastRef = useRef( addToast );
 	const removeToastRef = useRef( removeToast );
-	const moduleRef      = useRef( module );
-	const panelRef       = useRef( panel );
+	const moduleRef = useRef( module );
+	const panelRef = useRef( panel );
 
-	addToastRef.current    = addToast;
+	addToastRef.current = addToast;
 	removeToastRef.current = removeToast;
-	moduleRef.current      = module;
-	panelRef.current       = panel;
+	moduleRef.current = module;
+	panelRef.current = panel;
 
-	const timerRef    = useRef( null );
+	const timerRef = useRef( null );
 	const inFlightRef = useRef( false );
-	const toastRef    = useRef( null );
+	const toastRef = useRef( null );
 
 	// Stable function created once; reads latest values via refs.
 	const save = useRef( function saveSettings( settings ) {
@@ -45,7 +45,7 @@ export function useAutosave( module, panel ) {
 			clearTimeout( timerRef.current );
 		}
 
-		timerRef.current = setTimeout( async function() {
+		timerRef.current = setTimeout( async function () {
 			// Single-flight: skip if a save is already in progress.
 			if ( inFlightRef.current ) {
 				return;
@@ -66,9 +66,9 @@ export function useAutosave( module, panel ) {
 
 			try {
 				await apiRequest( {
-					path:   '/settings/' + moduleRef.current,
+					path: '/settings/' + moduleRef.current,
 					method: 'POST',
-					data:   { panel: panelRef.current, settings },
+					data: { panel: panelRef.current, settings },
 				} );
 
 				removeToastRef.current( toastRef.current );

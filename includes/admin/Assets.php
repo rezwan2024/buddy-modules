@@ -2,6 +2,7 @@
 /**
  * Enqueue admin scripts and styles for the Buddy Modules page.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -9,6 +10,11 @@ namespace BuddyModules\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Admin scripts and styles for Buddy Modules.
+ *
+ * @since 2.0.0
+ */
 class Assets {
 
 	/** Script/style handle. */
@@ -21,7 +27,7 @@ class Assets {
 	 * @since 2.0.0
 	 */
 	public function register(): void {
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue' ] );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
 	/**
@@ -40,7 +46,10 @@ class Assets {
 		$asset_file = BDM_DIR . 'build/admin.asset.php';
 		$asset      = file_exists( $asset_file )
 			? require $asset_file
-			: [ 'dependencies' => [], 'version' => BDM_VERSION ];
+			: array(
+				'dependencies' => array(),
+				'version'      => BDM_VERSION,
+			);
 
 		wp_enqueue_script(
 			self::SCRIPT_HANDLE,
@@ -50,7 +59,7 @@ class Assets {
 			true
 		);
 
-		$style_deps = [ 'wp-components' ];
+		$style_deps = array( 'wp-components' );
 		$icons      = $this->register_line_icons();
 		if ( $icons ) {
 			$style_deps[] = $icons;
@@ -62,6 +71,9 @@ class Assets {
 			$style_deps,
 			$asset['version']
 		);
+
+		// RTL sites load the mirrored build/admin-rtl.css instead.
+		wp_style_add_data( self::STYLE_HANDLE, 'rtl', 'replace' );
 
 		$this->localize( $asset['version'] );
 
@@ -95,7 +107,7 @@ class Assets {
 		wp_register_style(
 			$handle,
 			buddypress()->plugin_url . "bp-templates/bp-nouveau/readylaunch/icons/css/bb-icons-rl{$min}.css",
-			[],
+			array(),
 			function_exists( 'bp_get_version' ) ? bp_get_version() : BDM_VERSION
 		);
 
@@ -112,7 +124,7 @@ class Assets {
 	private function localize( string $version ): void {
 		$registry = \BuddyModules\Modules\Registry::get_instance();
 
-		$modules = [];
+		$modules = array();
 		foreach ( $registry->all() as $module ) {
 			$modules[] = $module->to_array( $registry->is_active( $module->get_id() ) );
 		}
@@ -122,13 +134,13 @@ class Assets {
 		wp_localize_script(
 			self::SCRIPT_HANDLE,
 			'bdmAdminData',
-			[
+			array(
 				'restRoot' => esc_url_raw( rest_url( 'buddy-modules/v1' ) ),
 				'nonce'    => wp_create_nonce( 'wp_rest' ),
 				'adminUrl' => esc_url_raw( admin_url( 'admin.php?page=buddy-modules' ) ),
 				'version'  => $version,
 				'modules'  => $modules,
-			]
+			)
 		);
 	}
 }

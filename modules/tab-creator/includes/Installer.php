@@ -2,6 +2,7 @@
 /**
  * Handles plugin activation: creates Tab Creator DB tables and sets version option.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -13,6 +14,11 @@ if ( ! defined( 'BDM_TC_DB_VERSION' ) ) {
 	define( 'BDM_TC_DB_VERSION', '1.0.0' );
 }
 
+/**
+ * Creates and upgrades the Tab Creator database tables.
+ *
+ * @since 2.0.0
+ */
 class Installer {
 
 	/**

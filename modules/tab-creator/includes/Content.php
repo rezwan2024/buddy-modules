@@ -2,6 +2,7 @@
 /**
  * Front-end output of custom tab / sub-tab content.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 

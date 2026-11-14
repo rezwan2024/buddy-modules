@@ -24,6 +24,11 @@
 	&__bulk-select {
 		min-width: 135px;
 		height: 40px;
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 2px $bdm-brand;
+		}
 	}
 
 	// Loading / empty
@@ -343,8 +348,10 @@
 }
 
 // Responsive column hiding.
-// TabsList (7 cols):        handle(1) cb(2) label(3) type(4) status(5) subtabs(6) actions(7)
-// ExistingTabsList (6 cols): handle(1) label(2) override(3) visibility(4) default(5) actions(6)
+// TabsList (7 cols): handle(1) cb(2) label(3) type(4) status(5)
+//   subtabs(6) actions(7).
+// ExistingTabsList (6 cols): handle(1) label(2) override(3)
+//   visibility(4) default(5) actions(6).
 
 @media (max-width: 1024px) {
 
@@ -383,10 +390,13 @@
 	// ExistingTabsList: also hide Default (5).
 	.bdm-admin-existing-tabs-list .bdm-admin-tabs-list__table {
 
+		// The two lists never share a table, so this order is safe.
+		/* stylelint-disable no-descending-specificity */
 		th:nth-child(5),
 		td:nth-child(5) {
 			display: none;
 		}
+		/* stylelint-enable no-descending-specificity */
 	}
 }
 

@@ -10,7 +10,6 @@
  */
 
 import { useState, useEffect, Suspense } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 import { apiRequest } from '../../common/utils/api';
 import { SideNavigation } from '../../common/components/SideNavigation';
@@ -21,60 +20,72 @@ import { CUSTOM_PANEL_SCREENS } from '../modules';
 /**
  * @since 2.0.0
  *
- * @param {Object}   props
+ * @param {Object}                                 props
  * @param {{ module: string, panel: string|null }} props.route
- * @param {Function} props.navigate
- * @returns {JSX.Element}
+ * @param {Function}                               props.navigate
+ * @return {JSX.Element} The module screen.
  */
 export function ModuleScreen( { route, navigate } ) {
-	var module = route.module;
+	const module = route.module;
 
-	var [ loading, setLoading ]     = useState( true );
-	var [ schema, setSchema ]       = useState( [] );
-	var [ values, setValues ]       = useState( {} );
-	var [ activePanel, setPanel ]   = useState( route.panel || null );
+	const [ loading, setLoading ] = useState( true );
+	const [ schema, setSchema ] = useState( [] );
+	const [ values, setValues ] = useState( {} );
+	const [ activePanel, setPanel ] = useState( route.panel || null );
 
 	// Sync route.panel → activePanel when user navigates via back/forward.
-	useEffect( function() {
-		if ( route.panel ) {
-			setPanel( route.panel );
-		}
-	}, [ route.panel ] );
+	useEffect(
+		function () {
+			if ( route.panel ) {
+				setPanel( route.panel );
+			}
+		},
+		[ route.panel ]
+	);
 
 	// Fetch schema + values when the module changes.
-	useEffect( function() {
-		setLoading( true );
+	useEffect(
+		function () {
+			setLoading( true );
 
-		apiRequest( { path: '/settings/' + module } )
-			.then( function( data ) {
-				var panels = data.panels || [];
-				setSchema( panels );
-				setValues( data.values || {} );
+			apiRequest( { path: '/settings/' + module } )
+				.then( function ( data ) {
+					const panels = data.panels || [];
+					setSchema( panels );
+					setValues( data.values || {} );
 
-				// Default to the first panel if none is set in the URL.
-				if ( ! route.panel && panels.length ) {
-					setPanel( panels[ 0 ].id );
-					navigate( { module: module, panel: panels[ 0 ].id } );
-				}
-			} )
-			.finally( function() { setLoading( false ); } );
-	}, [ module ] ); // eslint-disable-line react-hooks/exhaustive-deps
+					// Default to the first panel if none is set in the URL.
+					if ( ! route.panel && panels.length ) {
+						setPanel( panels[ 0 ].id );
+						navigate( { module, panel: panels[ 0 ].id } );
+					}
+				} )
+				.finally( function () {
+					setLoading( false );
+				} );
+		},
+		[ module ]
+	); // eslint-disable-line react-hooks/exhaustive-deps
 
-	var save = useAutosave( module, activePanel );
+	const save = useAutosave( module, activePanel );
 
 	function handleFieldChange( fieldId, newValue ) {
-		var nextPanelValues = Object.assign(
+		const nextPanelValues = Object.assign(
 			{},
 			values[ activePanel ] || {},
-			{ [ fieldId ]: newValue }
+			{
+				[ fieldId ]: newValue,
+			}
 		);
-		setValues( Object.assign( {}, values, { [ activePanel ]: nextPanelValues } ) );
+		setValues(
+			Object.assign( {}, values, { [ activePanel ]: nextPanelValues } )
+		);
 		save( nextPanelValues );
 	}
 
 	function handlePanelSelect( panelId ) {
 		setPanel( panelId );
-		navigate( { module: module, panel: panelId } );
+		navigate( { module, panel: panelId } );
 	}
 
 	function handleBack() {
@@ -89,13 +100,15 @@ export function ModuleScreen( { route, navigate } ) {
 		);
 	}
 
-	var activePanelSchema = schema.find( function( p ) { return p.id === activePanel; } );
-	var customKey         = module + '/' + activePanel;
-	var CustomScreen      = CUSTOM_PANEL_SCREENS[ customKey ] || null;
-	var panelValues       = values[ activePanel ] || {};
+	const activePanelSchema = schema.find( function ( p ) {
+		return p.id === activePanel;
+	} );
+	const customKey = module + '/' + activePanel;
+	const CustomScreen = CUSTOM_PANEL_SCREENS[ customKey ] || null;
+	const panelValues = values[ activePanel ] || {};
 
-	var sections    = activePanelSchema ? activePanelSchema.sections || [] : [];
-	var panelTitle  = activePanelSchema ? activePanelSchema.label : '';
+	const sections = activePanelSchema ? activePanelSchema.sections || [] : [];
+	const panelTitle = activePanelSchema ? activePanelSchema.label : '';
 
 	return (
 		<div className="bdm-admin-module-screen">
@@ -112,7 +125,9 @@ export function ModuleScreen( { route, navigate } ) {
 					<section className="bdm-admin-card">
 						{ panelTitle && (
 							<div className="bdm-admin-card__header">
-								<h2 className="bdm-admin-card__title">{ panelTitle }</h2>
+								<h2 className="bdm-admin-card__title">
+									{ panelTitle }
+								</h2>
 							</div>
 						) }
 						<div className="bdm-admin-card__body">

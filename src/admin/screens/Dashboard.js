@@ -8,7 +8,7 @@
  */
 
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
 
@@ -20,7 +20,7 @@ import { useToast } from '../../common/hooks/useToast';
  * @since 2.0.0
  *
  * @param {Array} modules
- * @returns {string[]}
+ * @return {string[]} Category names in display order.
  */
 function getCategories( modules ) {
 	const seen = {};
@@ -40,7 +40,7 @@ function getCategories( modules ) {
  *
  * @param {Array}  modules
  * @param {string} [onlyCategory] When set, include only this category.
- * @returns {Array<{ category: string, modules: Array }>}
+ * @return {Array<{ category: string, modules: Array }>} Modules grouped by category.
  */
 function groupByCategory( modules, onlyCategory ) {
 	const map = {};
@@ -70,13 +70,14 @@ function groupByCategory( modules, onlyCategory ) {
  *
  * @param {Object}   props
  * @param {boolean}  props.checked
- * @param {Function} props.onChange  Called with the new boolean value.
+ * @param {Function} props.onChange Called with the new boolean value.
  * @param {boolean}  props.disabled
  * @param {string}   props.label    Screen-reader label.
- * @returns {JSX.Element}
+ * @param {string}   props.id       Input ID, used by the label.
+ * @return {JSX.Element} The toggle.
  */
-function BigToggle( { checked, onChange, disabled, label } ) {
-	var classes = 'bdm-admin-big-toggle';
+function BigToggle( { checked, onChange, disabled, label, id } ) {
+	let classes = 'bdm-admin-big-toggle';
 	if ( checked ) {
 		classes += ' is-checked';
 	}
@@ -85,13 +86,14 @@ function BigToggle( { checked, onChange, disabled, label } ) {
 	}
 
 	return (
-		<label className={ classes }>
+		<label className={ classes } htmlFor={ id }>
 			<span className="screen-reader-text">{ label }</span>
 			<input
+				id={ id }
 				type="checkbox"
 				className="bdm-admin-big-toggle__input"
 				checked={ checked }
-				onChange={ function( e ) {
+				onChange={ function ( e ) {
 					if ( ! disabled ) {
 						onChange( e.target.checked );
 					}
@@ -116,28 +118,30 @@ function BigToggle( { checked, onChange, disabled, label } ) {
  * @param {Object}   props.module   Module data object from bdmAdminData.
  * @param {Function} props.onToggle Called with (id, newActiveState) after a successful API call.
  * @param {Function} props.navigate SPA navigate function.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The module card.
  */
 function ModuleCard( { module, onToggle, navigate } ) {
-	const [ active, setActive ]   = useState( module.active );
+	const [ active, setActive ] = useState( module.active );
 	const [ pending, setPending ] = useState( false );
-	const { addToast }            = useToast();
+	const { addToast } = useToast();
 
 	/**
 	 * Toggle handler: optimistically flip state, call API, revert on error.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param {boolean} newActive The new active state.
 	 */
 	function handleToggle( newActive ) {
 		setActive( newActive );
 		setPending( true );
 
 		apiRequest( {
-			path:   '/modules/' + module.id,
+			path: '/modules/' + module.id,
 			method: 'POST',
-			data:   { active: newActive },
+			data: { active: newActive },
 		} )
-			.then( function() {
+			.then( function () {
 				onToggle( module.id, newActive );
 				addToast(
 					newActive
@@ -146,17 +150,20 @@ function ModuleCard( { module, onToggle, navigate } ) {
 					'success'
 				);
 			} )
-			.catch( function( err ) {
+			.catch( function ( err ) {
 				// Revert optimistic update.
 				setActive( ! newActive );
 				addToast(
-					( err && err.message )
+					err && err.message
 						? err.message
-						: __( 'Could not update the module. Please try again.', 'buddy-modules' ),
+						: __(
+								'Could not update the module. Please try again.',
+								'buddy-modules'
+						  ),
 					'error'
 				);
 			} )
-			.finally( function() {
+			.finally( function () {
 				setPending( false );
 			} );
 	}
@@ -166,11 +173,18 @@ function ModuleCard( { module, onToggle, navigate } ) {
 		navigate( { module: module.id } );
 	}
 
-	var isDashicon = module.icon && 0 === module.icon.indexOf( 'dashicons-' );
+	const isDashicon = module.icon && 0 === module.icon.indexOf( 'dashicons-' );
 
 	return (
-		<div className={ 'bdm-admin-module-card' + ( active ? ' is-active' : '' ) }>
-			<div className="bdm-admin-module-card__icon-wrap" aria-hidden="true">
+		<div
+			className={
+				'bdm-admin-module-card' + ( active ? ' is-active' : '' )
+			}
+		>
+			<div
+				className="bdm-admin-module-card__icon-wrap"
+				aria-hidden="true"
+			>
 				{ isDashicon && (
 					<span className={ 'dashicons ' + module.icon } />
 				) }
@@ -180,12 +194,17 @@ function ModuleCard( { module, onToggle, navigate } ) {
 			</div>
 
 			<h3 className="bdm-admin-module-card__title">{ module.label }</h3>
-			<p className="bdm-admin-module-card__description">{ module.description }</p>
+			<p className="bdm-admin-module-card__description">
+				{ module.description }
+			</p>
 
 			<div className="bdm-admin-module-card__footer">
 				<button
 					type="button"
-					className={ 'bdm-admin-module-card__settings-btn' + ( ! active ? ' is-disabled' : '' ) }
+					className={
+						'bdm-admin-module-card__settings-btn' +
+						( ! active ? ' is-disabled' : '' )
+					}
 					onClick={ handleSettings }
 					disabled={ ! active }
 					aria-label={
@@ -193,18 +212,23 @@ function ModuleCard( { module, onToggle, navigate } ) {
 						module.label + ' — ' + __( 'Settings', 'buddy-modules' )
 					}
 				>
-					<span className="dashicons dashicons-admin-generic" aria-hidden="true" />
+					<span
+						className="dashicons dashicons-admin-generic"
+						aria-hidden="true"
+					/>
 					{ __( 'Settings', 'buddy-modules' ) }
 				</button>
 
 				<BigToggle
+					id={ 'bdm-admin-module-toggle-' + module.id }
 					checked={ active }
 					onChange={ handleToggle }
 					disabled={ pending || ! module.available }
-					label={
+					label={ sprintf(
 						/* translators: %s: module label */
-						__( 'Toggle', 'buddy-modules' ) + ' ' + module.label
-					}
+						__( 'Toggle %s', 'buddy-modules' ),
+						module.label
+					) }
 				/>
 			</div>
 		</div>
@@ -219,24 +243,23 @@ function ModuleCard( { module, onToggle, navigate } ) {
  * @since 2.0.0
  *
  * @param {Object}   props
- * @param {Object}   props.route    Current route (unused at dashboard level).
  * @param {Function} props.navigate SPA navigate function.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The dashboard.
  */
 export default function Dashboard( { navigate } ) {
-	const [ modules, setModules ] = useState(
-		function() {
-			return ( window.bdmAdminData && window.bdmAdminData.modules ) || [];
-		}
-	);
-	const [ filter, setFilter ]           = useState( 'all' );
+	const [ modules, setModules ] = useState( function () {
+		return ( window.bdmAdminData && window.bdmAdminData.modules ) || [];
+	} );
+	const [ filter, setFilter ] = useState( 'all' );
 	const [ categoryFilter, setCategoryFilter ] = useState( 'all' );
 
-	var activeCount   = modules.filter( function( m ) { return m.active; } ).length;
-	var inactiveCount = modules.length - activeCount;
+	const activeCount = modules.filter( function ( m ) {
+		return m.active;
+	} ).length;
+	const inactiveCount = modules.length - activeCount;
 
 	// Apply status filter.
-	var statusFiltered = modules.filter( function( m ) {
+	const statusFiltered = modules.filter( function ( m ) {
 		if ( 'active' === filter ) {
 			return m.active;
 		}
@@ -246,8 +269,11 @@ export default function Dashboard( { navigate } ) {
 		return true;
 	} );
 
-	var categories = getCategories( modules );
-	var groups     = groupByCategory( statusFiltered, 'all' !== categoryFilter ? categoryFilter : undefined );
+	const categories = getCategories( modules );
+	const groups = groupByCategory(
+		statusFiltered,
+		'all' !== categoryFilter ? categoryFilter : undefined
+	);
 
 	/**
 	 * Update a module's active state after a successful API call.
@@ -258,8 +284,8 @@ export default function Dashboard( { navigate } ) {
 	 * @param {boolean} newActive
 	 */
 	function handleToggle( id, newActive ) {
-		setModules( function( prev ) {
-			return prev.map( function( m ) {
+		setModules( function ( prev ) {
+			return prev.map( function ( m ) {
 				return m.id === id ? { ...m, active: newActive } : m;
 			} );
 		} );
@@ -269,30 +295,64 @@ export default function Dashboard( { navigate } ) {
 		<div className="bdm-admin-dashboard">
 			{ /* Filter bar */ }
 			<div className="bdm-admin-filter-bar">
-				<div className="bdm-admin-filter-pills" role="group" aria-label={ __( 'Filter modules', 'buddy-modules' ) }>
+				<div
+					className="bdm-admin-filter-pills"
+					role="group"
+					aria-label={ __( 'Filter modules', 'buddy-modules' ) }
+				>
 					<button
 						type="button"
-						className={ 'bdm-admin-filter-pills__pill' + ( 'all' === filter ? ' is-active' : '' ) }
-						onClick={ function() { setFilter( 'all' ); } }
+						className={
+							'bdm-admin-filter-pills__pill' +
+							( 'all' === filter ? ' is-active' : '' )
+						}
+						onClick={ function () {
+							setFilter( 'all' );
+						} }
 					>
-						{ /* translators: %d: total module count */
-							__( 'All', 'buddy-modules' ) + ' (' + modules.length + ')' }
+						{
+							/* translators: %d: total module count */
+							__( 'All', 'buddy-modules' ) +
+								' (' +
+								modules.length +
+								')'
+						}
 					</button>
 					<button
 						type="button"
-						className={ 'bdm-admin-filter-pills__pill' + ( 'active' === filter ? ' is-active' : '' ) }
-						onClick={ function() { setFilter( 'active' ); } }
+						className={
+							'bdm-admin-filter-pills__pill' +
+							( 'active' === filter ? ' is-active' : '' )
+						}
+						onClick={ function () {
+							setFilter( 'active' );
+						} }
 					>
-						{ /* translators: %d: active module count */
-							__( 'Active', 'buddy-modules' ) + ' (' + activeCount + ')' }
+						{
+							/* translators: %d: active module count */
+							__( 'Active', 'buddy-modules' ) +
+								' (' +
+								activeCount +
+								')'
+						}
 					</button>
 					<button
 						type="button"
-						className={ 'bdm-admin-filter-pills__pill' + ( 'inactive' === filter ? ' is-active' : '' ) }
-						onClick={ function() { setFilter( 'inactive' ); } }
+						className={
+							'bdm-admin-filter-pills__pill' +
+							( 'inactive' === filter ? ' is-active' : '' )
+						}
+						onClick={ function () {
+							setFilter( 'inactive' );
+						} }
 					>
-						{ /* translators: %d: inactive module count */
-							__( 'Inactive', 'buddy-modules' ) + ' (' + inactiveCount + ')' }
+						{
+							/* translators: %d: inactive module count */
+							__( 'Inactive', 'buddy-modules' ) +
+								' (' +
+								inactiveCount +
+								')'
+						}
 					</button>
 				</div>
 
@@ -300,12 +360,23 @@ export default function Dashboard( { navigate } ) {
 					<select
 						className="bdm-admin-category-select"
 						value={ categoryFilter }
-						onChange={ function( e ) { setCategoryFilter( e.target.value ); } }
-						aria-label={ __( 'Filter by category', 'buddy-modules' ) }
+						onChange={ function ( e ) {
+							setCategoryFilter( e.target.value );
+						} }
+						aria-label={ __(
+							'Filter by category',
+							'buddy-modules'
+						) }
 					>
-						<option value="all">{ __( 'All', 'buddy-modules' ) }</option>
-						{ categories.map( function( cat ) {
-							return <option key={ cat } value={ cat }>{ cat }</option>;
+						<option value="all">
+							{ __( 'All', 'buddy-modules' ) }
+						</option>
+						{ categories.map( function ( cat ) {
+							return (
+								<option key={ cat } value={ cat }>
+									{ cat }
+								</option>
+							);
 						} ) }
 					</select>
 				) }
@@ -313,14 +384,17 @@ export default function Dashboard( { navigate } ) {
 
 			{ /* Category groups */ }
 			{ groups.length > 0 ? (
-				groups.map( function( group ) {
+				groups.map( function ( group ) {
 					return (
-						<div key={ group.category } className="bdm-admin-category-group">
+						<div
+							key={ group.category }
+							className="bdm-admin-category-group"
+						>
 							<h2 className="bdm-admin-category-heading">
 								{ group.category.toUpperCase() }
 							</h2>
 							<div className="bdm-admin-module-grid">
-								{ group.modules.map( function( mod ) {
+								{ group.modules.map( function ( mod ) {
 									return (
 										<ModuleCard
 											key={ mod.id }
@@ -336,7 +410,12 @@ export default function Dashboard( { navigate } ) {
 				} )
 			) : (
 				<div className="bdm-admin-empty-state">
-					<p>{ __( 'No modules match the current filter.', 'buddy-modules' ) }</p>
+					<p>
+						{ __(
+							'No modules match the current filter.',
+							'buddy-modules'
+						) }
+					</p>
 				</div>
 			) }
 		</div>

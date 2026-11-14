@@ -36,13 +36,14 @@ function init() {
  * @since 2.0.0
  *
  * @param {Object} options apiFetch options (path, method, data, …).
- * @returns {Promise<*>}
+ * @return {Promise<*>} Resolves with the response data.
  */
 export function apiRequest( options ) {
 	init();
 
 	if ( options.path ) {
-		const root        = ( window.bdmAdminData && window.bdmAdminData.restRoot ) || '';
+		const root =
+			( window.bdmAdminData && window.bdmAdminData.restRoot ) || '';
 		const { path, ...rest } = options;
 		return apiFetch( { ...rest, url: root + path } );
 	}

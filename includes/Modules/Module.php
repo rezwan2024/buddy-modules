@@ -2,6 +2,7 @@
 /**
  * Abstract base class for all Buddy Modules modules.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -9,35 +10,76 @@ namespace BuddyModules\Modules;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Base class that every Buddy Modules module extends.
+ *
+ * @since 2.0.0
+ */
 abstract class Module {
 
-	/** Unique slug, e.g. 'tab-creator'. @var string */
+	/**
+	 * Unique slug, e.g. 'tab-creator'.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $id = '';
 
-	/** Human-readable name. @var string */
+	/**
+	 * Human-readable name.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $label = '';
 
-	/** Short description shown on the dashboard card. @var string */
+	/**
+	 * Short description shown on the dashboard card.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $description = '';
 
-	/** Icon identifier (bb-icons-rl class suffix or 'dashicons-…'). @var string */
+	/**
+	 * Icon identifier (bb-icons-rl class suffix or 'dashicons-…').
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $icon = 'dashicons-layout';
 
-	/** Dashboard category, e.g. 'Community'. @var string */
+	/**
+	 * Dashboard category, e.g. 'Community'.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $category = 'General';
 
 	/**
 	 * BuddyBoss BP component slugs this module depends on.
 	 * Array of strings: 'members', 'groups', 'activity', etc.
 	 *
+	 * @since 2.0.0
 	 * @var string[]
 	 */
-	protected array $requires = [];
+	protected array $requires = array();
 
-	/** URL path to the module's settings screen, e.g. '?page=buddy-modules&module=tab-creator'. @var string */
+	/**
+	 * URL path to the module's settings screen, e.g. '?page=buddy-modules&module=tab-creator'.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $settings_route = '';
 
-	/** Order in the dashboard card grid. Lower = earlier. @var int */
+	/**
+	 * Order in the dashboard card grid. Lower = earlier.
+	 *
+	 * @since 2.0.0
+	 * @var int
+	 */
 	protected int $order = 10;
 
 	/**
@@ -71,32 +113,54 @@ abstract class Module {
 	 */
 	public function deactivate(): void {}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module ID.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_id(): string {
 		return $this->id;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module name.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_label(): string {
 		return $this->label;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module description.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_description(): string {
 		return $this->description;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module icon identifier.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_icon(): string {
 		return $this->icon;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module dashboard category.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_category(): string {
 		return $this->category;
 	}
 
 	/**
+	 * Get the BP component slugs this module depends on.
+	 *
 	 * @since 2.0.0
 	 * @return string[]
 	 */
@@ -104,12 +168,20 @@ abstract class Module {
 		return $this->requires;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the URL path to the module's settings screen.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_settings_route(): string {
 		return $this->settings_route;
 	}
 
-	/** @since 2.0.0 */
+	/**
+	 * Get the module order in the dashboard card grid.
+	 *
+	 * @since 2.0.0
+	 */
 	public function get_order(): int {
 		return $this->order;
 	}
@@ -145,7 +217,7 @@ abstract class Module {
 	 * @param bool $active Whether the module is currently active.
 	 */
 	public function to_array( bool $active ): array {
-		return [
+		return array(
 			'id'             => $this->id,
 			'label'          => $this->label,
 			'description'    => $this->description,
@@ -157,6 +229,6 @@ abstract class Module {
 			'settings_route' => $this->settings_route,
 			'order'          => $this->order,
 			'external'       => $this->is_external(),
-		];
+		);
 	}
 }

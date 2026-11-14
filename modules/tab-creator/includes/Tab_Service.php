@@ -5,6 +5,7 @@
  * No HTML, no redirects, no nonces — pure data manipulation via DB.
  * REST controllers call these methods after sanitizing request data.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -12,6 +13,11 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Saves, deletes and reorders Tab Creator tabs and overrides.
+ *
+ * @since 2.0.0
+ */
 class Tab_Service {
 
 	// -------------------------------------------------------------------------
@@ -35,19 +41,26 @@ class Tab_Service {
 			return new \WP_Error(
 				'bdm_tc_label_required',
 				__( 'Tab label is required.', 'buddy-modules' ),
-				[ 'status' => 400 ]
+				array( 'status' => 400 )
 			);
 		}
 
 		// Auto-assign position for new tabs.
 		if ( $is_new && ! isset( $fields['position'] ) ) {
-			$last     = DB::get_tabs( $tab_type, [ 'orderby' => 'position', 'order' => 'DESC', 'limit' => 1 ] );
+			$last     = DB::get_tabs(
+				$tab_type,
+				array(
+					'orderby' => 'position',
+					'order'   => 'DESC',
+					'limit'   => 1,
+				)
+			);
 			$position = ! empty( $last ) ? ( (int) $last[0]->position + 10 ) : 10;
 		} else {
 			$position = (int) ( $fields['position'] ?? 10 );
 		}
 
-		$tab_data = [
+		$tab_data = array(
 			'is_enabled'      => (int) ( $fields['is_enabled'] ?? 1 ),
 			'is_predefined'   => (int) ( $fields['is_predefined'] ?? 0 ),
 			'site_admin_only' => (int) ( $fields['site_admin_only'] ?? 0 ),
@@ -56,22 +69,30 @@ class Tab_Service {
 			'position'        => $position,
 			'tab_link'        => esc_url_raw( $fields['tab_link'] ?? '' ),
 			'item_css_id'     => sanitize_html_class( $fields['item_css_id'] ?? '' ),
-			'content_source'  => in_array( $fields['content_source'] ?? 'content', [ 'content', 'url' ], true )
-				? $fields['content_source']
+			'content_source'  => in_array( $fields['content_source'] ?? 'content', array( 'content', 'url' ), true )
+				? ( $fields['content_source'] ?? 'content' )
 				: 'content',
 			'content'         => wp_kses_post( $fields['content'] ?? '' ),
 			'external_url'    => esc_url_raw( $fields['external_url'] ?? '' ),
 			'url_new_tab'     => (int) ( $fields['url_new_tab'] ?? 0 ),
-			'status'          => in_array( $fields['status'] ?? 'active', [ 'active', 'inactive' ], true )
-				? $fields['status']
+			'status'          => in_array( $fields['status'] ?? 'active', array( 'active', 'inactive' ), true )
+				? ( $fields['status'] ?? 'active' )
 				: 'active',
 			'updated_at'      => current_time( 'mysql' ),
-		];
+		);
 
 		if ( 'profile' === $tab_type ) {
-			$tab_data['default_subnav_slug']  = sanitize_key( $fields['default_subnav_slug'] ?? '' );
-			$tab_data['add_to_admin_bar']     = (int) ( $fields['add_to_admin_bar'] ?? 0 );
-			$tab_data['administer_item_id']   = sanitize_text_field( $fields['administer_item_id'] ?? '' );
+			$tab_data['default_subnav_slug'] = sanitize_key( $fields['default_subnav_slug'] ?? '' );
+			$tab_data['add_to_admin_bar']    = (int) ( $fields['add_to_admin_bar'] ?? 0 );
+			$tab_data['administer_item_id']  = sanitize_text_field( $fields['administer_item_id'] ?? '' );
+		}
+
+		// On update, write only the fields the request sent. Fields the editor
+		// doesn't show (position, tab link, item CSS ID, …) keep their stored value.
+		if ( ! $is_new ) {
+			$tab_data = array_intersect_key( $tab_data, $fields );
+
+			$tab_data['updated_at'] = current_time( 'mysql' );
 		}
 
 		if ( $is_new ) {
@@ -80,8 +101,15 @@ class Tab_Service {
 				$slug = sanitize_title( $fields['label'] ?? 'tab' );
 			}
 
+			$parent_id = absint( $fields['parent_id'] ?? 0 );
+
+			$slug_error = self::validate_new_slug( $tab_type, $slug, $parent_id );
+			if ( is_wp_error( $slug_error ) ) {
+				return $slug_error;
+			}
+
 			$tab_data['tab_type']   = $tab_type;
-			$tab_data['parent_id']  = absint( $fields['parent_id'] ?? 0 );
+			$tab_data['parent_id']  = $parent_id;
 			$tab_data['slug']       = $slug;
 			$tab_data['created_at'] = current_time( 'mysql' );
 
@@ -91,14 +119,16 @@ class Tab_Service {
 				return new \WP_Error(
 					'bdm_tc_insert_failed',
 					__( 'Failed to save tab. Please try again.', 'buddy-modules' ),
-					[ 'status' => 500 ]
+					array( 'status' => 500 )
 				);
 			}
 		} else {
 			DB::update_tab( $tab_id, $tab_data );
 		}
 
-		self::rebuild_tab_rules( $tab_type, $tab_id, $fields['rules'] ?? [] );
+		if ( $is_new || isset( $fields['rules'] ) ) {
+			self::rebuild_tab_rules( $tab_type, $tab_id, $fields['rules'] ?? array() );
+		}
 
 		DB::clear_cache();
 
@@ -124,11 +154,11 @@ class Tab_Service {
 			return new \WP_Error(
 				'bdm_tc_label_required',
 				__( 'Subtab label is required.', 'buddy-modules' ),
-				[ 'status' => 400 ]
+				array( 'status' => 400 )
 			);
 		}
 
-		$subtab_data = [
+		$subtab_data = array(
 			'tab_type'        => $tab_type,
 			'parent_id'       => $parent_id,
 			'label'           => $label,
@@ -143,7 +173,7 @@ class Tab_Service {
 			'status'          => 'active',
 			'is_default'      => 0,
 			'updated_at'      => current_time( 'mysql' ),
-		];
+		);
 
 		if ( 'profile' === $tab_type ) {
 			$subtab_data['add_to_admin_bar']   = (int) ( $fields['add_to_admin_bar'] ?? 0 );
@@ -164,14 +194,14 @@ class Tab_Service {
 				return new \WP_Error(
 					'bdm_tc_insert_failed',
 					__( 'Failed to save subtab. Please try again.', 'buddy-modules' ),
-					[ 'status' => 500 ]
+					array( 'status' => 500 )
 				);
 			}
 		} else {
 			DB::update_tab( $subtab_id, $subtab_data );
 		}
 
-		self::rebuild_tab_rules( $tab_type, $subtab_id, $fields['rules'] ?? [] );
+		self::rebuild_tab_rules( $tab_type, $subtab_id, $fields['rules'] ?? array() );
 
 		DB::clear_cache();
 
@@ -191,7 +221,7 @@ class Tab_Service {
 	public static function save_override( string $tab_type, string $slug, array $fields ): int|\WP_Error {
 		$label_override = sanitize_text_field( $fields['label_override'] ?? '' );
 
-		$override_data = [
+		$override_data = array(
 			'is_enabled'      => (int) ( $fields['is_enabled'] ?? 1 ),
 			'is_predefined'   => (int) ( $fields['is_predefined'] ?? 1 ),
 			'label_override'  => '' !== $label_override ? $label_override : null,
@@ -201,13 +231,30 @@ class Tab_Service {
 			'tab_link'        => esc_url_raw( $fields['tab_link'] ?? '' ),
 			'item_css_id'     => sanitize_html_class( $fields['item_css_id'] ?? '' ),
 			'updated_at'      => current_time( 'mysql' ),
-		];
+		);
 
 		if ( 'group' === $tab_type ) {
-			$pos_raw = $fields['position_override'] ?? null;
+			$pos_raw                            = $fields['position_override'] ?? null;
 			$override_data['position_override'] = ( null !== $pos_raw && '' !== $pos_raw )
 				? absint( $pos_raw )
 				: null;
+		}
+
+		// An existing override keeps every field the request didn't send
+		// (the editor has no Default, Site Admin Only, Tab Link, … fields).
+		$existing = DB::get_override( $tab_type, $slug );
+		if ( $existing ) {
+			$override_data = array_intersect_key( $override_data, $fields );
+
+			$override_data['updated_at'] = current_time( 'mysql' );
+		}
+
+		$kept_visibility = array();
+		if ( $existing && ! array_key_exists( 'visibility', $fields['rules'] ?? array() ) ) {
+			$kept_visibility = array_filter(
+				DB::get_rules_for_override( (int) $existing->id ),
+				fn( $rule ) => 'visibility' === $rule->rule_type
+			);
 		}
 
 		$override_id = DB::insert_or_update_override( $tab_type, $slug, $override_data );
@@ -216,13 +263,24 @@ class Tab_Service {
 			return new \WP_Error(
 				'bdm_tc_override_failed',
 				__( 'Failed to save override. Please try again.', 'buddy-modules' ),
-				[ 'status' => 500 ]
+				array( 'status' => 500 )
 			);
 		}
 
 		DB::delete_rules_for_override( $override_id );
 
-		self::rebuild_override_rules( $tab_type, $override_id, $fields['rules'] ?? [] );
+		self::rebuild_override_rules( $tab_type, $override_id, $fields['rules'] ?? array() );
+
+		foreach ( $kept_visibility as $rule ) {
+			DB::insert_override_rule(
+				array(
+					'override_id' => $override_id,
+					'rule_type'   => $rule->rule_type,
+					'rule_key'    => $rule->rule_key,
+					'rule_value'  => $rule->rule_value,
+				)
+			);
+		}
 
 		DB::clear_cache();
 
@@ -252,7 +310,7 @@ class Tab_Service {
 		foreach ( $ordered_ids as $index => $tab_id ) {
 			$tab_id = (int) $tab_id;
 			if ( $tab_id > 0 ) {
-				DB::update_tab( $tab_id, [ 'position' => ( $index + 1 ) * 10 ] );
+				DB::update_tab( $tab_id, array( 'position' => ( $index + 1 ) * 10 ) );
 			}
 		}
 
@@ -291,15 +349,84 @@ class Tab_Service {
 	// -------------------------------------------------------------------------
 
 	/**
+	 * Check that a new tab's slug doesn't clash with a BuddyBoss Platform nav
+	 * item or with another custom tab at the same level.
+	 *
+	 * A main tab with a Platform slug (e.g. "activity", "members") would share
+	 * the URL of the built-in tab; two siblings with one slug would share a URL.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param string $tab_type  'profile' or 'group'.
+	 * @param string $slug      Sanitized slug.
+	 * @param int    $parent_id Parent custom tab ID, 0 for a main tab.
+	 * @return true|\WP_Error True when the slug is free.
+	 */
+	private static function validate_new_slug( string $tab_type, string $slug, int $parent_id ) {
+		if ( 0 === $parent_id ) {
+			$builtin = 'group' === $tab_type
+				? Builtin_Tabs::get_known_group_slugs()
+				: Builtin_Tabs::get_known_profile_slugs();
+
+			// Owner-only profile tabs (Settings, Messages, Notifications, …) are not
+			// in the known list, so also reserve every active component's slug.
+			if ( 'profile' === $tab_type && function_exists( 'buddypress' ) ) {
+				foreach ( array_keys( (array) buddypress()->active_components ) as $component ) {
+					if ( ! empty( buddypress()->{$component}->slug ) ) {
+						$builtin[] = buddypress()->{$component}->slug;
+					}
+				}
+			}
+
+			if ( in_array( $slug, $builtin, true ) ) {
+				return new \WP_Error(
+					'bdm_tc_slug_builtin',
+					sprintf(
+						/* translators: %s: tab slug. */
+						__( 'The slug "%s" is used by a built-in BuddyBoss tab. Please choose another slug.', 'buddy-modules' ),
+						$slug
+					),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		foreach ( DB::get_tabs( $tab_type, array( 'parent_id' => $parent_id ) ) as $sibling ) {
+			if ( $sibling->slug === $slug ) {
+				return new \WP_Error(
+					'bdm_tc_slug_exists',
+					sprintf(
+						/* translators: %s: tab slug. */
+						__( 'Another tab already uses the slug "%s". Please choose another slug.', 'buddy-modules' ),
+						$slug
+					),
+					array( 'status' => 400 )
+				);
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Rebuild rules for a custom tab from a structured rules array.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $tab_type
-	 * @param int    $tab_id
-	 * @param array  $rules    { 'availability'|'enabled_for' => [...], 'visibility' => [...], 'associated_users'|'associated_groups'|'excluded_groups' => [...] }
+	 * @param string $tab_type 'profile' or 'group'.
+	 * @param int    $tab_id   Tab ID.
+	 * @param array  $rules    Rules keyed by 'availability'|'enabled_for', 'visibility' and 'associated_users'|'associated_groups'|'excluded_groups', each a list of values.
 	 */
 	private static function rebuild_tab_rules( string $tab_type, int $tab_id, array $rules ): void {
+		// The editor has no Visibility field: keep stored visibility rules unless the request sends them.
+		$kept_visibility = array();
+		if ( ! array_key_exists( 'visibility', $rules ) ) {
+			$kept_visibility = array_filter(
+				DB::get_rules_for_tab( $tab_id ),
+				fn( $rule ) => 'visibility' === $rule->rule_type
+			);
+		}
+
 		DB::delete_rules_for_tab( $tab_id );
 
 		if ( 'profile' === $tab_type ) {
@@ -307,54 +434,110 @@ class Tab_Service {
 		} else {
 			self::write_group_tab_rules( $tab_id, $rules );
 		}
+
+		foreach ( $kept_visibility as $rule ) {
+			DB::insert_rule(
+				array(
+					'tab_id'     => $tab_id,
+					'rule_type'  => $rule->rule_type,
+					'rule_key'   => $rule->rule_key,
+					'rule_value' => $rule->rule_value,
+				)
+			);
+		}
 	}
 
 	/**
 	 * Write profile tab rules (availability, visibility, associated users).
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param int   $tab_id Tab ID.
+	 * @param array $rules  Rules from the request, keyed by rule type.
 	 */
 	private static function write_profile_tab_rules( int $tab_id, array $rules ): void {
 		$wp_role_slugs = array_keys( wp_roles()->roles );
 
 		// Availability.
-		$allowed_avail = array_merge( [ 'all_members', 'none_wp' ], $wp_role_slugs );
+		$allowed_avail = array_merge( array( 'all_members', 'none_wp' ), $wp_role_slugs );
 		$availability  = array_filter(
-			array_map( 'sanitize_key', (array) ( $rules['availability'] ?? [] ) ),
+			array_map( 'sanitize_key', (array) ( $rules['availability'] ?? array() ) ),
 			fn( $v ) => in_array( $v, $allowed_avail, true )
 		);
 
 		foreach ( $availability as $avail_val ) {
 			if ( 'all_members' === $avail_val ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'all_members' ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'scope',
+						'rule_value' => 'all_members',
+					)
+				);
 			} elseif ( 'none_wp' === $avail_val ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'none' ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'scope',
+						'rule_value' => 'none',
+					)
+				);
 			} elseif ( in_array( $avail_val, $wp_role_slugs, true ) ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'role', 'rule_value' => $avail_val ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'role',
+						'rule_value' => $avail_val,
+					)
+				);
 			}
 		}
 
 		// Associated users.
-		$assoc_users = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_users'] ?? [] ) ) ) );
+		$assoc_users = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_users'] ?? array() ) ) ) );
 		foreach ( $assoc_users as $user_id ) {
 			if ( $user_id > 0 ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'user_id', 'rule_value' => (string) $user_id ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'user_id',
+						'rule_value' => (string) $user_id,
+					)
+				);
 			}
 		}
 
 		// Visibility.
-		$known_audiences = [ 'do_not_modify', 'anyone', 'none_remove', 'logged_in', 'owner_only', 'friends', 'site_admin' ];
+		$known_audiences = array( 'do_not_modify', 'anyone', 'none_remove', 'logged_in', 'owner_only', 'friends', 'site_admin' );
 		$allowed_vis     = array_merge( $known_audiences, $wp_role_slugs );
 		$visibility      = array_filter(
-			array_map( 'sanitize_key', (array) ( $rules['visibility'] ?? [] ) ),
+			array_map( 'sanitize_key', (array) ( $rules['visibility'] ?? array() ) ),
 			fn( $v ) => in_array( $v, $allowed_vis, true )
 		);
 
 		foreach ( $visibility as $vis_val ) {
 			if ( in_array( $vis_val, $known_audiences, true ) ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'visibility', 'rule_key' => 'audience', 'rule_value' => $vis_val ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'visibility',
+						'rule_key'   => 'audience',
+						'rule_value' => $vis_val,
+					)
+				);
 			} elseif ( in_array( $vis_val, $wp_role_slugs, true ) ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'visibility', 'rule_key' => 'role', 'rule_value' => $vis_val ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'visibility',
+						'rule_key'   => 'role',
+						'rule_value' => $vis_val,
+					)
+				);
 			}
 		}
 	}
@@ -363,50 +546,95 @@ class Tab_Service {
 	 * Write group tab rules (enabled_for, visibility, associated/excluded groups).
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param int   $tab_id Tab ID.
+	 * @param array $rules  Rules from the request, keyed by rule type.
 	 */
 	private static function write_group_tab_rules( int $tab_id, array $rules ): void {
 		// Enabled for (availability).
-		$allowed_ef  = [ 'all', 'public', 'private', 'hidden', 'none' ];
+		$allowed_ef  = array( 'all', 'public', 'private', 'hidden', 'none' );
 		$enabled_for = array_filter(
-			array_map( 'sanitize_key', (array) ( $rules['enabled_for'] ?? [] ) ),
+			array_map( 'sanitize_key', (array) ( $rules['enabled_for'] ?? array() ) ),
 			fn( $v ) => in_array( $v, $allowed_ef, true )
 		);
 
 		foreach ( $enabled_for as $ef_val ) {
 			if ( 'all' === $ef_val ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'all' ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'scope',
+						'rule_value' => 'all',
+					)
+				);
 			} elseif ( 'none' === $ef_val ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'none' ] );
-			} elseif ( in_array( $ef_val, [ 'public', 'private', 'hidden' ], true ) ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'group_status', 'rule_value' => $ef_val ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'scope',
+						'rule_value' => 'none',
+					)
+				);
+			} elseif ( in_array( $ef_val, array( 'public', 'private', 'hidden' ), true ) ) {
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'group_status',
+						'rule_value' => $ef_val,
+					)
+				);
 			}
 		}
 
 		// Associated groups.
-		$assoc_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_groups'] ?? [] ) ) ) );
+		$assoc_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_groups'] ?? array() ) ) ) );
 		foreach ( $assoc_groups as $group_id ) {
 			if ( $group_id > 0 ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'group_id', 'rule_value' => (string) $group_id ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'group_id',
+						'rule_value' => (string) $group_id,
+					)
+				);
 			}
 		}
 
 		// Excluded groups.
-		$excl_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['excluded_groups'] ?? [] ) ) ) );
+		$excl_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['excluded_groups'] ?? array() ) ) ) );
 		foreach ( $excl_groups as $group_id ) {
 			if ( $group_id > 0 ) {
-				DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'availability', 'rule_key' => 'excluded_group_id', 'rule_value' => (string) $group_id ] );
+				DB::insert_rule(
+					array(
+						'tab_id'     => $tab_id,
+						'rule_type'  => 'availability',
+						'rule_key'   => 'excluded_group_id',
+						'rule_value' => (string) $group_id,
+					)
+				);
 			}
 		}
 
 		// Visibility.
-		$allowed_vis = [ 'do_not_modify', 'anyone', 'logged_in', 'members', 'mods', 'admins', 'site_admin' ];
+		$allowed_vis = array( 'do_not_modify', 'anyone', 'logged_in', 'members', 'mods', 'admins', 'site_admin' );
 		$visibility  = array_filter(
-			array_map( 'sanitize_key', (array) ( $rules['visibility'] ?? [] ) ),
+			array_map( 'sanitize_key', (array) ( $rules['visibility'] ?? array() ) ),
 			fn( $v ) => in_array( $v, $allowed_vis, true )
 		);
 
 		foreach ( $visibility as $vis_val ) {
-			DB::insert_rule( [ 'tab_id' => $tab_id, 'rule_type' => 'visibility', 'rule_key' => 'audience', 'rule_value' => $vis_val ] );
+			DB::insert_rule(
+				array(
+					'tab_id'     => $tab_id,
+					'rule_type'  => 'visibility',
+					'rule_key'   => 'audience',
+					'rule_value' => $vis_val,
+				)
+			);
 		}
 	}
 
@@ -414,6 +642,10 @@ class Tab_Service {
 	 * Rebuild override rules from a structured rules array.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param string $tab_type    'profile' or 'group'.
+	 * @param int    $override_id Override ID.
+	 * @param array  $rules       Rules from the request, keyed by rule type.
 	 */
 	private static function rebuild_override_rules( string $tab_type, int $override_id, array $rules ): void {
 		if ( 'profile' === $tab_type ) {
@@ -427,6 +659,9 @@ class Tab_Service {
 	 * Write profile override rules.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param int   $override_id Override ID.
+	 * @param array $rules       Rules from the request, keyed by rule type.
 	 */
 	private static function write_profile_override_rules( int $override_id, array $rules ): void {
 		$wp_role_slugs = array_keys( wp_roles()->roles );
@@ -434,7 +669,7 @@ class Tab_Service {
 		// Availability.
 		$avail_raw = $rules['availability'] ?? null;
 		if ( ! empty( $avail_raw ) ) {
-			$allowed_avail = array_merge( [ 'all_members', 'none_wp' ], $wp_role_slugs );
+			$allowed_avail = array_merge( array( 'all_members', 'none_wp' ), $wp_role_slugs );
 			$availability  = array_filter(
 				array_map( 'sanitize_key', (array) $avail_raw ),
 				fn( $v ) => in_array( $v, $allowed_avail, true )
@@ -442,11 +677,32 @@ class Tab_Service {
 
 			foreach ( $availability as $avail_val ) {
 				if ( 'all_members' === $avail_val ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'all_members' ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'scope',
+							'rule_value'  => 'all_members',
+						)
+					);
 				} elseif ( 'none_wp' === $avail_val ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'none' ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'scope',
+							'rule_value'  => 'none',
+						)
+					);
 				} elseif ( in_array( $avail_val, $wp_role_slugs, true ) ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'role', 'rule_value' => $avail_val ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'role',
+							'rule_value'  => $avail_val,
+						)
+					);
 				}
 			}
 		}
@@ -454,7 +710,7 @@ class Tab_Service {
 		// Visibility.
 		$vis_raw = $rules['visibility'] ?? null;
 		if ( ! empty( $vis_raw ) ) {
-			$known_audiences = [ 'do_not_modify', 'anyone', 'none_remove', 'logged_in', 'owner_only', 'friends', 'site_admin' ];
+			$known_audiences = array( 'do_not_modify', 'anyone', 'none_remove', 'logged_in', 'owner_only', 'friends', 'site_admin' );
 			$allowed_vis     = array_merge( $known_audiences, $wp_role_slugs );
 			$visibility      = array_filter(
 				array_map( 'sanitize_key', (array) $vis_raw ),
@@ -463,9 +719,23 @@ class Tab_Service {
 
 			foreach ( $visibility as $vis_val ) {
 				if ( in_array( $vis_val, $known_audiences, true ) ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'visibility', 'rule_key' => 'audience', 'rule_value' => $vis_val ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'visibility',
+							'rule_key'    => 'audience',
+							'rule_value'  => $vis_val,
+						)
+					);
 				} elseif ( in_array( $vis_val, $wp_role_slugs, true ) ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'visibility', 'rule_key' => 'role', 'rule_value' => $vis_val ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'visibility',
+							'rule_key'    => 'role',
+							'rule_value'  => $vis_val,
+						)
+					);
 				}
 			}
 		}
@@ -475,12 +745,15 @@ class Tab_Service {
 	 * Write group override rules.
 	 *
 	 * @since 2.0.0
+	 *
+	 * @param int   $override_id Override ID.
+	 * @param array $rules       Rules from the request, keyed by rule type.
 	 */
 	private static function write_group_override_rules( int $override_id, array $rules ): void {
 		// Enabled for (availability).
 		$ef_raw = $rules['enabled_for'] ?? null;
 		if ( ! empty( $ef_raw ) ) {
-			$allowed_ef  = [ 'all', 'public', 'private', 'hidden', 'none' ];
+			$allowed_ef  = array( 'all', 'public', 'private', 'hidden', 'none' );
 			$enabled_for = array_filter(
 				array_map( 'sanitize_key', (array) $ef_raw ),
 				fn( $v ) => in_array( $v, $allowed_ef, true )
@@ -488,42 +761,84 @@ class Tab_Service {
 
 			foreach ( $enabled_for as $ef_val ) {
 				if ( 'all' === $ef_val ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'all' ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'scope',
+							'rule_value'  => 'all',
+						)
+					);
 				} elseif ( 'none' === $ef_val ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'scope', 'rule_value' => 'none' ] );
-				} elseif ( in_array( $ef_val, [ 'public', 'private', 'hidden' ], true ) ) {
-					DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'group_status', 'rule_value' => $ef_val ] );
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'scope',
+							'rule_value'  => 'none',
+						)
+					);
+				} elseif ( in_array( $ef_val, array( 'public', 'private', 'hidden' ), true ) ) {
+					DB::insert_override_rule(
+						array(
+							'override_id' => $override_id,
+							'rule_type'   => 'availability',
+							'rule_key'    => 'group_status',
+							'rule_value'  => $ef_val,
+						)
+					);
 				}
 			}
 		}
 
 		// Associated groups.
-		$assoc_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_groups'] ?? [] ) ) ) );
+		$assoc_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['associated_groups'] ?? array() ) ) ) );
 		foreach ( $assoc_groups as $group_id ) {
 			if ( $group_id > 0 ) {
-				DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'group_id', 'rule_value' => (string) $group_id ] );
+				DB::insert_override_rule(
+					array(
+						'override_id' => $override_id,
+						'rule_type'   => 'availability',
+						'rule_key'    => 'group_id',
+						'rule_value'  => (string) $group_id,
+					)
+				);
 			}
 		}
 
 		// Excluded groups.
-		$excl_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['excluded_groups'] ?? [] ) ) ) );
+		$excl_groups = array_values( array_filter( array_map( 'absint', (array) ( $rules['excluded_groups'] ?? array() ) ) ) );
 		foreach ( $excl_groups as $group_id ) {
 			if ( $group_id > 0 ) {
-				DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'availability', 'rule_key' => 'excluded_group_id', 'rule_value' => (string) $group_id ] );
+				DB::insert_override_rule(
+					array(
+						'override_id' => $override_id,
+						'rule_type'   => 'availability',
+						'rule_key'    => 'excluded_group_id',
+						'rule_value'  => (string) $group_id,
+					)
+				);
 			}
 		}
 
 		// Visibility.
 		$vis_raw = $rules['visibility'] ?? null;
 		if ( ! empty( $vis_raw ) ) {
-			$allowed_vis = [ 'do_not_modify', 'anyone', 'logged_in', 'members', 'mods', 'admins', 'site_admin' ];
+			$allowed_vis = array( 'do_not_modify', 'anyone', 'logged_in', 'members', 'mods', 'admins', 'site_admin' );
 			$visibility  = array_filter(
 				array_map( 'sanitize_key', (array) $vis_raw ),
 				fn( $v ) => in_array( $v, $allowed_vis, true )
 			);
 
 			foreach ( $visibility as $vis_val ) {
-				DB::insert_override_rule( [ 'override_id' => $override_id, 'rule_type' => 'visibility', 'rule_key' => 'audience', 'rule_value' => $vis_val ] );
+				DB::insert_override_rule(
+					array(
+						'override_id' => $override_id,
+						'rule_type'   => 'visibility',
+						'rule_key'    => 'audience',
+						'rule_value'  => $vis_val,
+					)
+				);
 			}
 		}
 	}

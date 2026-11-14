@@ -69,7 +69,7 @@
 	margin-top: $bdm-header-height;
 	padding: 24px;
 	background: $bdm-bg-page;
-	min-height: calc( 100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height} );
+	min-height: calc(100vh - #{$bdm-wp-adminbar} - #{$bdm-header-height});
 
 	// Module screens are full-bleed like Platform settings: cancel the .wrap
 	// margins (10px top, 2px left, 20px right) and #wpcontent's 20px left padding.

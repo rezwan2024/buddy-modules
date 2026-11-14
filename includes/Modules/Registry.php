@@ -4,6 +4,7 @@
  *
  * Active module IDs are stored in the WP option `bdm_active_modules` as a plain array.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -11,23 +12,48 @@ namespace BuddyModules\Modules;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Registry of all Buddy Modules modules and their active state.
+ *
+ * @since 2.0.0
+ */
 class Registry {
 
 	/** Option name for storing active module IDs. */
 	const OPTION = 'bdm_active_modules';
 
-	/** @var self|null */
+	/**
+	 * The single registry instance.
+	 *
+	 * @since 2.0.0
+	 * @var self|null
+	 */
 	private static ?self $instance = null;
 
-	/** @var Module[] Registered modules keyed by ID. */
-	private array $modules = [];
+	/**
+	 * Registered modules keyed by ID.
+	 *
+	 * @since 2.0.0
+	 * @var Module[]
+	 */
+	private array $modules = array();
 
-	/** @var string[] Active module IDs. */
-	private array $active = [];
+	/**
+	 * Active module IDs.
+	 *
+	 * @since 2.0.0
+	 * @var string[]
+	 */
+	private array $active = array();
 
+	/**
+	 * Load the active module IDs from the option.
+	 *
+	 * @since 2.0.0
+	 */
 	private function __construct() {
-		$stored       = get_option( self::OPTION, [] );
-		$this->active = is_array( $stored ) ? $stored : [];
+		$stored       = get_option( self::OPTION, array() );
+		$this->active = is_array( $stored ) ? $stored : array();
 	}
 
 	/**
@@ -48,7 +74,7 @@ class Registry {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param Module $module
+	 * @param Module $module Module to register.
 	 */
 	public function register( Module $module ): void {
 		$id = $module->get_id();
@@ -68,7 +94,7 @@ class Registry {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $id
+	 * @param string $id Module ID.
 	 * @return Module|null
 	 */
 	public function get( string $id ): ?Module {
@@ -91,7 +117,7 @@ class Registry {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $id
+	 * @param string $id Module ID.
 	 */
 	public function is_active( string $id ): bool {
 		return in_array( $id, $this->active, true );
@@ -102,7 +128,7 @@ class Registry {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $id
+	 * @param string $id Module ID.
 	 * @return true|\WP_Error
 	 */
 	public function activate( string $id ) {
@@ -137,7 +163,7 @@ class Registry {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $id
+	 * @param string $id Module ID.
 	 * @return true|\WP_Error
 	 */
 	public function deactivate( string $id ) {
@@ -147,7 +173,7 @@ class Registry {
 		}
 
 		if ( $this->is_active( $id ) ) {
-			$this->active = array_values( array_diff( $this->active, [ $id ] ) );
+			$this->active = array_values( array_diff( $this->active, array( $id ) ) );
 			update_option( self::OPTION, $this->active );
 			$module->deactivate();
 		}

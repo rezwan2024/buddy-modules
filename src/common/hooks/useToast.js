@@ -11,7 +11,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 
-/** @type {React.Context<{toasts: Array, addToast: Function, removeToast: Function}|null>} */
+/** @type {Object} Context holding { toasts, addToast, removeToast }, or null outside the provider. */
 export const ToastContext = createContext( null );
 
 /**
@@ -21,21 +21,21 @@ export const ToastContext = createContext( null );
  *
  * @param {Object}      props
  * @param {JSX.Element} props.children
- * @returns {JSX.Element}
+ * @return {JSX.Element} The provider wrapping the children.
  */
 export function ToastProvider( { children } ) {
 	const [ toasts, setToasts ] = useState( [] );
-	const idRef   = useRef( 0 );
-	const timers  = useRef( {} );
+	const idRef = useRef( 0 );
+	const timers = useRef( {} );
 
 	/**
 	 * Add a toast notification.
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param {string} message Toast text.
+	 * @param {string}                     message          Toast text.
 	 * @param {'success'|'error'|'saving'} [type='success'] Toast style.
-	 * @returns {number} Toast ID (pass to removeToast to dismiss early).
+	 * @return {number} Toast ID (pass to removeToast to dismiss early).
 	 */
 	function addToast( message, type = 'success' ) {
 		const id = ++idRef.current;
@@ -72,7 +72,7 @@ export function ToastProvider( { children } ) {
  *
  * @since 2.0.0
  *
- * @returns {{ toasts: Array, addToast: Function, removeToast: Function }}
+ * @return {{ toasts: Array, addToast: Function, removeToast: Function }} The toast state and actions.
  */
 export function useToast() {
 	return useContext( ToastContext );

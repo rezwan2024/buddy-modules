@@ -20,69 +20,99 @@ import { useToast } from '../../common/hooks/useToast';
 import { RowActions } from '../../common/components/RowActions';
 
 /**
- * @param {Object}   props
+ * @param {Object}                            props
  * @param {{ module: string, panel: string }} props.route
- * @param {string}   props.title      Panel title shown in the card header.
- * @param {Function} props.openModal  Called with {view, id?, label?} to open Add/Edit/Delete modal.
- * @param {number}   props.refreshKey Increment from parent triggers a list reload.
- * @returns {JSX.Element}
+ * @param {string}                            props.title      Panel title shown in the card header.
+ * @param {Function}                          props.openModal  Called with {view, id?, label?} to open Add/Edit/Delete modal.
+ * @param {number}                            props.refreshKey Increment from parent triggers a list reload.
+ * @return {JSX.Element} The tabs list.
  */
 export default function TabsList( { route, title, openModal, refreshKey } ) {
-	var tabType = route.panel === 'group-tabs' ? 'group' : 'profile';
+	const tabType = route.panel === 'group-tabs' ? 'group' : 'profile';
 
-	var [ tabs,       setTabs       ] = useState( [] );
-	var [ loading,    setLoading    ] = useState( true );
-	var [ selected,   setSelected   ] = useState( [] );
-	var [ bulkAction, setBulkAction ] = useState( '' );
-	var { addToast } = useToast();
+	const [ tabs, setTabs ] = useState( [] );
+	const [ loading, setLoading ] = useState( true );
+	const [ selected, setSelected ] = useState( [] );
+	const [ bulkAction, setBulkAction ] = useState( '' );
+	const { addToast } = useToast();
 
 	// Keep a stable ref to the latest tabs so the drag-end closure can revert.
-	var tabsRef = useRef( tabs );
-	useEffect( function() { tabsRef.current = tabs; }, [ tabs ] );
+	const tabsRef = useRef( tabs );
+	useEffect(
+		function () {
+			tabsRef.current = tabs;
+		},
+		[ tabs ]
+	);
 
-	var load = useCallback( function() {
-		setLoading( true );
-		return apiRequest( { path: '/tab-creator/tabs?tab_type=' + tabType + '&parent_id=0' } )
-			.then( function( data ) {
-				setTabs( data.tabs || [] );
+	const load = useCallback(
+		function () {
+			setLoading( true );
+			return apiRequest( {
+				path: '/tab-creator/tabs?tab_type=' + tabType + '&parent_id=0',
 			} )
-			.catch( function() {
-				addToast( __( 'Failed to load tabs.', 'buddy-modules' ), 'error' );
-			} )
-			.finally( function() { setLoading( false ); } );
-	}, [ tabType ] ); // eslint-disable-line react-hooks/exhaustive-deps
+				.then( function ( data ) {
+					setTabs( data.tabs || [] );
+				} )
+				.catch( function () {
+					addToast(
+						__( 'Failed to load tabs.', 'buddy-modules' ),
+						'error'
+					);
+				} )
+				.finally( function () {
+					setLoading( false );
+				} );
+		},
+		[ tabType ]
+	); // eslint-disable-line react-hooks/exhaustive-deps
 
-	useEffect( function() { load(); }, [ load ] );
+	useEffect(
+		function () {
+			load();
+		},
+		[ load ]
+	);
 
 	// Reload when parent signals a refresh (e.g. after a delete from the modal).
-	useEffect( function() {
-		if ( refreshKey > 0 ) {
-			load();
-		}
-	}, [ refreshKey ] ); // eslint-disable-line react-hooks/exhaustive-deps
+	useEffect(
+		function () {
+			if ( refreshKey > 0 ) {
+				load();
+			}
+		},
+		[ refreshKey ]
+	); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// -------------------------------------------------------------------------
 	// Status toggle — optimistic
 	// -------------------------------------------------------------------------
 
 	function handleStatusToggle( tab ) {
-		var newStatus = tab.status === 'active' ? 'inactive' : 'active';
-		setTabs( function( prev ) {
-			return prev.map( function( t ) {
-				return t.id === tab.id ? Object.assign( {}, t, { status: newStatus } ) : t;
+		const newStatus = tab.status === 'active' ? 'inactive' : 'active';
+		setTabs( function ( prev ) {
+			return prev.map( function ( t ) {
+				return t.id === tab.id
+					? Object.assign( {}, t, { status: newStatus } )
+					: t;
 			} );
 		} );
 		apiRequest( {
 			method: 'PATCH',
-			path:   '/tab-creator/tabs/' + tab.id,
-			data:   { status: newStatus },
-		} ).catch( function() {
-			setTabs( function( prev ) {
-				return prev.map( function( t ) {
-					return t.id === tab.id ? Object.assign( {}, t, { status: tab.status } ) : t;
+			path: '/tab-creator/tabs/' + tab.id,
+			data: { status: newStatus },
+		} ).catch( function () {
+			setTabs( function ( prev ) {
+				return prev.map( function ( t ) {
+					return t.id === tab.id
+						? Object.assign( {}, t, { status: tab.status } )
+						: t;
 				} );
 			} );
-			addToast( __( 'Could not update status.', 'buddy-modules' ), 'error' );
+			addToast(
+				__( 'Could not update status.', 'buddy-modules' ),
+				'error'
+			);
 		} );
 	}
 
@@ -91,20 +121,27 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 	// -------------------------------------------------------------------------
 
 	function handleDragEnd( result ) {
-		if ( ! result.destination || result.destination.index === result.source.index ) {
+		if (
+			! result.destination ||
+			result.destination.index === result.source.index
+		) {
 			return;
 		}
-		var before   = tabsRef.current.slice();
-		var reordered = before.slice();
-		var moved     = reordered.splice( result.source.index, 1 )[ 0 ];
+		const before = tabsRef.current.slice();
+		const reordered = before.slice();
+		const moved = reordered.splice( result.source.index, 1 )[ 0 ];
 		reordered.splice( result.destination.index, 0, moved );
 		setTabs( reordered );
 
 		apiRequest( {
 			method: 'POST',
-			path:   '/tab-creator/tabs/reorder',
-			data:   { ids: reordered.map( function( t ) { return t.id; } ) },
-		} ).catch( function() {
+			path: '/tab-creator/tabs/reorder',
+			data: {
+				ids: reordered.map( function ( t ) {
+					return t.id;
+				} ),
+			},
+		} ).catch( function () {
 			setTabs( before );
 			addToast( __( 'Could not save order.', 'buddy-modules' ), 'error' );
 		} );
@@ -114,18 +151,26 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 	// Bulk actions
 	// -------------------------------------------------------------------------
 
-	var allChecked     = tabs.length > 0 && selected.length === tabs.length;
-	var someChecked    = selected.length > 0 && selected.length < tabs.length;
+	const allChecked = tabs.length > 0 && selected.length === tabs.length;
+	const someChecked = selected.length > 0 && selected.length < tabs.length;
 
 	function handleSelectAll( e ) {
-		setSelected( e.target.checked ? tabs.map( function( t ) { return t.id; } ) : [] );
+		setSelected(
+			e.target.checked
+				? tabs.map( function ( t ) {
+						return t.id;
+				  } )
+				: []
+		);
 	}
 
 	function handleSelectOne( id, checked ) {
-		setSelected( function( prev ) {
+		setSelected( function ( prev ) {
 			return checked
 				? prev.concat( [ id ] )
-				: prev.filter( function( v ) { return v !== id; } );
+				: prev.filter( function ( v ) {
+						return v !== id;
+				  } );
 		} );
 	}
 
@@ -134,24 +179,34 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 			return;
 		}
 		if ( 'delete' === bulkAction ) {
-			// eslint-disable-next-line no-alert
-			if ( ! window.confirm( __( 'Delete the selected tabs? This cannot be undone.', 'buddy-modules' ) ) ) {
+			if (
+				// eslint-disable-next-line no-alert
+				! window.confirm(
+					__(
+						'Delete the selected tabs? This cannot be undone.',
+						'buddy-modules'
+					)
+				)
+			) {
 				return;
 			}
 		}
 		apiRequest( {
 			method: 'POST',
-			path:   '/tab-creator/tabs/bulk',
-			data:   { action: bulkAction, ids: selected },
+			path: '/tab-creator/tabs/bulk',
+			data: { action: bulkAction, ids: selected },
 		} )
-			.then( function() {
+			.then( function () {
 				setSelected( [] );
 				setBulkAction( '' );
 				load();
 				addToast( __( 'Action applied.', 'buddy-modules' ), 'success' );
 			} )
-			.catch( function() {
-				addToast( __( 'Bulk action failed.', 'buddy-modules' ), 'error' );
+			.catch( function () {
+				addToast(
+					__( 'Bulk action failed.', 'buddy-modules' ),
+					'error'
+				);
 			} );
 	}
 
@@ -161,7 +216,6 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 
 	return (
 		<div className="bdm-admin-card bdm-admin-tabs-list">
-
 			{ /* Card header: title + primary action */ }
 			<div className="bdm-admin-card__header">
 				<h2 className="bdm-admin-card__title">{ title }</h2>
@@ -169,11 +223,14 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 					<Button
 						variant="primary"
 						className="bdm-admin-button-icon"
-						onClick={ function() {
+						onClick={ function () {
 							openModal( { view: 'add' } );
 						} }
 					>
-						<i className="bb-icons-rl bb-icons-rl-plus" aria-hidden="true" />
+						<i
+							className="bb-icons-rl bb-icons-rl-plus"
+							aria-hidden="true"
+						/>
 						{ __( 'Add Tab', 'buddy-modules' ) }
 					</Button>
 				</div>
@@ -185,12 +242,22 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 					<select
 						className="bdm-admin-tabs-list__bulk-select"
 						value={ bulkAction }
-						onChange={ function( e ) { setBulkAction( e.target.value ); } }
+						onChange={ function ( e ) {
+							setBulkAction( e.target.value );
+						} }
 					>
-						<option value="">{ __( 'Bulk Actions', 'buddy-modules' ) }</option>
-						<option value="activate">{ __( 'Activate', 'buddy-modules' ) }</option>
-						<option value="deactivate">{ __( 'Deactivate', 'buddy-modules' ) }</option>
-						<option value="delete">{ __( 'Delete', 'buddy-modules' ) }</option>
+						<option value="">
+							{ __( 'Bulk Actions', 'buddy-modules' ) }
+						</option>
+						<option value="activate">
+							{ __( 'Activate', 'buddy-modules' ) }
+						</option>
+						<option value="deactivate">
+							{ __( 'Deactivate', 'buddy-modules' ) }
+						</option>
+						<option value="delete">
+							{ __( 'Delete', 'buddy-modules' ) }
+						</option>
 					</select>
 					<Button
 						variant="secondary"
@@ -212,7 +279,10 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 			{ /* Empty */ }
 			{ ! loading && tabs.length === 0 && (
 				<p className="bdm-admin-tabs-list__empty">
-					{ __( 'No tabs found. Add your first tab.', 'buddy-modules' ) }
+					{ __(
+						'No tabs found. Add your first tab.',
+						'buddy-modules'
+					) }
 				</p>
 			) }
 
@@ -227,11 +297,16 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 									<input
 										type="checkbox"
 										checked={ allChecked }
-										ref={ function( el ) {
-											if ( el ) { el.indeterminate = someChecked; }
+										ref={ function ( el ) {
+											if ( el ) {
+												el.indeterminate = someChecked;
+											}
 										} }
 										onChange={ handleSelectAll }
-										aria-label={ __( 'Select all', 'buddy-modules' ) }
+										aria-label={ __(
+											'Select all',
+											'buddy-modules'
+										) }
 									/>
 								</th>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--label">
@@ -247,56 +322,100 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 									{ __( 'Sub-tabs', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-									<span className="screen-reader-text">{ __( 'Actions', 'buddy-modules' ) }</span>
+									<span className="screen-reader-text">
+										{ __( 'Actions', 'buddy-modules' ) }
+									</span>
 								</th>
 							</tr>
 						</thead>
 						<Droppable droppableId="bdm-tabs-list">
-							{ function( droppable ) {
+							{ function ( droppable ) {
 								return (
 									<tbody
 										ref={ droppable.innerRef }
 										{ ...droppable.droppableProps }
 									>
-										{ tabs.map( function( tab, index ) {
+										{ tabs.map( function ( tab, index ) {
 											return (
 												<Draggable
 													key={ String( tab.id ) }
-													draggableId={ String( tab.id ) }
+													draggableId={ String(
+														tab.id
+													) }
 													index={ index }
 												>
-													{ function( drag, snapshot ) {
+													{ function (
+														drag,
+														snapshot
+													) {
 														return (
 															<tr
-																ref={ drag.innerRef }
+																ref={
+																	drag.innerRef
+																}
 																{ ...drag.draggableProps }
 																className={
 																	'bdm-admin-tabs-list__row' +
-																	( snapshot.isDragging ? ' bdm-admin-tabs-list__row--dragging' : '' ) +
-																	( selected.indexOf( tab.id ) !== -1 ? ' bdm-admin-tabs-list__row--selected' : '' )
+																	( snapshot.isDragging
+																		? ' bdm-admin-tabs-list__row--dragging'
+																		: '' ) +
+																	( selected.indexOf(
+																		tab.id
+																	) !== -1
+																		? ' bdm-admin-tabs-list__row--selected'
+																		: '' )
 																}
 															>
 																<td
 																	{ ...drag.dragHandleProps }
 																	className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--handle"
+																	aria-label={ sprintf(
+																		/* translators: %s: tab label. */
+																		__(
+																			'Reorder %s',
+																			'buddy-modules'
+																		),
+																		tab.label
+																	) }
 																>
 																	<span
 																		className="bdm-admin-drag-handle"
-																		title={ __( 'Drag to reorder', 'buddy-modules' ) }
+																		title={ __(
+																			'Drag to reorder',
+																			'buddy-modules'
+																		) }
 																	>
-																		<i className="bb-icons-rl bb-icons-rl-dots-six-vertical" aria-hidden="true" />
+																		<i
+																			className="bb-icons-rl bb-icons-rl-dots-six-vertical"
+																			aria-hidden="true"
+																		/>
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--cb">
 																	<input
 																		type="checkbox"
-																		checked={ selected.indexOf( tab.id ) !== -1 }
-																		onChange={ function( e ) {
-																			handleSelectOne( tab.id, e.target.checked );
+																		checked={
+																			selected.indexOf(
+																				tab.id
+																			) !==
+																			-1
+																		}
+																		onChange={ function (
+																			e
+																		) {
+																			handleSelectOne(
+																				tab.id,
+																				e
+																					.target
+																					.checked
+																			);
 																		} }
 																		aria-label={ sprintf(
 																			// translators: %s is the tab label.
-																			__( 'Select %s', 'buddy-modules' ),
+																			__(
+																				'Select %s',
+																				'buddy-modules'
+																			),
 																			tab.label
 																		) }
 																	/>
@@ -305,16 +424,26 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 																	<button
 																		type="button"
 																		className="bdm-admin-tabs-list__name"
-																		onClick={ function() {
-																			openModal( { view: 'edit', id: tab.id } );
+																		onClick={ function () {
+																			openModal(
+																				{
+																					view: 'edit',
+																					id: tab.id,
+																				}
+																			);
 																		} }
 																	>
-																		{ tab.label }
+																		{
+																			tab.label
+																		}
 																	</button>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
 																	<span className="bdm-admin-badge bdm-admin-badge--type">
-																		{ __( 'Custom', 'buddy-modules' ) }
+																		{ __(
+																			'Custom',
+																			'buddy-modules'
+																		) }
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
@@ -322,47 +451,78 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 																		type="button"
 																		className={
 																			'bdm-admin-status-toggle' +
-																			( tab.status === 'active'
+																			( tab.status ===
+																			'active'
 																				? ' bdm-admin-status-toggle--active'
-																				: ' bdm-admin-status-toggle--inactive'
-																			)
+																				: ' bdm-admin-status-toggle--inactive' )
 																		}
-																		onClick={ function() { handleStatusToggle( tab ); } }
+																		onClick={ function () {
+																			handleStatusToggle(
+																				tab
+																			);
+																		} }
 																	>
-																		{ tab.status === 'active'
-																			? __( 'Active', 'buddy-modules' )
-																			: __( 'Inactive', 'buddy-modules' )
-																		}
+																		{ tab.status ===
+																		'active'
+																			? __(
+																					'Active',
+																					'buddy-modules'
+																			  )
+																			: __(
+																					'Inactive',
+																					'buddy-modules'
+																			  ) }
 																	</button>
 																</td>
 																<td className="bdm-admin-tabs-list__col">
 																	<span className="bdm-admin-tabs-list__subtab-count">
-																		{ tab.subtab_count || 0 }
+																		{ tab.subtab_count ||
+																			0 }
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
 																	<RowActions
 																		label={ sprintf(
 																			// translators: %s is the tab label.
-																			__( 'More options for %s', 'buddy-modules' ),
+																			__(
+																				'More options for %s',
+																				'buddy-modules'
+																			),
 																			tab.label
 																		) }
 																		actions={ [
 																			{
-																				key:     'edit',
-																				label:   __( 'Edit', 'buddy-modules' ),
-																				icon:    'bb-icons-rl-pencil-simple',
-																				onClick: function() {
-																					openModal( { view: 'edit', id: tab.id } );
+																				key: 'edit',
+																				label: __(
+																					'Edit',
+																					'buddy-modules'
+																				),
+																				icon: 'bb-icons-rl-pencil-simple',
+																				onClick() {
+																					openModal(
+																						{
+																							view: 'edit',
+																							id: tab.id,
+																						}
+																					);
 																				},
 																			},
 																			{
-																				key:           'delete',
-																				label:         __( 'Delete', 'buddy-modules' ),
-																				icon:          'bb-icons-rl-trash',
+																				key: 'delete',
+																				label: __(
+																					'Delete',
+																					'buddy-modules'
+																				),
+																				icon: 'bb-icons-rl-trash',
 																				isDestructive: true,
-																				onClick:       function() {
-																					openModal( { view: 'delete', id: tab.id, label: tab.label } );
+																				onClick() {
+																					openModal(
+																						{
+																							view: 'delete',
+																							id: tab.id,
+																							label: tab.label,
+																						}
+																					);
 																				},
 																			},
 																		] }

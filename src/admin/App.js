@@ -18,16 +18,16 @@ import { Router } from './Router';
  *
  * @since 2.0.0
  *
- * @returns {{ module: string|null, panel: string|null, view: string|null, id: number|null }}
+ * @return {{ module: string|null, panel: string|null, view: string|null, id: number|null }} The current route.
  */
 function readRoute() {
 	const params = new URLSearchParams( window.location.search );
-	const rawId  = params.get( 'id' );
+	const rawId = params.get( 'id' );
 	return {
 		module: params.get( 'module' ),
-		panel:  params.get( 'panel' ),
-		view:   params.get( 'view' ),
-		id:     rawId ? parseInt( rawId, 10 ) : null,
+		panel: params.get( 'panel' ),
+		view: params.get( 'view' ),
+		id: rawId ? parseInt( rawId, 10 ) : null,
 	};
 }
 
@@ -37,11 +37,13 @@ function readRoute() {
  * @since 2.0.0
  *
  * @param {Object} params Desired module/panel/view/id values (null = remove).
- * @returns {string} Full URL string.
+ * @return {string} Full URL string.
  */
 function buildUrl( params ) {
 	const url = new URL( window.location.href );
-	[ 'module', 'panel', 'view', 'id' ].forEach( ( k ) => url.searchParams.delete( k ) );
+	[ 'module', 'panel', 'view', 'id' ].forEach( ( k ) =>
+		url.searchParams.delete( k )
+	);
 	Object.entries( params ).forEach( ( [ k, v ] ) => {
 		if ( null !== v && undefined !== v ) {
 			url.searchParams.set( k, v );
@@ -59,16 +61,20 @@ function buildUrl( params ) {
  * @since 2.0.0
  */
 function fixMenuHighlight() {
-	var menu = document.getElementById( 'toplevel_page_buddy-modules' );
+	const menu = document.getElementById( 'toplevel_page_buddy-modules' );
 	if ( ! menu ) {
 		return;
 	}
 
 	// Remove "current" from every top-level item first.
-	var allItems = document.querySelectorAll( '#adminmenu > li' );
-	allItems.forEach( function( li ) {
-		li.classList.remove( 'current', 'wp-has-current-submenu', 'wp-menu-open' );
-		var a = li.querySelector( 'a.menu-top' );
+	const allItems = document.querySelectorAll( '#adminmenu > li' );
+	allItems.forEach( function ( li ) {
+		li.classList.remove(
+			'current',
+			'wp-has-current-submenu',
+			'wp-menu-open'
+		);
+		const a = li.querySelector( 'a.menu-top' );
 		if ( a ) {
 			a.classList.remove( 'current', 'wp-has-current-submenu' );
 		}
@@ -76,7 +82,7 @@ function fixMenuHighlight() {
 
 	// Highlight ours.
 	menu.classList.add( 'current', 'wp-has-current-submenu', 'wp-menu-open' );
-	var menuLink = menu.querySelector( 'a.menu-top' );
+	const menuLink = menu.querySelector( 'a.menu-top' );
 	if ( menuLink ) {
 		menuLink.classList.add( 'current', 'wp-has-current-submenu' );
 		menuLink.setAttribute( 'aria-current', 'page' );
@@ -88,7 +94,7 @@ function fixMenuHighlight() {
  *
  * @since 2.0.0
  *
- * @returns {JSX.Element}
+ * @return {JSX.Element} The app.
  */
 export function App() {
 	const [ route, setRoute ] = useState( readRoute );
@@ -108,7 +114,7 @@ export function App() {
 		window.scrollTo( 0, 0 );
 	}
 
-	useEffect( function() {
+	useEffect( function () {
 		fixMenuHighlight();
 
 		function onPopState() {
@@ -118,7 +124,7 @@ export function App() {
 		}
 
 		window.addEventListener( 'popstate', onPopState );
-		return function() {
+		return function () {
 			window.removeEventListener( 'popstate', onPopState );
 		};
 	}, [] );
@@ -126,7 +132,12 @@ export function App() {
 	return (
 		<ToastProvider>
 			<Header navigate={ navigate } />
-			<div className={ 'bdm-admin-content' + ( route.module ? ' bdm-admin-content--module' : '' ) }>
+			<div
+				className={
+					'bdm-admin-content' +
+					( route.module ? ' bdm-admin-content--module' : '' )
+				}
+			>
 				<Router route={ route } navigate={ navigate } />
 			</div>
 			<Toast />

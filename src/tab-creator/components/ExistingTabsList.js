@@ -17,66 +17,99 @@ import { useToast } from '../../common/hooks/useToast';
 import { RowActions } from '../../common/components/RowActions';
 
 /**
- * @param {Object}   props
+ * @param {Object}                            props
  * @param {{ module: string, panel: string }} props.route
- * @param {string}   props.title      Panel title shown in the card header.
- * @param {Function} props.openModal  Called with {view, id?, label?} to open Edit/Reset modal.
- * @param {number}   props.refreshKey Increment from parent triggers a list reload.
- * @returns {JSX.Element}
+ * @param {string}                            props.title      Panel title shown in the card header.
+ * @param {Function}                          props.openModal  Called with {view, id?, label?} to open Edit/Reset modal.
+ * @param {number}                            props.refreshKey Increment from parent triggers a list reload.
+ * @return {JSX.Element} The existing tabs list.
  */
-export default function ExistingTabsList( { route, title, openModal, refreshKey } ) {
-	var tabType = route.panel === 'group-existing-tabs' ? 'group' : 'profile';
+export default function ExistingTabsList( {
+	route,
+	title,
+	openModal,
+	refreshKey,
+} ) {
+	const tabType = route.panel === 'group-existing-tabs' ? 'group' : 'profile';
 
-	var [ tabs,    setTabs    ] = useState( [] );
-	var [ loading, setLoading ] = useState( true );
-	var { addToast } = useToast();
+	const [ tabs, setTabs ] = useState( [] );
+	const [ loading, setLoading ] = useState( true );
+	const { addToast } = useToast();
 
-	var tabsRef = useRef( tabs );
-	useEffect( function() { tabsRef.current = tabs; }, [ tabs ] );
+	const tabsRef = useRef( tabs );
+	useEffect(
+		function () {
+			tabsRef.current = tabs;
+		},
+		[ tabs ]
+	);
 
-	var load = useCallback( function() {
-		setLoading( true );
-		return apiRequest( { path: '/tab-creator/existing-tabs?tab_type=' + tabType } )
-			.then( function( data ) {
-				setTabs( data.tabs || [] );
+	const load = useCallback(
+		function () {
+			setLoading( true );
+			return apiRequest( {
+				path: '/tab-creator/existing-tabs?tab_type=' + tabType,
 			} )
-			.catch( function() {
-				addToast( __( 'Failed to load existing tabs.', 'buddy-modules' ), 'error' );
-			} )
-			.finally( function() { setLoading( false ); } );
-	}, [ tabType ] ); // eslint-disable-line react-hooks/exhaustive-deps
+				.then( function ( data ) {
+					setTabs( data.tabs || [] );
+				} )
+				.catch( function () {
+					addToast(
+						__( 'Failed to load existing tabs.', 'buddy-modules' ),
+						'error'
+					);
+				} )
+				.finally( function () {
+					setLoading( false );
+				} );
+		},
+		[ tabType ]
+	); // eslint-disable-line react-hooks/exhaustive-deps
 
-	useEffect( function() { load(); }, [ load ] );
+	useEffect(
+		function () {
+			load();
+		},
+		[ load ]
+	);
 
 	// Reload when parent signals a refresh (e.g. after a reset from the modal).
-	useEffect( function() {
-		if ( refreshKey > 0 ) {
-			load();
-		}
-	}, [ refreshKey ] ); // eslint-disable-line react-hooks/exhaustive-deps
+	useEffect(
+		function () {
+			if ( refreshKey > 0 ) {
+				load();
+			}
+		},
+		[ refreshKey ]
+	); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// -------------------------------------------------------------------------
 	// Drag to reorder
 	// -------------------------------------------------------------------------
 
 	function handleDragEnd( result ) {
-		if ( ! result.destination || result.destination.index === result.source.index ) {
+		if (
+			! result.destination ||
+			result.destination.index === result.source.index
+		) {
 			return;
 		}
-		var before    = tabsRef.current.slice();
-		var reordered = before.slice();
-		var moved     = reordered.splice( result.source.index, 1 )[ 0 ];
+		const before = tabsRef.current.slice();
+		const reordered = before.slice();
+		const moved = reordered.splice( result.source.index, 1 )[ 0 ];
 		reordered.splice( result.destination.index, 0, moved );
 		setTabs( reordered );
 
 		apiRequest( {
 			method: 'POST',
-			path:   '/tab-creator/existing-tabs/reorder',
-			data:   {
+			path: '/tab-creator/existing-tabs/reorder',
+			data: {
 				tab_type: tabType,
-				slugs:    reordered.map( function( t ) { return t.original_slug; } ),
+				slugs: reordered.map( function ( t ) {
+					return t.original_slug;
+				} ),
 			},
-		} ).catch( function() {
+		} ).catch( function () {
 			setTabs( before );
 			addToast( __( 'Could not save order.', 'buddy-modules' ), 'error' );
 		} );
@@ -88,7 +121,6 @@ export default function ExistingTabsList( { route, title, openModal, refreshKey 
 
 	return (
 		<div className="bdm-admin-card bdm-admin-tabs-list bdm-admin-existing-tabs-list">
-
 			{ /* Card header */ }
 			<div className="bdm-admin-card__header">
 				<h2 className="bdm-admin-card__title">{ title }</h2>
@@ -128,113 +160,201 @@ export default function ExistingTabsList( { route, title, openModal, refreshKey 
 									{ __( 'Default', 'buddy-modules' ) }
 								</th>
 								<th className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
-									<span className="screen-reader-text">{ __( 'Actions', 'buddy-modules' ) }</span>
+									<span className="screen-reader-text">
+										{ __( 'Actions', 'buddy-modules' ) }
+									</span>
 								</th>
 							</tr>
 						</thead>
 						<Droppable droppableId="bdm-existing-tabs-list">
-							{ function( droppable ) {
+							{ function ( droppable ) {
 								return (
 									<tbody
 										ref={ droppable.innerRef }
 										{ ...droppable.droppableProps }
 									>
-										{ tabs.map( function( tab, index ) {
-											var displayLabel = tab.label_override || tab.default_label;
-											var hasOverride  = !! tab.override_id;
-											var isHidden     = !! tab.is_hidden;
+										{ tabs.map( function ( tab, index ) {
+											const displayLabel =
+												tab.label_override ||
+												tab.default_label;
+											const hasOverride =
+												!! tab.override_id;
+											const isHidden = !! tab.is_hidden;
 											return (
 												<Draggable
 													key={ tab.original_slug }
-													draggableId={ tab.original_slug }
+													draggableId={
+														tab.original_slug
+													}
 													index={ index }
 												>
-													{ function( drag, snapshot ) {
+													{ function (
+														drag,
+														snapshot
+													) {
 														return (
 															<tr
-																ref={ drag.innerRef }
+																ref={
+																	drag.innerRef
+																}
 																{ ...drag.draggableProps }
 																className={
 																	'bdm-admin-tabs-list__row' +
-																	( snapshot.isDragging ? ' bdm-admin-tabs-list__row--dragging' : '' )
+																	( snapshot.isDragging
+																		? ' bdm-admin-tabs-list__row--dragging'
+																		: '' )
 																}
 															>
 																<td
 																	{ ...drag.dragHandleProps }
 																	className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--handle"
+																	aria-label={ sprintf(
+																		/* translators: %s: tab label. */
+																		__(
+																			'Reorder %s',
+																			'buddy-modules'
+																		),
+																		displayLabel
+																	) }
 																>
 																	<span
 																		className="bdm-admin-drag-handle"
-																		title={ __( 'Drag to reorder', 'buddy-modules' ) }
+																		title={ __(
+																			'Drag to reorder',
+																			'buddy-modules'
+																		) }
 																	>
-																		<i className="bb-icons-rl bb-icons-rl-dots-six-vertical" aria-hidden="true" />
+																		<i
+																			className="bb-icons-rl bb-icons-rl-dots-six-vertical"
+																			aria-hidden="true"
+																		/>
 																	</span>
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--label">
 																	<button
 																		type="button"
 																		className="bdm-admin-tabs-list__name"
-																		onClick={ function() {
-																			openModal( { view: 'edit', id: tab.original_slug } );
+																		onClick={ function () {
+																			openModal(
+																				{
+																					view: 'edit',
+																					id: tab.original_slug,
+																				}
+																			);
 																		} }
 																	>
-																		{ displayLabel }
+																		{
+																			displayLabel
+																		}
 																	</button>
-																	{ tab.label_override && tab.label_override !== tab.default_label && (
-																		<span className="bdm-admin-tabs-list__override-hint">
-																			{ ' (' + tab.default_label + ')' }
+																	{ tab.label_override &&
+																		tab.label_override !==
+																			tab.default_label && (
+																			<span className="bdm-admin-tabs-list__override-hint">
+																				{ ' (' +
+																					tab.default_label +
+																					')' }
+																			</span>
+																		) }
+																</td>
+																<td className="bdm-admin-tabs-list__col">
+																	{ hasOverride ? (
+																		<span className="bdm-admin-badge bdm-admin-badge--custom">
+																			{ __(
+																				'Custom',
+																				'buddy-modules'
+																			) }
+																		</span>
+																	) : (
+																		<span className="bdm-admin-tabs-list__dash">
+																			&mdash;
 																		</span>
 																	) }
 																</td>
 																<td className="bdm-admin-tabs-list__col">
-																	{ hasOverride
-																		? <span className="bdm-admin-badge bdm-admin-badge--custom">{ __( 'Custom', 'buddy-modules' ) }</span>
-																		: <span className="bdm-admin-tabs-list__dash">&mdash;</span>
-																	}
+																	{ isHidden ? (
+																		<span className="bdm-admin-badge bdm-admin-badge--inactive">
+																			{ __(
+																				'Hidden',
+																				'buddy-modules'
+																			) }
+																		</span>
+																	) : (
+																		<span className="bdm-admin-badge bdm-admin-badge--active">
+																			{ __(
+																				'Visible',
+																				'buddy-modules'
+																			) }
+																		</span>
+																	) }
 																</td>
 																<td className="bdm-admin-tabs-list__col">
-																	{ isHidden
-																		? <span className="bdm-admin-badge bdm-admin-badge--inactive">{ __( 'Hidden', 'buddy-modules' ) }</span>
-																		: <span className="bdm-admin-badge bdm-admin-badge--active">{ __( 'Visible', 'buddy-modules' ) }</span>
-																	}
-																</td>
-																<td className="bdm-admin-tabs-list__col">
-																	{ tab.is_default
-																		? <span className="bdm-admin-badge bdm-admin-badge--default">{ __( 'Default', 'buddy-modules' ) }</span>
-																		: <span className="bdm-admin-tabs-list__dash">&mdash;</span>
-																	}
+																	{ tab.is_default ? (
+																		<span className="bdm-admin-badge bdm-admin-badge--default">
+																			{ __(
+																				'Default',
+																				'buddy-modules'
+																			) }
+																		</span>
+																	) : (
+																		<span className="bdm-admin-tabs-list__dash">
+																			&mdash;
+																		</span>
+																	) }
 																</td>
 																<td className="bdm-admin-tabs-list__col bdm-admin-tabs-list__col--actions">
 																	<RowActions
 																		label={ sprintf(
 																			// translators: %s is the tab label.
-																			__( 'More options for %s', 'buddy-modules' ),
+																			__(
+																				'More options for %s',
+																				'buddy-modules'
+																			),
 																			displayLabel
 																		) }
 																		actions={ [
 																			{
-																				key:     'edit',
-																				label:   __( 'Edit', 'buddy-modules' ),
-																				icon:    'bb-icons-rl-pencil-simple',
-																				onClick: function() {
-																					openModal( { view: 'edit', id: tab.original_slug } );
+																				key: 'edit',
+																				label: __(
+																					'Edit',
+																					'buddy-modules'
+																				),
+																				icon: 'bb-icons-rl-pencil-simple',
+																				onClick() {
+																					openModal(
+																						{
+																							view: 'edit',
+																							id: tab.original_slug,
+																						}
+																					);
 																				},
 																			},
-																		].concat( hasOverride ? [
-																			{
-																				key:           'reset',
-																				label:         __( 'Reset', 'buddy-modules' ),
-																				icon:          'bb-icons-rl-arrow-counter-clockwise',
-																				isDestructive: true,
-																				onClick:       function() {
-																					openModal( {
-																						view:  'reset',
-																						id:    tab.original_slug,
-																						label: tab.label_override || tab.default_label,
-																					} );
-																				},
-																			},
-																		] : [] ) }
+																		].concat(
+																			hasOverride
+																				? [
+																						{
+																							key: 'reset',
+																							label: __(
+																								'Reset',
+																								'buddy-modules'
+																							),
+																							icon: 'bb-icons-rl-arrow-counter-clockwise',
+																							isDestructive: true,
+																							onClick() {
+																								openModal(
+																									{
+																										view: 'reset',
+																										id: tab.original_slug,
+																										label:
+																											tab.label_override ||
+																											tab.default_label,
+																									}
+																								);
+																							},
+																						},
+																				  ]
+																				: []
+																		) }
 																	/>
 																</td>
 															</tr>

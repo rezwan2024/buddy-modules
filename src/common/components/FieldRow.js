@@ -17,16 +17,17 @@
  * @param {string}      [props.help]    Help text shown under the control.
  * @param {string}      [props.error]   Validation message shown under the control.
  * @param {JSX.Element} props.children  The control(s).
- * @returns {JSX.Element}
+ * @return {JSX.Element} The field row.
  */
 export function FieldRow( { label, htmlFor, help, error, children } ) {
 	return (
 		<div className="bdm-admin-field-row">
 			<div className="bdm-admin-field-row__label">
-				{ htmlFor
-					? <label htmlFor={ htmlFor }>{ label }</label>
-					: <span>{ label }</span>
-				}
+				{ htmlFor ? (
+					<label htmlFor={ htmlFor }>{ label }</label>
+				) : (
+					<span>{ label }</span>
+				) }
 			</div>
 			<div className="bdm-admin-field-row__content">
 				{ children }
@@ -34,7 +35,9 @@ export function FieldRow( { label, htmlFor, help, error, children } ) {
 					<p className="bdm-admin-field-row__help">{ help }</p>
 				) }
 				{ error && (
-					<p className="bdm-admin-field-row__error" role="alert">{ error }</p>
+					<p className="bdm-admin-field-row__error" role="alert">
+						{ error }
+					</p>
 				) }
 			</div>
 		</div>

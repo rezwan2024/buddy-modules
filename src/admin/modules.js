@@ -15,22 +15,22 @@ import { lazy } from '@wordpress/element';
  *
  * Each component receives: { route, navigate, values, onChange }.
  *
- * @type {Object.<string, React.LazyExoticComponent>}
+ * @type {Object.<string, Object>}
  */
-export var CUSTOM_PANEL_SCREENS = {
-	'tab-creator/profile-tabs': lazy( function() {
+export const CUSTOM_PANEL_SCREENS = {
+	'tab-creator/profile-tabs': lazy( function () {
 		return import( '../tab-creator/components/TabCreatorPanel' );
 	} ),
 
-	'tab-creator/group-tabs': lazy( function() {
+	'tab-creator/group-tabs': lazy( function () {
 		return import( '../tab-creator/components/TabCreatorPanel' );
 	} ),
 
-	'tab-creator/profile-existing-tabs': lazy( function() {
+	'tab-creator/profile-existing-tabs': lazy( function () {
 		return import( '../tab-creator/components/ExistingTabCreatorPanel' );
 	} ),
 
-	'tab-creator/group-existing-tabs': lazy( function() {
+	'tab-creator/group-existing-tabs': lazy( function () {
 		return import( '../tab-creator/components/ExistingTabCreatorPanel' );
 	} ),
 };

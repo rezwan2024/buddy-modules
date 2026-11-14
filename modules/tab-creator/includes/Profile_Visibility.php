@@ -2,6 +2,7 @@
 /**
  * Checks profile tab availability and visibility on the front end.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,6 +10,11 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Availability and visibility checks for custom profile tabs.
+ *
+ * @since 2.0.0
+ */
 class Profile_Visibility {
 
 	/**
@@ -76,7 +82,7 @@ class Profile_Visibility {
 
 		foreach ( $visibility_rules as $rule ) {
 			// Skip admin-only flags.
-			if ( 'audience' === $rule->rule_key && in_array( $rule->rule_value, [ 'do_not_modify', 'none_remove' ], true ) ) {
+			if ( 'audience' === $rule->rule_key && in_array( $rule->rule_value, array( 'do_not_modify', 'none_remove' ), true ) ) {
 				continue;
 			}
 

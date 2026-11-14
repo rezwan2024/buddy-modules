@@ -10,7 +10,7 @@
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
-import TabsList  from './TabsList';
+import TabsList from './TabsList';
 import TabEditor from './TabEditor';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
@@ -19,18 +19,18 @@ import { useToast } from '../../common/hooks/useToast';
  * @param {Object} props
  * @param {Object} props.route
  * @param {string} props.title Panel title, shown in the list card header.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The tab creator panel.
  */
 export default function TabCreatorPanel( props ) {
-	var route        = props.route;
-	var { addToast } = useToast();
+	const route = props.route;
+	const { addToast } = useToast();
 
-	var [ modalOpen,     setModalOpen     ] = useState( false );
-	var [ modalView,     setModalView     ] = useState( null );   // 'add' | 'edit' | 'delete'
-	var [ modalTabId,    setModalTabId    ] = useState( null );
-	var [ modalTabLabel, setModalTabLabel ] = useState( '' );
-	var [ deleting,      setDeleting      ] = useState( false );
-	var [ refreshKey,    setRefreshKey    ] = useState( 0 );
+	const [ modalOpen, setModalOpen ] = useState( false );
+	const [ modalView, setModalView ] = useState( null ); // 'add' | 'edit' | 'delete'
+	const [ modalTabId, setModalTabId ] = useState( null );
+	const [ modalTabLabel, setModalTabLabel ] = useState( '' );
+	const [ deleting, setDeleting ] = useState( false );
+	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	function openModal( opts ) {
 		setModalView( opts.view );
@@ -48,31 +48,44 @@ export default function TabCreatorPanel( props ) {
 
 	function handleSaved() {
 		closeModal();
-		setRefreshKey( function( k ) { return k + 1; } );
+		setRefreshKey( function ( k ) {
+			return k + 1;
+		} );
 	}
 
 	function handleDeleteConfirm() {
 		setDeleting( true );
-		apiRequest( { method: 'DELETE', path: '/tab-creator/tabs/' + modalTabId } )
-			.then( function() {
+		apiRequest( {
+			method: 'DELETE',
+			path: '/tab-creator/tabs/' + modalTabId,
+		} )
+			.then( function () {
 				closeModal();
-				setRefreshKey( function( k ) { return k + 1; } );
+				setRefreshKey( function ( k ) {
+					return k + 1;
+				} );
 				addToast( __( 'Tab deleted.', 'buddy-modules' ), 'success' );
 			} )
-			.catch( function() {
-				addToast( __( 'Could not delete tab.', 'buddy-modules' ), 'error' );
+			.catch( function () {
+				addToast(
+					__( 'Could not delete tab.', 'buddy-modules' ),
+					'error'
+				);
 			} )
-			.finally( function() { setDeleting( false ); } );
+			.finally( function () {
+				setDeleting( false );
+			} );
 	}
 
-	var editorRoute = Object.assign( {}, route, {
+	const editorRoute = Object.assign( {}, route, {
 		view: modalView || 'add',
-		id:   modalTabId,
+		id: modalTabId,
 	} );
 
-	var modalTitle = 'edit' === modalView
-		? __( 'Edit Tab', 'buddy-modules' )
-		: __( 'Add Tab', 'buddy-modules' );
+	const modalTitle =
+		'edit' === modalView
+			? __( 'Edit Tab', 'buddy-modules' )
+			: __( 'Add Tab', 'buddy-modules' );
 
 	return (
 		<div>
@@ -109,7 +122,10 @@ export default function TabCreatorPanel( props ) {
 						<p>
 							{ sprintf(
 								// translators: %s is the tab label.
-								__( 'Delete "%s"? This cannot be undone.', 'buddy-modules' ),
+								__(
+									'Delete "%s"? This cannot be undone.',
+									'buddy-modules'
+								),
 								modalTabLabel
 							) }
 						</p>

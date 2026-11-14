@@ -14,7 +14,7 @@ import { useToast } from '../hooks/useToast';
  *
  * @since 2.0.0
  *
- * @returns {JSX.Element|null}
+ * @return {JSX.Element|null} The toast stack, or null when there are no toasts.
  */
 export function Toast() {
 	const { toasts, removeToast } = useToast();
@@ -24,14 +24,21 @@ export function Toast() {
 	}
 
 	return (
-		<div className="bdm-admin-toast-list" role="region" aria-label={ __( 'Notifications', 'buddy-modules' ) } aria-live="polite">
+		<div
+			className="bdm-admin-toast-list"
+			role="region"
+			aria-label={ __( 'Notifications', 'buddy-modules' ) }
+			aria-live="polite"
+		>
 			{ toasts.map( ( toast ) => (
 				<div
 					key={ toast.id }
 					className={ `bdm-admin-toast bdm-admin-toast--${ toast.type }` }
 					role="alert"
 				>
-					<span className="bdm-admin-toast__message">{ toast.message }</span>
+					<span className="bdm-admin-toast__message">
+						{ toast.message }
+					</span>
 					<button
 						type="button"
 						className="bdm-admin-toast__dismiss"

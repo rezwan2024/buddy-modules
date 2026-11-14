@@ -229,10 +229,10 @@
 	}
 }
 
-// Tab editor modal — wraps TabEditor / ExistingTabEditor inside a @wordpress/components Modal.
-// Styled like the Platform Edit Group modal (.bb-admin-settings-modal).
-// WP's Modal component places className on the same element as components-modal__frame,
-// so we must use a combined selector (no space) to match it.
+// Tab editor modal: wraps TabEditor / ExistingTabEditor inside a
+// @wordpress/components Modal, styled like the Platform Edit Group modal
+// (.bb-admin-settings-modal). WP's Modal puts className on the same element
+// as components-modal__frame, so the selector is combined (no space).
 .bdm-admin-tab-editor-modal.components-modal__frame {
 	// The header is position:absolute. WP's open animation (transform) is what
 	// normally gives the frame a containing block; with the animation off
@@ -369,7 +369,7 @@
 
 	// Scrollable body wrapping the editor form.
 	&__body {
-		max-height: calc( 85vh - 65px );
+		max-height: calc(85vh - 65px);
 		overflow-y: auto;
 		padding: 24px 24px 0;
 		box-sizing: border-box;
@@ -603,7 +603,7 @@
 
 	&__dropdown {
 		position: absolute;
-		top: calc( 100% + 4px );
+		top: calc(100% + 4px);
 		left: 0;
 		z-index: 200;
 		min-width: 320px;

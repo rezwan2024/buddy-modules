@@ -2,6 +2,7 @@
 /**
  * Registers custom profile tabs and sub-tabs on the BuddyBoss front end.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -9,14 +10,25 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Registers custom profile tabs and sub-tabs and applies overrides to existing profile tabs.
+ *
+ * @since 2.0.0
+ */
 class Profile_Nav {
 
-	/** @var array Cached top-level profile tabs keyed by tab_type. */
-	private static array $tabs_cache = [];
+	/**
+	 * Cached top-level profile tabs keyed by tab_type.
+	 *
+	 * @since 2.0.0
+	 * @var array
+	 */
+	private static array $tabs_cache = array();
 
 	/**
 	 * Whether a hidden "home" sub-nav item was registered on this request.
 	 *
+	 * @since 2.0.0
 	 * @var bool
 	 */
 	private static bool $has_home_subnav = false;
@@ -29,11 +41,11 @@ class Profile_Nav {
 	public static function init(): void {
 		// Priority 15: after BuddyBoss registers its built-in tabs (priority 10),
 		// but before we add our own (priority 20).
-		add_action( 'bp_setup_nav', [ self::class, 'cache_builtin_nav_slugs' ], 15 );
-		add_action( 'bp_setup_nav', [ self::class, 'register_tabs' ], 20 );
-		add_action( 'bp_setup_nav', [ self::class, 'register_subtabs' ], 30 );
-		add_action( 'bp_setup_nav', [ self::class, 'apply_existing_overrides' ], 50 );
-		add_action( 'wp_enqueue_scripts', [ self::class, 'enqueue_home_subnav_style' ] );
+		add_action( 'bp_setup_nav', array( self::class, 'cache_builtin_nav_slugs' ), 15 );
+		add_action( 'bp_setup_nav', array( self::class, 'register_tabs' ), 20 );
+		add_action( 'bp_setup_nav', array( self::class, 'register_subtabs' ), 30 );
+		add_action( 'bp_setup_nav', array( self::class, 'apply_existing_overrides' ), 50 );
+		add_action( 'wp_enqueue_scripts', array( self::class, 'enqueue_home_subnav_style' ) );
 	}
 
 	/**
@@ -50,7 +62,7 @@ class Profile_Nav {
 			return;
 		}
 
-		wp_register_style( 'bdm-tc-profile-nav', false, [], BDM_VERSION );
+		wp_register_style( 'bdm-tc-profile-nav', false, array(), BDM_VERSION );
 		wp_enqueue_style( 'bdm-tc-profile-nav' );
 		wp_add_inline_style(
 			'bdm-tc-profile-nav',
@@ -74,13 +86,13 @@ class Profile_Nav {
 			return;
 		}
 
-		$primary = $nav->get_primary( [ 'user_id' => bp_displayed_user_id() ] );
+		$primary = $nav->get_primary( array( 'user_id' => bp_displayed_user_id() ) );
 		if ( ! is_array( $primary ) || empty( $primary ) ) {
 			return;
 		}
 
-		$slugs  = [];
-		$labels = [];
+		$slugs  = array();
+		$labels = array();
 		foreach ( $primary as $slug => $item ) {
 			$data = is_object( $item ) ? (array) $item : (array) $item;
 			// Exclude tabs that only appear on the viewer's own profile.
@@ -88,8 +100,8 @@ class Profile_Nav {
 			if ( false === $show || '0' === (string) $show || 0 === $show ) {
 				continue;
 			}
-			$clean_slug           = sanitize_key( (string) $slug );
-			$slugs[]              = $clean_slug;
+			$clean_slug            = sanitize_key( (string) $slug );
+			$slugs[]               = $clean_slug;
 			$labels[ $clean_slug ] = wp_strip_all_tags( (string) ( $data['name'] ?? $clean_slug ) );
 		}
 
@@ -112,7 +124,13 @@ class Profile_Nav {
 			return self::$tabs_cache[ $tab_type ];
 		}
 
-		$tabs = DB::get_tabs( $tab_type, [ 'status' => 'active', 'parent_id' => 0 ] );
+		$tabs                          = DB::get_tabs(
+			$tab_type,
+			array(
+				'status'    => 'active',
+				'parent_id' => 0,
+			)
+		);
 		self::$tabs_cache[ $tab_type ] = $tabs;
 
 		return $tabs;
@@ -136,8 +154,8 @@ class Profile_Nav {
 		$tabs = self::get_tabs( 'profile' );
 
 		// Active custom sub-tabs, grouped by parent tab ID.
-		$children_by_parent = [];
-		foreach ( DB::get_tabs( 'profile', [ 'status' => 'active' ] ) as $child ) {
+		$children_by_parent = array();
+		foreach ( DB::get_tabs( 'profile', array( 'status' => 'active' ) ) as $child ) {
 			if ( (int) $child->parent_id > 0 && $child->is_enabled ) {
 				$children_by_parent[ (int) $child->parent_id ][] = $child->slug;
 			}
@@ -165,32 +183,32 @@ class Profile_Nav {
 			// A content tab with sub-tabs gets its own "home" sub-nav item. The
 			// theme/Nouveau sub-nav template hides a secondary nav with only one
 			// item, so a tab with a single sub-tab never showed its sub-nav.
-			$children    = $children_by_parent[ (int) $tab->id ] ?? [];
+			$children    = $children_by_parent[ (int) $tab->id ] ?? array();
 			$home_subnav = 'url' !== $tab->content_source
 				&& empty( $tab->default_subnav_slug )
 				&& ! empty( $children )
 				&& ! in_array( $tab->slug, $children, true );
 
 			// Offset by 100 so custom tabs always appear after built-in BuddyBoss tabs.
-			$nav_args = [
+			$nav_args = array(
 				'name'                => $label,
 				'slug'                => $tab->slug,
 				'position'            => (int) $tab->position + 100,
 				'screen_function'     => '__return_false',
-				'default_subnav_slug' => $home_subnav ? $tab->slug : ( $tab->default_subnav_slug ?: false ),
-			];
+				'default_subnav_slug' => $home_subnav ? $tab->slug : ( $tab->default_subnav_slug ? $tab->default_subnav_slug : false ),
+			);
 
 			if ( ! empty( $tab->item_css_id ) ) {
 				$nav_args['item_css_id'] = $tab->item_css_id;
 			}
 
 			if ( 'url' === $tab->content_source ) {
-				$link = ! empty( $tab->tab_link ) ? $tab->tab_link : $tab->external_url;
+				$link                        = ! empty( $tab->tab_link ) ? $tab->tab_link : $tab->external_url;
 				$nav_args['link']            = esc_url( $link );
 				$nav_args['screen_function'] = '__return_false';
 			} else {
-				$tab_id = (int) $tab->id;
-				$nav_args['screen_function'] = function() use ( $tab_id ) {
+				$tab_id                      = (int) $tab->id;
+				$nav_args['screen_function'] = function () use ( $tab_id ) {
 					self::render_screen( $tab_id );
 				};
 
@@ -205,7 +223,7 @@ class Profile_Nav {
 				// Same closure object as the parent nav item, so BuddyPress hooks it
 				// to bp_screens once and the tab content renders once.
 				bp_core_new_subnav_item(
-					[
+					array(
 						'name'            => apply_filters( 'bdm_tc_tab_home_subnav_label', $label, (int) $tab->id ),
 						'slug'            => $tab->slug,
 						// Hidden by enqueue_home_subnav_style() via this ID prefix.
@@ -214,7 +232,7 @@ class Profile_Nav {
 						'parent_url'      => trailingslashit( $user_domain . $tab->slug ),
 						'position'        => 0,
 						'screen_function' => $nav_args['screen_function'],
-					]
+					)
 				);
 				self::$has_home_subnav = true;
 			}
@@ -237,7 +255,7 @@ class Profile_Nav {
 		$user_domain       = bp_displayed_user_domain();
 
 		// Load all active sub-tabs for profile type.
-		$subtabs = DB::get_tabs( 'profile', [ 'status' => 'active' ] );
+		$subtabs = DB::get_tabs( 'profile', array( 'status' => 'active' ) );
 		$subtabs = array_filter( $subtabs, fn( $t ) => (int) $t->parent_id > 0 || ! empty( $t->parent_existing_slug ) );
 
 		foreach ( $subtabs as $subtab ) {
@@ -288,22 +306,22 @@ class Profile_Nav {
 			$screen_function = '__return_false';
 
 			if ( 'url' !== $subtab->content_source ) {
-				$screen_function = function() use ( $tab_id ) {
+				$screen_function = function () use ( $tab_id ) {
 					self::render_screen( $tab_id );
 				};
 			}
 
-			$subnav_args = [
+			$subnav_args = array(
 				'name'            => $label,
 				'slug'            => $subtab->slug,
 				'parent_slug'     => $parent_slug,
 				'parent_url'      => trailingslashit( $user_domain . $parent_slug ),
 				'position'        => (int) $subtab->position,
 				'screen_function' => $screen_function,
-			];
+			);
 
 			if ( 'url' === $subtab->content_source ) {
-				$link = ! empty( $subtab->tab_link ) ? $subtab->tab_link : $subtab->external_url;
+				$link                = ! empty( $subtab->tab_link ) ? $subtab->tab_link : $subtab->external_url;
 				$subnav_args['link'] = esc_url( $link );
 			} elseif ( ! empty( $subtab->tab_link ) ) {
 				$subnav_args['link'] = esc_url( $subtab->tab_link );
@@ -378,11 +396,11 @@ class Profile_Nav {
 					$key = $rule->rule_key;
 					$val = $rule->rule_value;
 
-					if ( ! in_array( $key, [ 'audience', 'role' ], true ) ) {
+					if ( ! in_array( $key, array( 'audience', 'role' ), true ) ) {
 						continue;
 					}
 
-					if ( in_array( $val, [ 'do_not_modify', 'none_remove' ], true ) ) {
+					if ( in_array( $val, array( 'do_not_modify', 'none_remove' ), true ) ) {
 						$can_view = true;
 						break;
 					}
@@ -438,22 +456,22 @@ class Profile_Nav {
 
 			// --- Label override ----------------------------------------------
 			if ( ! empty( $override->label_override ) ) {
-				$nav->edit_nav( [ 'name' => $override->label_override ], $slug );
+				$nav->edit_nav( array( 'name' => $override->label_override ), $slug );
 			}
 
 			// --- Tab link override -------------------------------------------
 			if ( ! empty( $override->tab_link ) ) {
-				$nav->edit_nav( [ 'link' => esc_url( $override->tab_link ) ], $slug );
+				$nav->edit_nav( array( 'link' => esc_url( $override->tab_link ) ), $slug );
 			}
 
 			// --- Item CSS ID override ----------------------------------------
 			if ( ! empty( $override->item_css_id ) ) {
-				$nav->edit_nav( [ 'css_id' => $override->item_css_id ], $slug );
+				$nav->edit_nav( array( 'css_id' => $override->item_css_id ), $slug );
 			}
 		}
 
 		// --- Sub-tabs added to existing built-in profile tabs ----------------
-		$existing_subtabs = DB::get_tabs( 'profile', [ 'status' => 'active' ] );
+		$existing_subtabs = DB::get_tabs( 'profile', array( 'status' => 'active' ) );
 		$existing_subtabs = array_filter(
 			$existing_subtabs,
 			fn( $t ) => ! empty( $t->parent_existing_slug ) && 0 === (int) $t->parent_id
@@ -482,22 +500,22 @@ class Profile_Nav {
 			$screen_function = '__return_false';
 
 			if ( 'url' !== $subtab->content_source ) {
-				$screen_function = function() use ( $tab_id ) {
+				$screen_function = function () use ( $tab_id ) {
 					self::render_screen( $tab_id );
 				};
 			}
 
-			$subnav_args = [
+			$subnav_args = array(
 				'name'            => $label,
 				'slug'            => $subtab->slug,
 				'parent_slug'     => $parent_slug,
 				'parent_url'      => trailingslashit( $user_domain . $parent_slug ),
 				'position'        => (int) $subtab->position,
 				'screen_function' => $screen_function,
-			];
+			);
 
 			if ( 'url' === $subtab->content_source ) {
-				$link = ! empty( $subtab->tab_link ) ? $subtab->tab_link : $subtab->external_url;
+				$link                = ! empty( $subtab->tab_link ) ? $subtab->tab_link : $subtab->external_url;
 				$subnav_args['link'] = esc_url( $link );
 			} elseif ( ! empty( $subtab->tab_link ) ) {
 				$subnav_args['link'] = esc_url( $subtab->tab_link );
@@ -521,7 +539,7 @@ class Profile_Nav {
 	public static function render_screen( int $tab_id ): void {
 		add_action(
 			'bp_template_content',
-			function() use ( $tab_id ): void {
+			function () use ( $tab_id ): void {
 				$tab = DB::get_tab( $tab_id );
 
 				if ( ! $tab ) {
@@ -531,14 +549,17 @@ class Profile_Nav {
 				$displayed_user_id = bp_displayed_user_id();
 				$current_user_id   = get_current_user_id();
 
-				$all_subtabs = DB::get_tabs( 'profile', [
-					'status'    => 'active',
-					'parent_id' => $tab_id,
-					'orderby'   => 'position',
-					'order'     => 'ASC',
-				] );
+				$all_subtabs = DB::get_tabs(
+					'profile',
+					array(
+						'status'    => 'active',
+						'parent_id' => $tab_id,
+						'orderby'   => 'position',
+						'order'     => 'ASC',
+					)
+				);
 
-				$visible_subtabs = [];
+				$visible_subtabs = array();
 				foreach ( $all_subtabs as $st ) {
 					if ( ! $st->is_enabled ) {
 						continue;
@@ -550,9 +571,8 @@ class Profile_Nav {
 					$rules       = DB::get_rules_for_tab( (int) $st->id );
 					$has_inherit = ! empty( array_filter( $rules, fn( $r ) => 'inherit' === $r->rule_key ) );
 
-					if ( $has_inherit ) {
-						// Parent is already accessible; inherit passes through.
-					} else {
+					// "inherit" passes through: the parent is already accessible.
+					if ( ! $has_inherit ) {
 						if ( ! Profile_Visibility::can_use_tab( (int) $st->id, $displayed_user_id ) ) {
 							continue;
 						}
@@ -593,6 +613,7 @@ class Profile_Nav {
 			}
 		);
 
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- BuddyBoss Platform's own template filter.
 		bp_core_load_template( apply_filters( 'bp_core_template_plugin', 'members/single/plugins' ) );
 	}
 }

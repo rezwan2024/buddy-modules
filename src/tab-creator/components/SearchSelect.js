@@ -11,7 +11,7 @@
  */
 
 import { useState, useRef, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 
 /**
@@ -21,35 +21,46 @@ import { Spinner } from '@wordpress/components';
  * @param {Function} props.fetchOptions
  * @param {string}   [props.placeholder]
  * @param {string}   [props.inputId]     ID for the search input (for an outside <label>).
- * @returns {JSX.Element}
+ * @return {JSX.Element} The search select.
  */
-export default function SearchSelect( { selectedItems, onChange, fetchOptions, placeholder, inputId } ) {
-	var [ search,    setSearch    ] = useState( '' );
-	var [ results,   setResults   ] = useState( [] );
-	var [ loading,   setLoading   ] = useState( false );
-	var [ open,      setOpen      ] = useState( false );
+export default function SearchSelect( {
+	selectedItems,
+	onChange,
+	fetchOptions,
+	placeholder,
+	inputId,
+} ) {
+	const [ search, setSearch ] = useState( '' );
+	const [ results, setResults ] = useState( [] );
+	const [ loading, setLoading ] = useState( false );
+	const [ open, setOpen ] = useState( false );
 
-	var debounceRef = useRef( null );
-	var wrapRef     = useRef( null );
+	const debounceRef = useRef( null );
+	const wrapRef = useRef( null );
 
-	var doSearch = useCallback( function( term ) {
-		setLoading( true );
-		fetchOptions( term )
-			.then( function( opts ) {
-				setResults( opts );
-				setOpen( true );
-			} )
-			.finally( function() { setLoading( false ); } );
-	}, [ fetchOptions ] );
+	const doSearch = useCallback(
+		function ( term ) {
+			setLoading( true );
+			fetchOptions( term )
+				.then( function ( opts ) {
+					setResults( opts );
+					setOpen( true );
+				} )
+				.finally( function () {
+					setLoading( false );
+				} );
+		},
+		[ fetchOptions ]
+	);
 
 	function handleSearchChange( e ) {
-		var val = e.target.value;
+		const val = e.target.value;
 		setSearch( val );
 
 		if ( debounceRef.current ) {
 			clearTimeout( debounceRef.current );
 		}
-		debounceRef.current = setTimeout( function() {
+		debounceRef.current = setTimeout( function () {
 			doSearch( val );
 		}, 300 );
 	}
@@ -63,7 +74,9 @@ export default function SearchSelect( { selectedItems, onChange, fetchOptions, p
 	}
 
 	function handleSelect( item ) {
-		var alreadySelected = selectedItems.some( function( s ) { return s.id === item.id; } );
+		const alreadySelected = selectedItems.some( function ( s ) {
+			return s.id === item.id;
+		} );
 		if ( ! alreadySelected ) {
 			onChange( selectedItems.concat( [ item ] ) );
 		}
@@ -72,33 +85,68 @@ export default function SearchSelect( { selectedItems, onChange, fetchOptions, p
 	}
 
 	function handleRemove( id ) {
-		onChange( selectedItems.filter( function( s ) { return s.id !== id; } ) );
+		onChange(
+			selectedItems.filter( function ( s ) {
+				return s.id !== id;
+			} )
+		);
 	}
 
 	function handleBlur( e ) {
 		// Close only if focus moves outside the wrapper.
-		if ( wrapRef.current && ! wrapRef.current.contains( e.relatedTarget ) ) {
+		if (
+			wrapRef.current &&
+			! wrapRef.current.contains( e.relatedTarget )
+		) {
 			setOpen( false );
 		}
 	}
 
-	var selectedIds = selectedItems.map( function( s ) { return s.id; } );
-	var unselected  = results.filter( function( r ) { return selectedIds.indexOf( r.id ) === -1; } );
+	// Escape closes the result list first (not the surrounding modal).
+	function handleKeyDown( e ) {
+		if ( 'Escape' === e.key && open ) {
+			e.stopPropagation();
+			e.preventDefault();
+			setOpen( false );
+		}
+	}
+
+	const selectedIds = selectedItems.map( function ( s ) {
+		return s.id;
+	} );
+	const unselected = results.filter( function ( r ) {
+		return selectedIds.indexOf( r.id ) === -1;
+	} );
 
 	return (
-		<div className="bdm-admin-search-select" ref={ wrapRef } onBlur={ handleBlur }>
+		<div
+			className="bdm-admin-search-select"
+			ref={ wrapRef }
+			onBlur={ handleBlur }
+			onKeyDown={ handleKeyDown }
+			role="presentation"
+		>
 			{ /* Chips */ }
 			{ selectedItems.length > 0 && (
 				<div className="bdm-admin-search-select__chips">
-					{ selectedItems.map( function( item ) {
+					{ selectedItems.map( function ( item ) {
 						return (
-							<span key={ item.id } className="bdm-admin-search-select__chip">
+							<span
+								key={ item.id }
+								className="bdm-admin-search-select__chip"
+							>
 								{ item.label }
 								<button
 									type="button"
 									className="bdm-admin-search-select__chip-remove"
-									onClick={ function() { handleRemove( item.id ); } }
-									aria-label={ __( 'Remove', 'buddy-modules' ) }
+									onClick={ function () {
+										handleRemove( item.id );
+									} }
+									aria-label={ sprintf(
+										/* translators: %s: selected user or group name. */
+										__( 'Remove %s', 'buddy-modules' ),
+										item.label
+									) }
 								>
 									&times;
 								</button>
@@ -117,7 +165,9 @@ export default function SearchSelect( { selectedItems, onChange, fetchOptions, p
 					value={ search }
 					onChange={ handleSearchChange }
 					onFocus={ handleSearchFocus }
-					placeholder={ placeholder || __( 'Search…', 'buddy-modules' ) }
+					placeholder={
+						placeholder || __( 'Search…', 'buddy-modules' )
+					}
 					autoComplete="off"
 				/>
 				{ loading && <Spinner /> }
@@ -126,15 +176,17 @@ export default function SearchSelect( { selectedItems, onChange, fetchOptions, p
 			{ /* Dropdown */ }
 			{ open && unselected.length > 0 && (
 				<ul className="bdm-admin-search-select__dropdown">
-					{ unselected.map( function( item ) {
+					{ unselected.map( function ( item ) {
 						return (
 							<li key={ item.id }>
 								<button
 									type="button"
 									className="bdm-admin-search-select__option"
-									onMouseDown={ function( e ) {
-										// Prevent blur from closing dropdown before click registers.
+									onMouseDown={ function ( e ) {
+										// Keep focus in the field so blur doesn't close the list first.
 										e.preventDefault();
+									} }
+									onClick={ function () {
 										handleSelect( item );
 									} }
 								>

@@ -5,6 +5,7 @@
  * BuddyModules\TabCreator\Foo  → modules/tab-creator/includes/Foo.php
  * BuddyModules\Foo\Bar         → includes/Foo/Bar.php
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -12,6 +13,11 @@ namespace BuddyModules;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Load Buddy Modules classes from their files on demand.
+ *
+ * @since 2.0.0
+ */
 class Autoloader {
 
 	/**
@@ -20,7 +26,7 @@ class Autoloader {
 	 * @since 2.0.0
 	 */
 	public function register(): void {
-		spl_autoload_register( [ $this, 'load' ] );
+		spl_autoload_register( array( $this, 'load' ) );
 	}
 
 	/**
@@ -28,25 +34,25 @@ class Autoloader {
 	 *
 	 * @since 2.0.0
 	 *
-	 * @param string $class FQCN.
+	 * @param string $class_name FQCN.
 	 */
-	public function load( string $class ): void {
+	public function load( string $class_name ): void {
 		$prefix = 'BuddyModules\\';
 
-		if ( 0 !== strpos( $class, $prefix ) ) {
+		if ( 0 !== strpos( $class_name, $prefix ) ) {
 			return;
 		}
 
-		$relative = substr( $class, strlen( $prefix ) );
+		$relative = substr( $class_name, strlen( $prefix ) );
 
 		// Namespace-to-path overrides. Keys are sub-namespace prefixes (with trailing \\).
 		// Admin\\ maps to includes/admin/ (lowercase) because on macOS the mkdir for
 		// includes/Admin/ resolved to the pre-existing legacy includes/admin/ folder;
 		// using the explicit lowercase path keeps things predictable on Linux too.
-		$ns_map = [
+		$ns_map = array(
 			'TabCreator\\' => BDM_DIR . 'modules/tab-creator/includes/',
 			'Admin\\'      => BDM_DIR . 'includes/admin/',
-		];
+		);
 
 		foreach ( $ns_map as $ns => $base_dir ) {
 			if ( 0 === strpos( $relative, $ns ) ) {
@@ -59,7 +65,7 @@ class Autoloader {
 			}
 		}
 
-		// Core namespace (all other sub-namespaces): BuddyModules\Foo\Bar → includes/Foo/Bar.php
+		// Core namespace (all other sub-namespaces): BuddyModules\Foo\Bar → includes/Foo/Bar.php.
 		$file = BDM_DIR . 'includes/' . str_replace( '\\', '/', $relative ) . '.php';
 		if ( file_exists( $file ) ) {
 			require_once $file;

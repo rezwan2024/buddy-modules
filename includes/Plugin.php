@@ -2,6 +2,7 @@
 /**
  * Core plugin singleton. Boots all subsystems.
  *
+ * @package BuddyModules
  * @since 2.0.0
  */
 
@@ -9,14 +10,29 @@ namespace BuddyModules;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Main Buddy Modules plugin class that boots all subsystems.
+ *
+ * @since 2.0.0
+ */
 class Plugin {
 
-	/** @var self|null */
+	/**
+	 * The single instance of the plugin.
+	 *
+	 * @since 2.0.0
+	 * @var self|null
+	 */
 	private static ?self $instance = null;
 
 	/** Minimum BuddyBoss Platform version required. */
 	const MIN_PLATFORM_VERSION = '2.8';
 
+	/**
+	 * Private constructor. Use get_instance() instead.
+	 *
+	 * @since 2.0.0
+	 */
 	private function __construct() {}
 
 	/**
@@ -39,8 +55,12 @@ class Plugin {
 	 * @since 2.0.0
 	 */
 	private function init(): void {
+		// Translations from the plugin's languages/ folder (PHP strings; the JS
+		// strings load through wp_set_script_translations() in Admin\Assets).
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
 		if ( ! $this->platform_ok() ) {
-			add_action( 'admin_notices', [ $this, 'show_platform_notice' ] );
+			add_action( 'admin_notices', array( $this, 'show_platform_notice' ) );
 			return;
 		}
 
@@ -50,7 +70,7 @@ class Plugin {
 		// but before bp_setup_nav (priority 6, which fires do_action('bp_setup_nav')).
 		// Our Profile_Nav::init() / Group_Nav::init() register callbacks on bp_setup_nav,
 		// so they must be hooked before that action fires.
-		add_action( 'bp_init', [ $this, 'load_and_boot_modules' ], 5 );
+		add_action( 'bp_init', array( $this, 'load_and_boot_modules' ), 5 );
 
 		// Boot admin UI.
 		if ( is_admin() ) {
@@ -60,7 +80,16 @@ class Plugin {
 		}
 
 		// Boot REST API.
-		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+	}
+
+	/**
+	 * Load the plugin's translation files.
+	 *
+	 * @since 2.0.0
+	 */
+	public function load_textdomain(): void {
+		load_plugin_textdomain( 'buddy-modules', false, dirname( plugin_basename( BDM_FILE ) ) . '/languages' );
 	}
 
 	/**
@@ -70,7 +99,7 @@ class Plugin {
 	 */
 	public function load_and_boot_modules(): void {
 		$registry = Modules\Registry::get_instance();
-		$this->load_modules( $registry );
+		$this->load_modules();
 
 		// Register settings schemas for all modules (always, regardless of active state).
 		foreach ( $registry->all() as $module ) {
@@ -82,10 +111,8 @@ class Plugin {
 	 * Load all module registration files.
 	 *
 	 * @since 2.0.0
-	 *
-	 * @param Modules\Registry $registry
 	 */
-	private function load_modules( Modules\Registry $registry ): void {
+	private function load_modules(): void {
 		$module_files = glob( BDM_DIR . 'modules/*/module.php' );
 		if ( ! is_array( $module_files ) ) {
 			return;
@@ -138,7 +165,7 @@ class Plugin {
 	 */
 	public static function on_activate(): void {
 		if ( ! get_option( 'bdm_active_modules' ) ) {
-			add_option( 'bdm_active_modules', [] );
+			add_option( 'bdm_active_modules', array() );
 		}
 		flush_rewrite_rules();
 	}

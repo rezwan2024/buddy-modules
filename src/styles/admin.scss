@@ -7,9 +7,16 @@
  * @since 2.0.0
  */
 
-@import 'variables';
+@import "variables";
+@import "header";
+@import "dashboard";
+@import "toast";
+@import "module-screen";
+@import "tabs-list";
+@import "tab-editor";
 
-// Override WP admin theme accent so @wordpress/components picks up the brand colour.
+// Override the WP admin theme accent so @wordpress/components
+// picks up the brand colour.
 body.toplevel_page_buddy-modules {
 	--wp-admin-theme-color: #ef5d33;
 	--wp-admin-theme-color-darker-10: #d7542e;
@@ -36,13 +43,6 @@ body.toplevel_page_buddy-modules {
 		margin: 0;
 	}
 }
-
-@import 'header';
-@import 'dashboard';
-@import 'toast';
-@import 'module-screen';
-@import 'tabs-list';
-@import 'tab-editor';
 
 // Buttons, fields and modals — values measured on the BuddyBoss Platform
 // settings screens (Groups → All Groups list + Edit Group modal).
@@ -172,6 +172,12 @@ body.toplevel_page_buddy-modules {
 			border-color: $bdm-text-disabled !important;
 			box-shadow: none !important;
 			outline: none !important;
+		}
+
+		// Keyboard focus stays visible.
+		&:focus-visible {
+			border-color: $bdm-brand !important;
+			box-shadow: 0 0 0 1px $bdm-brand !important;
 		}
 	}
 

@@ -51,7 +51,7 @@
 	line-height: 18px;
 	color: $bdm-text;
 	appearance: none;
-	background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='6' viewBox='0 0 11 6' fill='none'%3E%3Cpath d='M10.854 0.854028L5.854 5.854a.75.75 0 01-1.061 0L.146 0.854A.5.5 0 01.5 0h10a.5.5 0 01.354.854z' fill='%23666666'/%3E%3C/svg%3E" );
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='6' viewBox='0 0 11 6' fill='none'%3E%3Cpath d='M10.854 0.854028L5.854 5.854a.75.75 0 01-1.061 0L.146 0.854A.5.5 0 01.5 0h10a.5.5 0 01.354.854z' fill='%23666666'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 8px center;
 	background-size: 11px 6px;
@@ -91,15 +91,15 @@
 
 .bdm-admin-module-grid {
 	display: grid;
-	grid-template-columns: repeat( 4, 1fr );
+	grid-template-columns: repeat(4, 1fr);
 	gap: 16px;
 
 	@media ( max-width: 1200px ) {
-		grid-template-columns: repeat( 3, 1fr );
+		grid-template-columns: repeat(3, 1fr);
 	}
 
 	@media ( max-width: 900px ) {
-		grid-template-columns: repeat( 2, 1fr );
+		grid-template-columns: repeat(2, 1fr);
 	}
 
 	@media ( max-width: 600px ) {
@@ -128,7 +128,7 @@
 		width: 48px;
 		height: 48px;
 		border-radius: 50%;
-		background: rgba( $bdm-brand, 0.1 );
+		background: rgba($bdm-brand, 0.1);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -206,7 +206,7 @@
 			pointer-events: none;
 		}
 
-		&:hover:not( :disabled ) {
+		&:hover:not(:disabled) {
 			border-color: $bdm-border-secondary;
 			background: $bdm-bg-secondary-hover;
 			color: $bdm-text;
@@ -228,11 +228,6 @@
 		width: 0;
 		height: 0;
 		pointer-events: none;
-
-		&:focus-visible + .bdm-admin-big-toggle__track {
-			outline: 2px solid $bdm-brand;
-			outline-offset: 2px;
-		}
 	}
 
 	&__track {
@@ -243,6 +238,11 @@
 		background: #ccc;
 		transition: background 0.2s ease;
 		position: relative;
+
+		.bdm-admin-big-toggle__input:focus-visible + & {
+			outline: 2px solid $bdm-brand;
+			outline-offset: 2px;
+		}
 	}
 
 	&__thumb {
@@ -251,7 +251,7 @@
 		height: 20px;
 		border-radius: 50%;
 		background: $bdm-bg-base;
-		box-shadow: 0 1px 3px rgba( 0, 0, 0, 0.3 );
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 		position: absolute;
 		top: 3px;
 		left: 3px;
@@ -263,7 +263,7 @@
 	}
 
 	&.is-checked .bdm-admin-big-toggle__thumb {
-		transform: translateX( 22px );
+		transform: translateX(22px);
 	}
 
 	&.is-disabled {

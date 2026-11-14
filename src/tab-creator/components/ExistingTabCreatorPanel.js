@@ -10,8 +10,8 @@
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
-import ExistingTabsList   from './ExistingTabsList';
-import ExistingTabEditor  from './ExistingTabEditor';
+import ExistingTabsList from './ExistingTabsList';
+import ExistingTabEditor from './ExistingTabEditor';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
 
@@ -19,19 +19,19 @@ import { useToast } from '../../common/hooks/useToast';
  * @param {Object} props
  * @param {Object} props.route
  * @param {string} props.title Panel title, shown in the list card header.
- * @returns {JSX.Element}
+ * @return {JSX.Element} The existing tab creator panel.
  */
 export default function ExistingTabCreatorPanel( props ) {
-	var route        = props.route;
-	var tabType      = 'group-existing-tabs' === route.panel ? 'group' : 'profile';
-	var { addToast } = useToast();
+	const route = props.route;
+	const tabType = 'group-existing-tabs' === route.panel ? 'group' : 'profile';
+	const { addToast } = useToast();
 
-	var [ modalOpen,     setModalOpen     ] = useState( false );
-	var [ modalView,     setModalView     ] = useState( null );   // 'edit' | 'reset'
-	var [ modalTabId,    setModalTabId    ] = useState( null );
-	var [ modalTabLabel, setModalTabLabel ] = useState( '' );
-	var [ resetting,     setResetting     ] = useState( false );
-	var [ refreshKey,    setRefreshKey    ] = useState( 0 );
+	const [ modalOpen, setModalOpen ] = useState( false );
+	const [ modalView, setModalView ] = useState( null ); // 'edit' | 'reset'
+	const [ modalTabId, setModalTabId ] = useState( null );
+	const [ modalTabLabel, setModalTabLabel ] = useState( '' );
+	const [ resetting, setResetting ] = useState( false );
+	const [ refreshKey, setRefreshKey ] = useState( 0 );
 
 	function openModal( opts ) {
 		setModalView( opts.view );
@@ -49,30 +49,39 @@ export default function ExistingTabCreatorPanel( props ) {
 
 	function handleSaved() {
 		closeModal();
-		setRefreshKey( function( k ) { return k + 1; } );
+		setRefreshKey( function ( k ) {
+			return k + 1;
+		} );
 	}
 
 	function handleResetConfirm() {
 		setResetting( true );
 		apiRequest( {
 			method: 'DELETE',
-			path:   '/tab-creator/existing-tabs/' + modalTabId,
-			data:   { tab_type: tabType },
+			path: '/tab-creator/existing-tabs/' + modalTabId,
+			data: { tab_type: tabType },
 		} )
-			.then( function() {
+			.then( function () {
 				closeModal();
-				setRefreshKey( function( k ) { return k + 1; } );
+				setRefreshKey( function ( k ) {
+					return k + 1;
+				} );
 				addToast( __( 'Override reset.', 'buddy-modules' ), 'success' );
 			} )
-			.catch( function() {
-				addToast( __( 'Could not reset override.', 'buddy-modules' ), 'error' );
+			.catch( function () {
+				addToast(
+					__( 'Could not reset override.', 'buddy-modules' ),
+					'error'
+				);
 			} )
-			.finally( function() { setResetting( false ); } );
+			.finally( function () {
+				setResetting( false );
+			} );
 	}
 
-	var editorRoute = Object.assign( {}, route, {
+	const editorRoute = Object.assign( {}, route, {
 		view: 'edit',
-		id:   modalTabId,
+		id: modalTabId,
 	} );
 
 	return (
@@ -110,7 +119,10 @@ export default function ExistingTabCreatorPanel( props ) {
 						<p>
 							{ sprintf(
 								// translators: %s is the tab label.
-								__( 'Reset "%s" to its default settings?', 'buddy-modules' ),
+								__(
+									'Reset "%s" to its default settings?',
+									'buddy-modules'
+								),
 								modalTabLabel
 							) }
 						</p>

@@ -5,6 +5,7 @@
  * Boots the Tab Creator module: DB installer, migration, REST controllers,
  * and front-end nav/visibility hooks.
  *
+ * @package BuddyModules\TabCreator
  * @since 2.0.0
  */
 
@@ -12,16 +13,76 @@ namespace BuddyModules\TabCreator;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Profile and Group Tab Creator module definition.
+ *
+ * @since 2.0.0
+ */
 class Module extends \BuddyModules\Modules\Module {
 
-	protected string $id          = 'tab-creator';
-	protected string $label       = 'Profile and Group Tab Creator';
+	/**
+	 * Unique module slug.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	protected string $id = 'tab-creator';
+
+	/**
+	 * Human-readable module name.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	protected string $label = 'Profile and Group Tab Creator';
+
+	/**
+	 * Short description shown on the dashboard card.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $description = 'Create and manage unlimited custom tabs and sub-tabs for BuddyBoss member profiles and groups. No coding required.';
-	protected string $icon        = 'dashicons-menu-alt';
-	protected string $category    = 'Community';
-	protected array  $requires    = [ 'members' ];
+
+	/**
+	 * Dashboard card icon.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	protected string $icon = 'dashicons-menu-alt';
+
+	/**
+	 * Dashboard category.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
+	protected string $category = 'Community';
+
+	/**
+	 * BuddyBoss components this module depends on.
+	 *
+	 * @since 2.0.0
+	 * @var string[]
+	 */
+	protected array $requires = array( 'members' );
+
+	/**
+	 * URL path to the module's settings screen.
+	 *
+	 * @since 2.0.0
+	 * @var string
+	 */
 	protected string $settings_route = '?page=buddy-modules&module=tab-creator';
-	protected int    $order       = 10;
+
+	/**
+	 * Order in the dashboard card grid.
+	 *
+	 * @since 2.0.0
+	 * @var int
+	 */
+	protected int $order = 10;
 
 	/**
 	 * Boot the module on each page load when active.
@@ -33,7 +94,7 @@ class Module extends \BuddyModules\Modules\Module {
 		Migration::maybe_migrate();
 		Migration::register_notices();
 
-		add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
 		// Front-end nav: profile tabs.
 		if ( ! is_admin() && bp_is_active( 'members' ) ) {
@@ -70,10 +131,10 @@ class Module extends \BuddyModules\Modules\Module {
 		\BuddyModules\Settings\Fields::register_panel(
 			$module,
 			'profile-tabs',
-			[
+			array(
 				'label' => __( 'Profile Tabs', 'buddy-modules' ),
 				'icon'  => 'bb-icons-rl-user',
-			]
+			)
 		);
 
 		// ── Group Tabs panel ──────────────────────────────────────────────────
@@ -81,10 +142,10 @@ class Module extends \BuddyModules\Modules\Module {
 		\BuddyModules\Settings\Fields::register_panel(
 			$module,
 			'group-tabs',
-			[
+			array(
 				'label' => __( 'Group Tabs', 'buddy-modules' ),
 				'icon'  => 'bb-icons-rl-users-three',
-			]
+			)
 		);
 
 		// ── Profile Built-in Tabs panel ───────────────────────────────────────
@@ -92,10 +153,10 @@ class Module extends \BuddyModules\Modules\Module {
 		\BuddyModules\Settings\Fields::register_panel(
 			$module,
 			'profile-existing-tabs',
-			[
+			array(
 				'label' => __( 'Profile Built-in Tabs', 'buddy-modules' ),
 				'icon'  => 'bb-icons-rl-user-list',
-			]
+			)
 		);
 
 		// ── Group Built-in Tabs panel ─────────────────────────────────────────
@@ -103,10 +164,10 @@ class Module extends \BuddyModules\Modules\Module {
 		\BuddyModules\Settings\Fields::register_panel(
 			$module,
 			'group-existing-tabs',
-			[
+			array(
 				'label' => __( 'Group Built-in Tabs', 'buddy-modules' ),
 				'icon'  => 'bb-icons-rl-list-bullets',
-			]
+			)
 		);
 	}
 }

@@ -20,16 +20,13 @@ const distignore = fs
 	.map( ( l ) => l.trim() )
 	.filter( ( l ) => l && ! l.startsWith( '#' ) );
 
-const excludes = distignore
-	.map( ( p ) => `--exclude="${ p }"` )
-	.join( ' ' );
+const excludes = distignore.map( ( p ) => `--exclude="${ p }"` ).join( ' ' );
 
 execSync( `rm -rf "${ tmpDir }"` );
 execSync( `mkdir -p "${ tmpDir }/buddy-modules"` );
-execSync(
-	`rsync -a ${ excludes } "${ root }/" "${ tmpDir }/buddy-modules/"`,
-	{ stdio: 'inherit' }
-);
+execSync( `rsync -a ${ excludes } "${ root }/" "${ tmpDir }/buddy-modules/"`, {
+	stdio: 'inherit',
+} );
 
 const out = path.join( root, zipName );
 execSync( `cd "${ tmpDir }" && zip -r "${ out }" buddy-modules`, {
@@ -37,4 +34,5 @@ execSync( `cd "${ tmpDir }" && zip -r "${ out }" buddy-modules`, {
 } );
 execSync( `rm -rf "${ tmpDir }"` );
 
+// eslint-disable-next-line no-console -- CLI build script output.
 console.log( `Built: ${ zipName }` );

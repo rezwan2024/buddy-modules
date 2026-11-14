@@ -1,6 +1,15 @@
 <?php
+/**
+ * Remove Buddy Modules tables, options and transients on uninstall.
+ *
+ * @package BuddyModules
+ * @since 2.0.0
+ */
+
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
+// Dropping the plugin's own tables on uninstall.
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 global $wpdb;
 
 // Drop Tab Creator tables.
