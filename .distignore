@@ -21,3 +21,5 @@
 *.zip
 *.log
 .DS_Store
+/site/
+/_site/

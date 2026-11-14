@@ -10,6 +10,12 @@ Requires WordPress 6.4+, PHP 8.0+ and BuddyBoss Platform 2.8+ (Node 22 to build)
 
 Active installs (sites that checked for updates in the last 7 days) by plugin, WordPress and PHP version. It is private: open it once as `/stats?token=<STATS_TOKEN>` (the token is not in this repo) and a cookie keeps you signed in for a year. `?format=json` gives the raw numbers. How it works: [Update Worker](#update-worker-active-installs).
 
+## Landing page
+
+**https://rezwan2024.github.io/buddy-modules/** — built from `site/` by `.github/workflows/pages.yml` on every push to `dev` that changes `site/`, `docs/screenshots/` or `readme.txt`. `node scripts/site.js` (`npm run site`) writes `_site/`: it copies `site/`, adds `docs/screenshots/` as `images/`, and fills `{{VERSION}}`, `{{WP}}` and `{{PHP}}` from the readme.txt headers, so the version on the page follows each release. Preview: `npm run site && python3 -m http.server -d _site`.
+
+Design follows the BuddyBoss website (light only): cream `#F6EFE8` hero and CTA, lavender `#F9F5FB` band, orange `#E86D2A` buttons (`#D7542E` in the header), text `#222`; headings in Figtree (free stand-in for BuddyBoss's licensed Athletics), body in Inter, large text in the system font (SF Pro on Apple).
+
 ## Branches
 
 | Branch | Contents |
@@ -76,7 +82,7 @@ Local run: `printf 'STATS_TOKEN=localtest\n' > .dev.vars && npm run db:init:loca
 | `README.md` (this file) | `dev` branch on GitHub |
 | `README.dist.md` | `main` branch and the release zip, as `README.md` (copied by `scripts/dist.js`) |
 | `CLAUDE.md`, `docs/development/PLAN.md`, `docs/development/PROGRESS.md` | Project instructions, plan, and progress/handoff notes for development sessions (`dev` only). |
-| `docs/screenshots/` | Images in `README.dist.md`, loaded from the `dev` branch by URL (not in the zip). Retake from wp-admin at 1440px wide, 2× scale, cropped to the plugin area. |
+| `docs/screenshots/` | Images in `README.dist.md` and on the landing page, loaded from the `dev` branch by URL (not in the zip). Retake from wp-admin at 1440px wide, 2× scale, cropped to the plugin area. |
 | `readme.txt` | WordPress "View details" screen; its `== Changelog ==` becomes the release notes |
 
 ## Changelog
