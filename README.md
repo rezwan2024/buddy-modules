@@ -56,6 +56,10 @@ Update checks go through the Buddy Modules update service, which returns the lat
 
 ## Changelog
 
+### Version 2.0.8
+
+- **Fix:** A module switched on or off now keeps its toggle state when you open its Settings and go back to the modules list.
+
 ### Version 2.0.7
 
 - **Fix:** When Buddy Modules is installed twice (a second copy in another folder), only one copy runs and a notice says which one to keep.
