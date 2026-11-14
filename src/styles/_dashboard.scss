@@ -201,6 +201,8 @@
 .bdm-admin-big-toggle {
 	position: relative;
 	display: inline-block;
+	// Platform's card toggle sits 8px in from the card padding.
+	margin-right: 8px;
 	cursor: pointer;
 	user-select: none;
 
@@ -236,8 +238,10 @@
 		border-radius: 50%;
 		background: $bdm-bg-base;
 		position: absolute;
-		top: 4px;
-		left: 4px;
+		// Inside the track's 1px border: 4px from the outer edge, like
+		// Platform's components-form-toggle (centered, 5px gap when on).
+		top: 3px;
+		left: 3px;
 		transition: transform 0.2s ease;
 	}
 
@@ -247,7 +251,7 @@
 	}
 
 	&.is-checked .bdm-admin-big-toggle__thumb {
-		transform: translateX(16px);
+		transform: translateX(15px);
 	}
 
 	&.is-disabled {
