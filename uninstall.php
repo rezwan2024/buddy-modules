@@ -27,6 +27,10 @@ delete_option( 'bdm_tc_existing_group_tab_order' );
 // Delete core module options.
 delete_option( 'bdm_active_modules' );
 
+// Delete the update checker's stored state and cron event.
+delete_site_option( 'external_updates-buddy-modules' );
+wp_clear_scheduled_hook( 'puc_cron_check_updates-buddy-modules' );
+
 // Delete Tab Creator transients.
 delete_transient( 'bdm_tc_builtin_profile_nav_v2' );
 delete_transient( 'bdm_tc_builtin_profile_nav_labels' );

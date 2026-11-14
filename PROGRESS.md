@@ -124,11 +124,11 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[!]` blocked (s
 - lint:css: 0 new errors vs dbf684c (62 pre-existing, one fewer than before); lint:js still crashes (pre-existing TS/ESLint issue); build green (6 pre-existing Sass warnings).
 
 ## P9 — Release system
-- [ ] Plugin Update Checker bundled + booted (release assets)
-- [ ] `.github/workflows/release.yml` (tag on dev → build → main + Release zip)
-- [ ] `npm run stats`
+- [x] Plugin Update Checker bundled + booted (release assets) — PUC v6.0 in `lib/plugin-update-checker/`, `BuddyModules\Updater::boot()` from `buddy-modules.php` (before plugins_loaded, so it works even without Platform); asset regex `^buddy-modules\.zip$`, branch fallback `main`; skipped when the plugin folder has `.git` (filter `bdm_update_checker_enabled`), so a dev checkout is never replaced; uninstall clears `external_updates-buddy-modules` + its cron
+- [x] `.github/workflows/release.yml` (tag on dev → build → main + Release zip) — checks tag ⊂ dev + 4 version strings (header, BDM_VERSION, package.json, readme Stable tag); `scripts/dist.js` (rsync `--exclude-from=.distignore`, patterns now root-anchored); `scripts/publish-dist.js` writes main as one GitHub-API commit (GitHub-signed → Verified, parent = previous main) and moves the tag onto it; release notes = readme changelog entry (`scripts/changelog.js`)
+- [x] `npm run stats` (`scripts/stats.js`, `gh api --paginate --slurp`)
 - [ ] Test: v2.0.0 release, then v2.0.1, and confirm the WP update notice + one-click update on prod.local
-- [ ] readme + changelog
+- [x] readme + changelog (`readme.txt` with `== Changelog ==`, `README.md` with the release steps)
 
 ## P10 — Optional: active installs (Cloudflare Worker)
 - [ ] Not started (do only when Rezwan asks)

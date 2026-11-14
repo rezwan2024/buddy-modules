@@ -1,13 +1,21 @@
-src/
-node_modules/
-.github/
-CLAUDE.md
-PLAN.md
-PROGRESS.md
-phpcs.xml.dist
-webpack.config.js
-package.json
-package-lock.json
-.gitignore
-.distignore
+# Dev-only files. Excluded from the release zip and the main branch.
+# Patterns are rsync excludes; a leading / anchors to the plugin root.
+/.git/
+/.github/
+/.gitignore
+/.distignore
+/node_modules/
+/src/
+/scripts/
+/dist/
+/vendor/
+/CLAUDE.md
+/PLAN.md
+/PROGRESS.md
+/phpcs.xml.dist
+/webpack.config.js
+/package.json
+/package-lock.json
+*.zip
 *.log
+.DS_Store

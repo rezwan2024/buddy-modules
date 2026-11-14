@@ -6,9 +6,11 @@
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js",
-    "lint:css": "wp-scripts lint-style",
-    "zip": "npm run build && node scripts/zip.js"
+    "lint:js": "wp-scripts lint-js src scripts",
+    "lint:css": "wp-scripts lint-style \"src/**/*.{css,scss}\"",
+    "zip": "npm run build && node scripts/dist.js",
+    "stats": "node scripts/stats.js",
+    "changelog": "node scripts/changelog.js"
   },
   "devDependencies": {
     "@wordpress/scripts": "^30.0.0",

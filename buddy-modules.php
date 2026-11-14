@@ -26,6 +26,10 @@ define( 'BDM_URL', plugin_dir_url( __FILE__ ) );
 require_once BDM_DIR . 'includes/Autoloader.php';
 ( new BuddyModules\Autoloader() )->register();
 
+// Updates from GitHub Releases. Runs outside plugins_loaded so the update
+// checker works even when the BuddyBoss Platform dependency is missing.
+BuddyModules\Updater::boot();
+
 register_activation_hook(
 	__FILE__,
 	function (): void {

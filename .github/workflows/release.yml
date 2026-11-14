@@ -1,0 +1,108 @@
+# Release: push a v* tag on a dev commit (e.g. `git tag v2.0.1 && git push origin v2.0.1`).
+#
+# 1. Checks the tag is on dev and matches every version string.
+# 2. npm ci && npm run build.
+# 3. Assembles the dist with .distignore (dist/buddy-modules/ + buddy-modules.zip).
+# 4. Force-publishes the dist to main as one GitHub-signed commit, and moves the tag onto it.
+# 5. Creates the GitHub Release with buddy-modules.zip and the readme.txt changelog as notes.
+#
+# The bundled Plugin Update Checker installs buddy-modules.zip from the latest release.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - name: Check out the tagged commit
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag is on dev
+        run: |
+          git fetch --no-tags origin dev
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          if ! git merge-base --is-ancestor "$SOURCE_SHA" origin/dev; then
+            echo "::error::Tag $TAG ($SOURCE_SHA) is not on the dev branch."
+            exit 1
+          fi
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+
+      - name: Check the version strings match the tag
+        run: |
+          VERSION="${TAG#v}"
+          HEADER="$(sed -n 's/^ \* Version:[[:space:]]*//p' buddy-modules.php)"
+          CONSTANT="$(sed -n "s/^define( 'BDM_VERSION', '\(.*\)' );/\1/p" buddy-modules.php)"
+          PACKAGE="$(node -p "require('./package.json').version")"
+          STABLE="$(sed -n 's/^Stable tag:[[:space:]]*//p' readme.txt)"
+          echo "tag=$VERSION header=$HEADER BDM_VERSION=$CONSTANT package.json=$PACKAGE readme=$STABLE"
+          for v in "$HEADER" "$CONSTANT" "$PACKAGE" "$STABLE"; do
+            if [ "$v" != "$VERSION" ]; then
+              echo "::error::Version mismatch: every version string must be $VERSION."
+              exit 1
+            fi
+          done
+          node scripts/changelog.js "$VERSION" > "$RUNNER_TEMP/notes.md"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Check PHP syntax
+        run: find . -name '*.php' -not -path './node_modules/*' -print0 | xargs -0 -n1 php -l > /dev/null
+
+      - name: Assemble the dist
+        run: |
+          node scripts/dist.js
+          for f in buddy-modules.php readme.txt build/admin.js build/admin.asset.php build/admin.css lib/plugin-update-checker/plugin-update-checker.php; do
+            unzip -l dist/buddy-modules.zip "buddy-modules/$f" > /dev/null || { echo "::error::$f missing from the zip"; exit 1; }
+          done
+          for f in src package.json node_modules .github CLAUDE.md PLAN.md PROGRESS.md; do
+            if [ -e "dist/buddy-modules/$f" ]; then echo "::error::$f must not ship"; exit 1; fi
+          done
+
+      - name: Publish the dist to main and tag it
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/publish-dist.js dist/buddy-modules "$TAG" "$SOURCE_SHA"
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '\n\n---\nBuilt from %s on `dev`. Install or update with **buddy-modules.zip** below.\n' "$SOURCE_SHA" >> "$RUNNER_TEMP/notes.md"
+          PRERELEASE=""
+          case "$VERSION" in *-*) PRERELEASE="--prerelease" ;; esac
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" dist/buddy-modules.zip --clobber
+            gh release edit "$TAG" --title "Buddy Modules $VERSION" --notes-file "$RUNNER_TEMP/notes.md"
+          else
+            gh release create "$TAG" dist/buddy-modules.zip \
+              --verify-tag \
+              --title "Buddy Modules $VERSION" \
+              --notes-file "$RUNNER_TEMP/notes.md" \
+              $PRERELEASE
+          fi

@@ -1,5 +1,7 @@
-node_modules/
-build/
+*.log
+/node_modules/
+/build/
+/dist/
 *.zip
-vendor/
+/vendor/
 .DS_Store
