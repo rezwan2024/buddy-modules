@@ -44,6 +44,28 @@ The [release workflow](.github/workflows/release.yml) then checks the tag is on 
 
 Because the workflow moves the tag onto the built commit on `main`, refresh local tags afterwards with `git fetch --tags --force`.
 
+## Update Worker (active installs)
+
+`worker/` is a Cloudflare Worker (free tier) that the plugin's update checker calls instead of GitHub:
+
+- `GET /update` returns Plugin Update Checker metadata for the latest GitHub release (`download_url` = the release's `buddy-modules.zip`, cached 10 minutes) and records the site in D1: SHA-256 site hash, plugin/WP/PHP versions, first/last seen.
+- `GET /stats` shows active installs (sites seen in the last 7 days) by plugin, WordPress and PHP version. Open `/stats?token=<STATS_TOKEN>` once; a cookie keeps you signed in. `?format=json` gives the raw numbers.
+- Opt-out: `add_filter( 'bdm_send_update_stats', '__return_false' );` makes the plugin check GitHub directly.
+
+Deploy (from `worker/`):
+
+```bash
+npm install
+npx wrangler login                       # once
+npx wrangler d1 create buddy-modules-stats   # put the database_id in wrangler.toml
+npm run db:init                          # create the table
+npx wrangler secret put STATS_TOKEN      # any long random string
+npx wrangler secret put GITHUB_TOKEN     # optional, raises the GitHub rate limit
+npm run deploy
+```
+
+Local run: `printf 'STATS_TOKEN=localtest\n' > .dev.vars && npm run db:init:local && npm run dev` (http://127.0.0.1:8787).
+
 ## Changelog
 
 See [`readme.txt`](readme.txt) → `== Changelog ==`.
