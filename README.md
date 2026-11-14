@@ -1,6 +1,13 @@
 # Buddy Modules
 
-Optional modules for BuddyBoss Platform sites. Turn each module on or off from **Buddy Modules** in wp-admin; every module has its own settings screen.
+**Free and open-source modules that extend BuddyBoss Platform.** Start with the Profile and Group Tab Creator; more modules are on the way.
+
+- **Free & open source:** GPLv2, every line of code is here. No licence key, no upsells.
+- **Modern React admin:** a fast admin panel where changes save instantly, with no page reloads.
+- **On/off modules:** turn on only what you need; each module has its own settings.
+- **One-click updates** from the WordPress Plugins screen.
+
+🌐 **Website: https://rezwan2024.github.io/buddy-modules/**
 
 ![Buddy Modules screen in wp-admin: module cards with an on/off toggle and a Settings button](https://raw.githubusercontent.com/rezwan2024/buddy-modules/dev/docs/screenshots/dashboard.png)
 
@@ -49,6 +56,10 @@ Update checks go through the Buddy Modules update service, which returns the lat
 
 ## Changelog
 
+### Version 2.0.6
+
+- **Readme:** website link and a clearer introduction (free and open source, more modules on the way). No functional changes.
+
 ### Version 2.0.5
 
 - **Readme:** screenshots of the Buddy Modules and Tab Creator screens. No functional changes.
@@ -83,6 +94,10 @@ Update checks go through the Buddy Modules update service, which returns the lat
 - **Fix:** Custom group tabs show for logged-out visitors on public groups.
 - **Fix:** Line breaks in tab content are kept on the front end.
 - **Improvement:** RTL stylesheet, JavaScript and PHP translations (`buddy-modules.pot`), and keyboard access in menus and modals.
+
+## Contributing
+
+Buddy Modules is built to extend BuddyBoss Platform, never to replace it. Found a bug or want a new module? [Open an issue](https://github.com/rezwan2024/buddy-modules/issues/new).
 
 ## License
 
