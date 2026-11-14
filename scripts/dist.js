@@ -39,9 +39,12 @@ execFileSync(
 );
 
 // main and the zip get the user-facing readme; README.md on dev is for development.
-fs.copyFileSync(
-	path.join( root, 'README.dist.md' ),
-	path.join( pluginDir, 'README.md' )
+// Its <!-- changelog --> marker is filled from the readme.txt changelog.
+fs.writeFileSync(
+	path.join( pluginDir, 'README.md' ),
+	fs
+		.readFileSync( path.join( root, 'README.dist.md' ), 'utf8' )
+		.replace( '<!-- changelog -->', changelogMarkdown() )
 );
 
 // -X drops extra file attributes, so the zip is the same on macOS and Linux.
@@ -49,6 +52,33 @@ execFileSync( 'zip', [ '-rqX', zipFile, slug ], {
 	cwd: distDir,
 	stdio: 'inherit',
 } );
+
+/**
+ * The readme.txt changelog as Markdown: a heading per version, plain bullets,
+ * and the "New:" / "Fix:" / "Improvement:" labels in bold.
+ *
+ * @return {string} Markdown.
+ */
+function changelogMarkdown() {
+	const readme = fs.readFileSync( path.join( root, 'readme.txt' ), 'utf8' );
+	const section = (
+		readme.split( /^== Changelog ==\s*$/m )[ 1 ] || ''
+	).split( /^== .* ==\s*$/m )[ 0 ];
+	const out = [];
+
+	for ( const line of section.split( '\n' ) ) {
+		const heading = line.match( /^= (.+) =\s*$/ );
+		const bullet = line.match( /^\*\s+(.*)$/ );
+
+		if ( heading ) {
+			out.push( '', `### Version ${ heading[ 1 ].trim() }`, '' );
+		} else if ( bullet ) {
+			out.push( '- ' + bullet[ 1 ].replace( /^(\w+):\s/, '**$1:** ' ) );
+		}
+	}
+
+	return out.join( '\n' ).trim();
+}
 
 // eslint-disable-next-line no-console -- CLI build script output.
 console.log( `Built: dist/${ slug }/ and dist/${ slug }.zip` );

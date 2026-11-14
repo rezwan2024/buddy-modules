@@ -27,7 +27,7 @@ Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin. Your exist
 
 == Installation ==
 
-1. Download `buddy-modules.zip` from the latest release: https://github.com/rezwan2024/buddy-modules/releases/latest
+1. Download the latest `buddy-modules.zip`: https://github.com/rezwan2024/buddy-modules/releases/latest/download/buddy-modules.zip
 2. In wp-admin, go to **Plugins → Add New → Upload Plugin** and upload the zip.
 3. Activate **Buddy Modules**, then open **Buddy Modules** in the admin menu.
 
@@ -43,10 +43,6 @@ From this plugin's GitHub releases. WordPress checks about twice a day; use **Ch
 
 The check goes through the Buddy Modules update service (a Cloudflare Worker), which returns the latest GitHub release and counts active installs. Each check sends a one-way hash of your site address (not the address itself), the Buddy Modules, WordPress and PHP versions, and your site language. Nothing else is sent, and no cookies are set. The counts are only used to see how many sites run each version.
 
-To check GitHub directly and send nothing, add this to a small plugin or your theme's functions.php:
-
-`add_filter( 'bdm_send_update_stats', '__return_false' );`
-
 = Does uninstalling remove the legacy Tab Creator data? =
 
 No. Uninstalling Buddy Modules removes only its own tables and options.
@@ -57,7 +53,7 @@ No. Uninstalling Buddy Modules removes only its own tables and options.
 * Readme updates on GitHub. No functional changes.
 
 = 2.0.2 =
-* Update checks now go through the Buddy Modules update service, which counts active installs by a one-way hash of the site address. See "What does the update check send?" in the FAQ. Opt out with the `bdm_send_update_stats` filter.
+* Update checks now go through the Buddy Modules update service, which counts active installs using a one-way hash of the site address.
 
 = 2.0.1 =
 * Test release to check the update from GitHub releases on the WordPress Plugins screen. No functional changes.
