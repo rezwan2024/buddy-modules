@@ -1,0 +1,21 @@
+# Buddy Modules update Worker: Plugin Update Checker metadata URL + active install stats.
+# Deploy: npm install && npx wrangler deploy (see README.md "Update Worker").
+name = "buddy-modules-updates"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[vars]
+GITHUB_REPO = "rezwan2024/buddy-modules"
+RELEASE_ASSET = "buddy-modules.zip"
+ACTIVE_DAYS = "7"
+
+# Created with `npx wrangler d1 create buddy-modules-stats`.
+[[d1_databases]]
+binding = "DB"
+database_name = "buddy-modules-stats"
+database_id = "db9f3498-808d-48e7-ae1a-d94fe879b988"
+
+# Secrets (npx wrangler secret put <NAME>):
+#   STATS_TOKEN   required, protects /stats
+#   GITHUB_TOKEN  optional, raises the GitHub API rate limit

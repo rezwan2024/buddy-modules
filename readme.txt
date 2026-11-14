@@ -39,6 +39,14 @@ Updates appear on the **Plugins** and **Dashboard → Updates** screens like any
 
 From this plugin's GitHub releases. WordPress checks about twice a day; use **Check for updates** under the plugin on the Plugins screen to check now.
 
+= What does the update check send? =
+
+The check goes through the Buddy Modules update service (a Cloudflare Worker), which returns the latest GitHub release and counts active installs. Each check sends a one-way hash of your site address (not the address itself), the Buddy Modules, WordPress and PHP versions, and your site language. Nothing else is sent, and no cookies are set. The counts are only used to see how many sites run each version.
+
+To check GitHub directly and send nothing, add this to a small plugin or your theme's functions.php:
+
+`add_filter( 'bdm_send_update_stats', '__return_false' );`
+
 = Does uninstalling remove the legacy Tab Creator data? =
 
 No. Uninstalling Buddy Modules removes only its own tables and options.

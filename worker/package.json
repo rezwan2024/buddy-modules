@@ -1,0 +1,14 @@
+{
+	"name": "buddy-modules-update-worker",
+	"private": true,
+	"description": "Cloudflare Worker: update metadata for Buddy Modules + active install stats.",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy",
+		"db:init": "wrangler d1 execute buddy-modules-stats --remote --file=schema.sql",
+		"db:init:local": "wrangler d1 execute buddy-modules-stats --local --file=schema.sql"
+	},
+	"devDependencies": {
+		"wrangler": "^4.0.0"
+	}
+}

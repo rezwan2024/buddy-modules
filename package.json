@@ -6,7 +6,7 @@
   "scripts": {
     "build": "wp-scripts build",
     "start": "wp-scripts start",
-    "lint:js": "wp-scripts lint-js src scripts",
+    "lint:js": "wp-scripts lint-js src scripts worker/src",
     "lint:css": "wp-scripts lint-style \"src/**/*.{css,scss}\"",
     "zip": "npm run build && node scripts/dist.js",
     "stats": "node scripts/stats.js",
