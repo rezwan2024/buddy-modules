@@ -4,7 +4,7 @@ Tags: buddyboss, profile tabs, group tabs, community
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.8
+Stable tag: 2.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,9 @@ The check goes through the Buddy Modules update service (a Cloudflare Worker), w
 No. Uninstalling Buddy Modules removes only its own tables and options.
 
 == Changelog ==
+
+= 2.0.9 =
+* Fix: The module on/off toggle is now aligned like the BuddyBoss Platform settings toggles.
 
 = 2.0.8 =
 * Fix: A module switched on or off now keeps its toggle state when you open its Settings and go back to the modules list.
