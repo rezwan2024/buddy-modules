@@ -3,7 +3,7 @@
  * Plugin Name:       Buddy Modules
  * Plugin URI:        https://github.com/rezwan2024/buddy-modules
  * Description:       A module host for BuddyBoss sites. Includes Profile and Group Tab Creator and future modules.
- * Version:           2.0.2
+ * Version:           2.0.3
  * Requires at least: 6.4
  * Requires PHP:      8.0
  * Author:            MD. Rezwan Shiblu
@@ -18,7 +18,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'BDM_VERSION', '2.0.2' );
+define( 'BDM_VERSION', '2.0.3' );
 define( 'BDM_FILE', __FILE__ );
 define( 'BDM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'BDM_URL', plugin_dir_url( __FILE__ ) );
