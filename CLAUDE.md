@@ -33,7 +33,7 @@ After every phase commit, output this block verbatim, filling in the next phase 
 ```
 Buddy Modules plugin — P<N> session.
 
-Plugin: /Users/shiblu/Local Sites/prod/app/public/wp-content/plugins/buddy-modules/
+Plugin (dev checkout): /Users/shiblu/Local Sites/prod/buddy-modules-dev/
 
 FIRST: Read PROGRESS.md only (find the handoff note). Do NOT re-read CLAUDE.md or PLAN.md in full.
 
@@ -76,7 +76,8 @@ Done when: <paste the "Done when" line from PLAN.md>
 
 ## Locations
 
-- Plugin (local, Local by Flywheel site "prod"): `/Users/shiblu/Local Sites/prod/app/public/wp-content/plugins/buddy-modules/`. Before P0 it is still `.../plugins/buddyboss-tab-creator/`.
+- **Dev checkout (git, branch `dev`)**: `/Users/shiblu/Local Sites/prod/buddy-modules-dev/` (moved out of `wp-content/plugins/` in P9, 2026-11-14, so a WordPress update never replaces the working tree).
+- **Installed plugin on prod.local**: `.../wp-content/plugins/buddy-modules/` = the **release zip**, kept up to date through the WP update screen (no `.git`). To test unreleased dev code there, copy the built dist over it (`npm run zip`, then `rsync -a --delete dist/buddy-modules/ <plugins>/buddy-modules/`) and reinstall the latest release afterwards (WP update screen or the release zip). Never move the checkout back into `plugins/` while the release copy is there. The update checker is off in any folder that has `.git` (filter `bdm_update_checker_enabled`).
 - Legacy backup (after P0): `/Users/shiblu/Local Sites/prod/plugin-backups/buddyboss-tab-creator-1.0.0-legacy/`
 - Test site: `http://prod.local` (wp-admin), BuddyBoss Platform 3.7.x active.
 - GitHub: `https://github.com/rezwan2024/buddy-modules` (public). `gh` has two accounts: use **`rezwan2024`** for this repo (`gh auth switch -u rezwan2024` before repo commands, switch back to `rezwan-buddyboss` after).
@@ -120,7 +121,7 @@ Done when: <paste the "Done when" line from PLAN.md>
 ## Commands
 
 ```bash
-cd "/Users/shiblu/Local Sites/prod/app/public/wp-content/plugins/buddy-modules"
+cd "/Users/shiblu/Local Sites/prod/buddy-modules-dev"
 npm ci                 # first time / after lockfile change
 npm start              # watch while developing
 npm run build          # must be green before every commit
@@ -159,6 +160,7 @@ phpcs: don't `composer install` inside the plugin. Install WPCS once into the sc
   - `gh`: the `rezwan2024` login has scopes `repo, workflow, admin:gpg_key`. Use `gh auth switch -h github.com -u rezwan2024` before repo commands and `gh auth switch -h github.com -u rezwan-buddyboss` after (this gh version has no `-u` on `refresh`).
 - Never commit `node_modules/`, `build/`, `*.zip`, or anything secret. `.distignore` keeps `src/`, md files, configs and `node_modules` out of the dist.
 - Push / create repo / create releases / tags only when Rezwan asks.
+- **Releasing** (P9): bump the 4 version strings (header, `BDM_VERSION`, `package.json` via `npm version x.y.z --no-git-tag-version`, readme `Stable tag`), add `= x.y.z =` to readme `== Changelog ==`, signed commit, `git push origin dev vX.Y.Z` after `git tag vX.Y.Z`. `.github/workflows/release.yml` builds, publishes `main` + moves the tag + creates the Release. Then `git fetch --tags --force`. Full steps in `README.md`.
 
 ## Debugging with subagents
 
