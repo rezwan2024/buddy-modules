@@ -8,6 +8,18 @@
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
+// Deleting one of two installed copies (e.g. a duplicate in another folder)
+// must not remove the data the other copy still uses.
+if ( ! function_exists( 'get_plugins' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+
+foreach ( array_keys( get_plugins() ) as $bdm_plugin_file ) {
+	if ( WP_UNINSTALL_PLUGIN !== $bdm_plugin_file && 'buddy-modules.php' === basename( $bdm_plugin_file ) ) {
+		return;
+	}
+}
+
 // Dropping the plugin's own tables on uninstall.
 // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 global $wpdb;
