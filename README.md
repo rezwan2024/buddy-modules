@@ -56,6 +56,11 @@ Update checks go through the Buddy Modules update service, which returns the lat
 
 ## Changelog
 
+### Version 2.0.7
+
+- **Fix:** When Buddy Modules is installed twice (a second copy in another folder), only one copy runs and a notice says which one to keep.
+- **Fix:** Deleting an extra copy of Buddy Modules no longer removes your tabs and settings.
+
 ### Version 2.0.6
 
 - **Readme:** website link and a clearer introduction (free and open source, more modules on the way). No functional changes.
