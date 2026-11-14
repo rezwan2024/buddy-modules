@@ -56,6 +56,10 @@ Update checks go through the Buddy Modules update service, which returns the lat
 
 ## Changelog
 
+### Version 2.0.9
+
+- **Fix:** The module on/off toggle is now aligned like the BuddyBoss Platform settings toggles.
+
 ### Version 2.0.8
 
 - **Fix:** A module switched on or off now keeps its toggle state when you open its Settings and go back to the modules list.
