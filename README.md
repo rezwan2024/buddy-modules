@@ -1,75 +1,48 @@
 # Buddy Modules
 
-A module host for BuddyBoss sites. Its first module is the **Profile and Group Tab Creator**: custom profile and group tabs and sub-tabs, plus rename, hide and reorder for the built-in BuddyBoss tabs. Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin.
+Optional modules for BuddyBoss Platform sites. Turn each module on or off from **Buddy Modules** in wp-admin; every module has its own settings screen.
 
-Requires WordPress 6.4+, PHP 8.0+ and BuddyBoss Platform 2.8+.
+## Modules
+
+### Profile and Group Tab Creator
+
+- Add custom tabs and sub-tabs to member profiles and groups, with your own content (shortcodes supported).
+- Choose who gets a tab: user roles or chosen members on profiles; group status, chosen groups or excluded groups on groups.
+- Rename, hide and reorder the built-in BuddyBoss profile and group tabs.
+- Drag to reorder, bulk activate, deactivate or delete, and keep tabs as drafts.
+
+Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin. Your existing tabs, rules and built-in tab changes are copied over once; the legacy data is left untouched.
+
+## Requirements
+
+- WordPress 6.4 or newer
+- PHP 8.0 or newer
+- BuddyBoss Platform 2.8 or newer
 
 ## Install
 
-Download **`buddy-modules.zip`** from the [latest release](https://github.com/rezwan2024/buddy-modules/releases/latest) and upload it in **Plugins → Add New → Upload Plugin**. Don't use the "Source code" downloads.
+1. Download **`buddy-modules.zip`** from the [latest release](https://github.com/rezwan2024/buddy-modules/releases/latest). Don't use the "Source code" downloads.
+2. In wp-admin, go to **Plugins → Add New → Upload Plugin** and upload the zip.
+3. Activate **Buddy Modules**, then open **Buddy Modules** in the admin menu.
 
-Updates show up on the WordPress **Plugins** screen and install with one click. The plugin checks this repository's releases through the bundled [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) (`lib/plugin-update-checker/`). The checker is off when the plugin runs from a git checkout; the `bdm_update_checker_enabled` filter overrides that.
+## Updates
 
-## Branches
+New versions appear on the **Plugins** and **Dashboard → Updates** screens like any other plugin and install with one click. WordPress checks about twice a day; click **Check for updates** under the plugin on the Plugins screen to check now.
 
-| Branch | Contents |
-|---|---|
-| `dev` | Source. All work happens here. |
-| `main` | The built plugin only. Written by the release workflow; never commit to it by hand. |
+## Privacy
 
-## Development
+Update checks go through the Buddy Modules update service, which returns the latest release and counts active installs. Each check sends a one-way hash of your site address (not the address itself), the Buddy Modules, WordPress and PHP versions, and your site language. Nothing else is sent, and no cookies are set.
 
-```bash
-npm ci
-npm start             # watch build
-npm run build         # production build into build/
-npm run lint:js && npm run lint:css
-npm run zip           # build + dist/buddy-modules/ + dist/buddy-modules.zip (respects .distignore)
-npm run stats         # download count per release (needs the GitHub CLI)
-npm run changelog -- 2.0.1   # print one version's changelog from readme.txt
+To check GitHub directly and send nothing, add this to a small plugin or your theme's `functions.php`:
+
+```php
+add_filter( 'bdm_send_update_stats', '__return_false' );
 ```
-
-## Releasing
-
-1. On `dev`, set the new version in all four places: the `Version:` header and `BDM_VERSION` in `buddy-modules.php`, `version` in `package.json`, and `Stable tag:` in `readme.txt`.
-2. Add a `= x.y.z =` entry at the top of the `== Changelog ==` section in `readme.txt`. It becomes the release notes.
-3. Commit, push `dev`, then tag and push the tag:
-
-   ```bash
-   git tag v2.0.1
-   git push origin dev v2.0.1
-   ```
-
-The [release workflow](.github/workflows/release.yml) then checks the tag is on `dev` and matches every version string, runs `npm ci && npm run build`, assembles the dist with `.distignore`, publishes it to `main` as one commit, moves the tag onto that commit, and creates the GitHub Release with `buddy-modules.zip`. A version with a hyphen (`v2.1.0-beta.1`) is published as a pre-release, which the update checker ignores.
-
-Because the workflow moves the tag onto the built commit on `main`, refresh local tags afterwards with `git fetch --tags --force`.
-
-## Update Worker (active installs)
-
-`worker/` is a Cloudflare Worker (free tier) that the plugin's update checker calls instead of GitHub:
-
-- `GET /update` returns Plugin Update Checker metadata for the latest GitHub release (`download_url` = the release's `buddy-modules.zip`, cached 10 minutes) and records the site in D1: SHA-256 site hash, plugin/WP/PHP versions, first/last seen.
-- `GET /stats` shows active installs (sites seen in the last 7 days) by plugin, WordPress and PHP version. Open `/stats?token=<STATS_TOKEN>` once; a cookie keeps you signed in. `?format=json` gives the raw numbers.
-- Opt-out: `add_filter( 'bdm_send_update_stats', '__return_false' );` makes the plugin check GitHub directly.
-
-Deploy (from `worker/`):
-
-```bash
-npm install
-npx wrangler login                       # once
-npx wrangler d1 create buddy-modules-stats   # put the database_id in wrangler.toml
-npm run db:init                          # create the table
-npx wrangler secret put STATS_TOKEN      # any long random string
-npx wrangler secret put GITHUB_TOKEN     # optional, raises the GitHub rate limit
-npm run deploy
-```
-
-Local run: `printf 'STATS_TOKEN=localtest\n' > .dev.vars && npm run db:init:local && npm run dev` (http://127.0.0.1:8787).
 
 ## Changelog
 
-See [`readme.txt`](readme.txt) → `== Changelog ==`.
+See [`readme.txt`](readme.txt) → `== Changelog ==`, or the [releases page](https://github.com/rezwan2024/buddy-modules/releases).
 
 ## License
 
-GPLv2 or later. Plugin Update Checker is MIT-licensed (`lib/plugin-update-checker/license.txt`).
+GPLv2 or later. The bundled Plugin Update Checker is MIT-licensed (`lib/plugin-update-checker/license.txt`).
