@@ -284,9 +284,18 @@ export default function Dashboard( { navigate } ) {
 	 */
 	function handleToggle( id, newActive ) {
 		setModules( function ( prev ) {
-			return prev.map( function ( m ) {
+			const next = prev.map( function ( m ) {
 				return m.id === id ? { ...m, active: newActive } : m;
 			} );
+
+			// The Dashboard remounts when the user comes back from a module
+			// screen and reads its initial state from bdmAdminData, so keep
+			// that page-load copy in sync with the saved state.
+			if ( window.bdmAdminData ) {
+				window.bdmAdminData.modules = next;
+			}
+
+			return next;
 		} );
 	}
 
