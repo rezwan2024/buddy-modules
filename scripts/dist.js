@@ -38,6 +38,12 @@ execFileSync(
 	{ stdio: 'inherit' }
 );
 
+// main and the zip get the user-facing readme; README.md on dev is for development.
+fs.copyFileSync(
+	path.join( root, 'README.dist.md' ),
+	path.join( pluginDir, 'README.md' )
+);
+
 // -X drops extra file attributes, so the zip is the same on macOS and Linux.
 execFileSync( 'zip', [ '-rqX', zipFile, slug ], {
 	cwd: distDir,

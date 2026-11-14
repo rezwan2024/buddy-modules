@@ -1,21 +1,25 @@
-# Buddy Modules
+# Buddy Modules — development
 
-A module host for BuddyBoss sites. Its first module is the **Profile and Group Tab Creator**: custom profile and group tabs and sub-tabs, plus rename, hide and reorder for the built-in BuddyBoss tabs. Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin.
+This is the **`dev`** branch: the plugin source, build tooling, release workflow and update Worker. To install the plugin, use the [latest release](https://github.com/rezwan2024/buddy-modules/releases/latest); the user-facing readme is on [`main`](https://github.com/rezwan2024/buddy-modules/tree/main).
 
-Requires WordPress 6.4+, PHP 8.0+ and BuddyBoss Platform 2.8+.
+Requires WordPress 6.4+, PHP 8.0+ and BuddyBoss Platform 2.8+ (Node 22 to build).
 
-## Install
+## Active installs
 
-Download **`buddy-modules.zip`** from the [latest release](https://github.com/rezwan2024/buddy-modules/releases/latest) and upload it in **Plugins → Add New → Upload Plugin**. Don't use the "Source code" downloads.
+**Stats page: https://buddy-modules-updates.buddy-modules-update-worker.workers.dev/stats**
 
-Updates show up on the WordPress **Plugins** screen and install with one click. The plugin checks this repository's releases through the bundled [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) (`lib/plugin-update-checker/`). The checker is off when the plugin runs from a git checkout; the `bdm_update_checker_enabled` filter overrides that.
+Active installs (sites that checked for updates in the last 7 days) by plugin, WordPress and PHP version. It is private: open it once as `/stats?token=<STATS_TOKEN>` (the token is not in this repo) and a cookie keeps you signed in for a year. `?format=json` gives the raw numbers. How it works: [Update Worker](#update-worker-active-installs).
 
 ## Branches
 
 | Branch | Contents |
 |---|---|
+| `main` (default) | The built plugin only, with the user-facing readme (`README.dist.md` is published as its `README.md`). Written by the release workflow; never commit to it by hand. |
 | `dev` | Source. All work happens here. |
-| `main` | The built plugin only. Written by the release workflow; never commit to it by hand. |
+
+## Updates in WordPress
+
+The plugin checks for updates with the bundled [Plugin Update Checker](https://github.com/YahnisElsts/plugin-update-checker) (`lib/plugin-update-checker/`), through the update Worker below; `bdm_send_update_stats` → false checks this repository's releases directly. The checker is off when the plugin runs from a git checkout; the `bdm_update_checker_enabled` filter overrides that.
 
 ## Development
 
@@ -49,7 +53,7 @@ Because the workflow moves the tag onto the built commit on `main`, refresh loca
 `worker/` is a Cloudflare Worker (free tier) that the plugin's update checker calls instead of GitHub:
 
 - `GET /update` returns Plugin Update Checker metadata for the latest GitHub release (`download_url` = the release's `buddy-modules.zip`, cached 10 minutes) and records the site in D1: SHA-256 site hash, plugin/WP/PHP versions, first/last seen.
-- `GET /stats` shows active installs (sites seen in the last 7 days) by plugin, WordPress and PHP version. Open `/stats?token=<STATS_TOKEN>` once; a cookie keeps you signed in. `?format=json` gives the raw numbers.
+- `GET /stats` ([open](https://buddy-modules-updates.buddy-modules-update-worker.workers.dev/stats)) shows active installs (sites seen in the last 7 days) by plugin, WordPress and PHP version. Open `/stats?token=<STATS_TOKEN>` once; a cookie keeps you signed in. `?format=json` gives the raw numbers.
 - Opt-out: `add_filter( 'bdm_send_update_stats', '__return_false' );` makes the plugin check GitHub directly.
 
 Deploy (from `worker/`):
@@ -65,6 +69,14 @@ npm run deploy
 ```
 
 Local run: `printf 'STATS_TOKEN=localtest\n' > .dev.vars && npm run db:init:local && npm run dev` (http://127.0.0.1:8787).
+
+## Readmes
+
+| File | Shown where |
+|---|---|
+| `README.md` (this file) | `dev` branch on GitHub |
+| `README.dist.md` | `main` branch and the release zip, as `README.md` (copied by `scripts/dist.js`) |
+| `readme.txt` | WordPress "View details" screen; its `== Changelog ==` becomes the release notes |
 
 ## Changelog
 

@@ -13,6 +13,8 @@
 /CLAUDE.md
 /PLAN.md
 /PROGRESS.md
+/README.md
+/README.dist.md
 /phpcs.xml.dist
 /webpack.config.js
 /package.json
