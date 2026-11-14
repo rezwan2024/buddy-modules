@@ -4,7 +4,7 @@ Tags: buddyboss, profile tabs, group tabs, community
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,10 @@ The check goes through the Buddy Modules update service (a Cloudflare Worker), w
 No. Uninstalling Buddy Modules removes only its own tables and options.
 
 == Changelog ==
+
+= 2.0.7 =
+* Fix: When Buddy Modules is installed twice (a second copy in another folder), only one copy runs and a notice says which one to keep.
+* Fix: Deleting an extra copy of Buddy Modules no longer removes your tabs and settings.
 
 = 2.0.6 =
 * Readme: website link and a clearer introduction (free and open source, more modules on the way). No functional changes.
