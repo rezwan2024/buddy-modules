@@ -4,7 +4,7 @@ Tags: buddyboss, profile tabs, group tabs, community
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,9 @@ From this plugin's GitHub releases. WordPress checks about twice a day; use **Ch
 No. Uninstalling Buddy Modules removes only its own tables and options.
 
 == Changelog ==
+
+= 2.0.1 =
+* Test release to check the update from GitHub releases on the WordPress Plugins screen. No functional changes.
 
 = 2.0.0 =
 * New: Buddy Modules, the in-place upgrade of the legacy BuddyBoss Tab Creator 1.0.0, with the Profile and Group Tab Creator as its first module.
