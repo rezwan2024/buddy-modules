@@ -107,8 +107,9 @@ function recordInstall( env, site, versions ) {
 }
 
 /**
- * Build the metadata from the latest release, cached for CACHE_SECONDS so
- * GitHub's API rate limit is never reached.
+ * The update metadata, cached for CACHE_SECONDS. A longer-lived copy of the
+ * last good answer is served when GitHub cannot be reached, so sites never
+ * see an update error because of a GitHub hiccup.
  *
  * @param {Object} env Worker bindings.
  * @param {Object} ctx Execution context (waitUntil).
@@ -116,72 +117,83 @@ function recordInstall( env, site, versions ) {
  */
 async function getMetadata( env, ctx ) {
 	const cache = caches.default;
-	const key = new Request(
-		`https://bdm-cache.internal/metadata/${ env.GITHUB_REPO }`
-	);
-	const cached = await cache.match( key );
+	const base = `https://bdm-cache.internal/${ env.GITHUB_REPO }`;
+	const freshKey = new Request( `${ base }/metadata` );
+	const staleKey = new Request( `${ base }/metadata-last-good` );
+	const cached = await cache.match( freshKey );
 
 	if ( cached ) {
 		return cached.json();
 	}
 
-	const metadata = await buildMetadata( env );
+	let metadata;
+	try {
+		metadata = await buildMetadata( env );
+	} catch ( error ) {
+		const stale = await cache.match( staleKey );
+		if ( stale ) {
+			console.error( 'metadata failed, serving last good copy', error );
+			return stale.json();
+		}
+		throw error;
+	}
 
-	ctx.waitUntil(
+	const store = ( key, seconds ) =>
 		cache.put(
 			key,
 			Response.json( metadata, {
-				headers: { 'Cache-Control': `max-age=${ CACHE_SECONDS }` },
+				headers: { 'Cache-Control': `max-age=${ seconds }` },
 			} )
-		)
+		);
+
+	ctx.waitUntil(
+		Promise.all( [
+			store( freshKey, CACHE_SECONDS ),
+			store( staleKey, 30 * DAY ),
+		] )
 	);
 
 	return metadata;
 }
 
 /**
- * Read the latest release and readme.txt from GitHub.
+ * Build the metadata without the GitHub API (which rate-limits Cloudflare's
+ * shared IPs): the latest tag comes from the github.com/…/releases/latest
+ * redirect, everything else from readme.txt on main (written by the release
+ * workflow together with the release).
  *
  * @param {Object} env Worker bindings.
  * @return {Promise<Object>} Plugin Update Checker metadata.
  */
 async function buildMetadata( env ) {
-	const headers = {
-		Accept: 'application/vnd.github+json',
-		'User-Agent': 'buddy-modules-update-worker',
-	};
+	const repo = env.GITHUB_REPO;
+	const headers = { 'User-Agent': 'buddy-modules-update-worker' };
 
-	if ( env.GITHUB_TOKEN ) {
-		headers.Authorization = `Bearer ${ env.GITHUB_TOKEN }`;
-	}
-
-	const [ releaseResponse, readmeResponse ] = await Promise.all( [
-		fetch(
-			`https://api.github.com/repos/${ env.GITHUB_REPO }/releases/latest`,
-			{ headers }
-		),
-		fetch(
-			`https://raw.githubusercontent.com/${ env.GITHUB_REPO }/main/readme.txt`,
-			{ headers: { 'User-Agent': headers[ 'User-Agent' ] } }
-		),
+	const [ latestResponse, readmeResponse ] = await Promise.all( [
+		fetch( `https://github.com/${ repo }/releases/latest`, {
+			headers,
+			redirect: 'manual',
+		} ),
+		fetch( `https://raw.githubusercontent.com/${ repo }/main/readme.txt`, {
+			headers,
+		} ),
 	] );
 
-	if ( ! releaseResponse.ok ) {
-		throw new Error( `GitHub release: HTTP ${ releaseResponse.status }` );
-	}
+	const location = latestResponse.headers.get( 'Location' ) || '';
+	const tag = ( location.match( /\/releases\/tag\/([^/?#]+)$/ ) || [] )[ 1 ];
 
-	const release = await releaseResponse.json();
-	const asset = ( release.assets || [] ).find(
-		( item ) => item.name === env.RELEASE_ASSET
-	);
-
-	if ( ! asset ) {
+	if ( ! tag ) {
 		throw new Error(
-			`Release ${ release.tag_name } has no ${ env.RELEASE_ASSET }`
+			`Latest release redirect: HTTP ${ latestResponse.status } ${ location }`
 		);
 	}
 
-	const readme = readmeResponse.ok ? await readmeResponse.text() : '';
+	if ( ! readmeResponse.ok ) {
+		throw new Error( `readme.txt: HTTP ${ readmeResponse.status }` );
+	}
+
+	const readme = await readmeResponse.text();
+	const version = decodeURIComponent( tag ).replace( /^v/, '' );
 	const header = ( name ) => {
 		const match = readme.match(
 			new RegExp( `^${ name }:\\s*(.+)$`, 'mi' )
@@ -192,19 +204,32 @@ async function buildMetadata( env ) {
 	return {
 		name: 'Buddy Modules',
 		slug: 'buddy-modules',
-		version: release.tag_name.replace( /^v/, '' ),
-		download_url: asset.browser_download_url,
-		homepage: `https://github.com/${ env.GITHUB_REPO }`,
+		version,
+		download_url: `https://github.com/${ repo }/releases/download/${ tag }/${ env.RELEASE_ASSET }`,
+		homepage: `https://github.com/${ repo }`,
 		author: 'rezwan2024',
 		requires: header( 'Requires at least' ),
 		tested: header( 'Tested up to' ),
 		requires_php: header( 'Requires PHP' ),
-		last_updated: release.published_at,
 		sections: {
 			description: escapeHtml( readmeShortDescription( readme ) ),
-			changelog: releaseNotesToHtml( release.body || '' ),
+			changelog: releaseNotesToHtml( readmeChangelog( readme ) ),
 		},
 	};
+}
+
+/**
+ * The readme.txt changelog (all versions) as simple Markdown.
+ *
+ * @param {string} readme readme.txt contents.
+ * @return {string} Markdown: "## <version>" headings and "*" bullets.
+ */
+function readmeChangelog( readme ) {
+	const section = (
+		readme.split( /^== Changelog ==\s*$/m )[ 1 ] || ''
+	).split( /^== .* ==\s*$/m )[ 0 ];
+
+	return section.replace( /^= (.+) =\s*$/gm, '## Version $1' );
 }
 
 /**
@@ -219,14 +244,12 @@ function readmeShortDescription( readme ) {
 }
 
 /**
- * Turn the release notes (simple Markdown: bullets, bold, code) into HTML.
- * The build note after the "---" line is left out.
+ * Turn simple Markdown (headings, bullets, bold, code) into HTML.
  *
- * @param {string} body Release body.
+ * @param {string} body Markdown.
  * @return {string} HTML.
  */
 function releaseNotesToHtml( body ) {
-	const notes = body.split( /\n-{3,}\n/ )[ 0 ];
 	const inline = ( text ) =>
 		escapeHtml( text )
 			.replace( /\*\*(.+?)\*\*/g, '<strong>$1</strong>' )
@@ -235,7 +258,7 @@ function releaseNotesToHtml( body ) {
 	let html = '';
 	let inList = false;
 
-	for ( const raw of notes.split( '\n' ) ) {
+	for ( const raw of body.split( '\n' ) ) {
 		const line = raw.trim();
 		const bullet = line.match( /^[*-]\s+(.*)$/ );
 
