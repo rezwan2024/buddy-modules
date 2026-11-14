@@ -104,9 +104,29 @@ body.toplevel_page_buddy-modules {
 		padding: 4px 12px;
 	}
 
-	// Button with a leading line icon ("+ Add Tab").
+	// "Add …" button: outlined brand, like Platform's "Add New Topic"
+	// (.bb-topic-list__add-btn): transparent, 1px brand border + text.
+	.components-button.is-secondary.bdm-admin-button-add {
+		background: transparent;
+		border: 1px solid $bdm-brand;
+		color: $bdm-brand;
+
+		&:disabled {
+			background: transparent;
+			border-color: $bdm-brand-light;
+			color: $bdm-brand-light;
+		}
+
+		&:hover:not(:disabled) {
+			background: transparent;
+			border-color: $bdm-brand-light;
+			color: $bdm-brand;
+		}
+	}
+
+	// Button with a leading line icon ("+ Add Tab"); Platform: 16px icon, 4px gap.
 	.bdm-admin-button-icon {
-		gap: 6px;
+		gap: 4px;
 
 		i {
 			font-size: 16px;

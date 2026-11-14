@@ -2,15 +2,19 @@
 
 // ── Filter bar ──────────────────────────────────────────────────────────────
 
+// Platform .bb-admin-settings__filters: line under the pills.
 .bdm-admin-filter-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 12px;
-	margin-bottom: 24px;
+	margin: 0 0 24px;
+	padding: 0 0 24px;
+	border-bottom: 1px solid $bdm-border;
 }
 
+// Platform .bb-admin-settings__filter-tab: outlined pills, the active one grey.
 .bdm-admin-filter-pills {
 	display: flex;
 	align-items: center;
@@ -18,26 +22,32 @@
 
 	&__pill {
 		appearance: none;
-		border: 1px solid $bdm-border-secondary;
-		background: $bdm-bg-secondary;
+		height: 34px;
+		padding: 7px 16px;
+		border: 1px solid $bdm-border-tertiary;
 		border-radius: 999px;
-		padding: 6px 16px;
+		background: transparent;
 		font-size: 13px;
-		color: $bdm-text;
+		font-weight: 500;
+		line-height: 18px;
+		color: $bdm-text-tertiary;
 		cursor: pointer;
 		transition: $bdm-transition;
-		line-height: 1.4;
 
 		&:hover {
-			border-color: $bdm-border-secondary;
-			background: $bdm-bg-secondary-hover;
 			color: $bdm-text;
 		}
 
+		&:focus-visible {
+			outline: none;
+			box-shadow: 0 0 0 2px $bdm-brand;
+		}
+
 		&.is-active {
-			background: $bdm-brand;
-			border-color: $bdm-brand;
-			color: $bdm-text-inverse;
+			background: $bdm-bg-secondary;
+			border-color: $bdm-text-disabled;
+			box-shadow: inset 0 0 0 0.5px $bdm-text-disabled;
+			color: $bdm-text;
 		}
 	}
 }
@@ -69,8 +79,12 @@
 
 // ── Category group ───────────────────────────────────────────────────────────
 
+// Platform .bb-admin-settings__category: groups 40px apart, heading then cards.
 .bdm-admin-category-group {
-	margin-bottom: 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 40px;
 
 	&:last-child {
 		margin-bottom: 0;
@@ -78,138 +92,106 @@
 }
 
 .bdm-admin-category-heading {
-	font-size: 11px;
-	font-weight: 600;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: $bdm-text-tertiary;
-	margin: 0 0 16px;
+	margin: 0;
 	padding: 0;
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.3;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	color: $bdm-text-secondary;
 }
 
 // ── Module card grid ─────────────────────────────────────────────────────────
 
+// Platform .bb-admin-settings__features-grid: wrapping row, 16px gap, 4 cards.
 .bdm-admin-module-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	display: flex;
+	flex-wrap: wrap;
 	gap: 16px;
-
-	@media ( max-width: 1200px ) {
-		grid-template-columns: repeat(3, 1fr);
-	}
-
-	@media ( max-width: 900px ) {
-		grid-template-columns: repeat(2, 1fr);
-	}
-
-	@media ( max-width: 600px ) {
-		grid-template-columns: 1fr;
-	}
 }
 
-// ── Module card ──────────────────────────────────────────────────────────────
+// ── Module card (Platform .bb-admin-settings__feature-card) ─────────────────
 
 .bdm-admin-module-card {
-	background: $bdm-bg-base;
-	border: 1px solid $bdm-border;
-	border-radius: $bdm-radius-lg;
-	padding: 20px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
-	box-shadow: $bdm-shadow-card;
-	transition: box-shadow 0.2s ease;
+	justify-content: space-between;
+	box-sizing: border-box;
+	width: calc(25% - 12px);
+	min-height: 242px;
+	padding: 16px;
+	background: $bdm-bg-base;
+	border: 0.5px solid $bdm-border-tertiary;
+	border-radius: $bdm-radius-xl;
+	transition: box-shadow 0.2s, opacity 0.2s;
 
-	&:hover {
-		box-shadow: $bdm-shadow-card-hover;
+	@media (max-width: 1400px) {
+		width: calc(33.333% - 11px);
 	}
 
-	&__icon-wrap {
-		width: 48px;
-		height: 48px;
-		border-radius: 50%;
-		background: rgba($bdm-brand, 0.1);
+	@media (max-width: 1024px) {
+		width: calc(50% - 8px);
+	}
+
+	@media (max-width: 600px) {
+		width: 100%;
+	}
+
+	&__body,
+	&__name {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	&__icon-frame {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		flex-shrink: 0;
+		width: 28px;
+		height: 28px;
+		color: $bdm-brand;
 
+		.bb-icons-rl,
 		.dashicons {
-			font-size: 24px;
-			color: $bdm-brand;
-			width: 24px;
-			height: 24px;
-		}
-
-		.bb-icon-rf {
-			font-size: 24px;
-			color: $bdm-brand;
+			width: 28px;
+			height: 28px;
+			font-size: 28px;
+			line-height: 28px;
 		}
 	}
 
 	&__title {
-		font-size: 15px;
-		font-weight: 600;
-		color: $bdm-text;
 		margin: 0;
-		line-height: 1.3;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 22px;
+		color: $bdm-text;
 	}
 
 	&__description {
-		font-size: 13px;
-		color: $bdm-text-tertiary;
-		line-height: 1.5;
 		margin: 0;
-		flex: 1;
+		font-size: 13px;
+		line-height: 18px;
+		color: $bdm-text-tertiary;
 	}
 
 	&__footer {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 8px;
-		margin-top: 4px;
-		padding-top: 12px;
-		border-top: 1px solid $bdm-border;
+		padding-top: 8px;
 	}
 
-	&__settings-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		padding: 8px 16px;
-		border: 1px solid $bdm-border-secondary;
-		border-radius: $bdm-radius-lg;
-		background: $bdm-bg-secondary;
-		color: $bdm-text;
-		font-size: 13px;
-		font-weight: 500;
-		cursor: pointer;
-		text-decoration: none;
-		transition: $bdm-transition;
+	// Platform .bb-admin-settings__feature-settings-btn (secondary button).
+	.components-button.is-secondary.bdm-admin-module-card__settings-btn {
+		gap: 4px;
 
-		.dashicons {
-			font-size: 14px;
-			width: 14px;
-			height: 14px;
-		}
-
-		&:focus {
-			box-shadow: none;
-			outline: 2px solid $bdm-text;
-		}
-
-		&:disabled,
-		&.is-disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-			pointer-events: none;
-		}
-
-		&:hover:not(:disabled) {
-			border-color: $bdm-border-secondary;
-			background: $bdm-bg-secondary-hover;
-			color: $bdm-text;
+		i {
+			font-size: 16px;
+			line-height: 1;
+			color: $bdm-text-secondary;
 		}
 	}
 }
@@ -232,10 +214,12 @@
 
 	&__track {
 		display: block;
-		width: 48px;
-		height: 26px;
+		box-sizing: border-box;
+		width: 40px;
+		height: 24px;
+		border: 1px solid transparent;
 		border-radius: 999px;
-		background: #ccc;
+		background: #b2b2b2;
 		transition: background 0.2s ease;
 		position: relative;
 
@@ -247,23 +231,23 @@
 
 	&__thumb {
 		display: block;
-		width: 20px;
-		height: 20px;
+		width: 16px;
+		height: 16px;
 		border-radius: 50%;
 		background: $bdm-bg-base;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 		position: absolute;
-		top: 3px;
-		left: 3px;
+		top: 4px;
+		left: 4px;
 		transition: transform 0.2s ease;
 	}
 
 	&.is-checked .bdm-admin-big-toggle__track {
 		background: $bdm-brand;
+		border-color: $bdm-brand;
 	}
 
 	&.is-checked .bdm-admin-big-toggle__thumb {
-		transform: translateX(22px);
+		transform: translateX(16px);
 	}
 
 	&.is-disabled {

@@ -11,6 +11,7 @@ import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { apiRequest } from '../../common/utils/api';
 import { useToast } from '../../common/hooks/useToast';
+import { getIconClass } from '../../common/utils/icons';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -173,47 +174,45 @@ function ModuleCard( { module, onToggle, navigate } ) {
 		navigate( { module: module.id } );
 	}
 
-	const isDashicon = module.icon && 0 === module.icon.indexOf( 'dashicons-' );
-
 	return (
 		<div
 			className={
 				'bdm-admin-module-card' + ( active ? ' is-active' : '' )
 			}
 		>
-			<div
-				className="bdm-admin-module-card__icon-wrap"
-				aria-hidden="true"
-			>
-				{ isDashicon && (
-					<span className={ 'dashicons ' + module.icon } />
-				) }
-				{ ! isDashicon && module.icon && (
-					<span className={ 'bb-icon-rf bb-icon-' + module.icon } />
-				) }
+			<div className="bdm-admin-module-card__body">
+				<div className="bdm-admin-module-card__name">
+					{ module.icon && (
+						<span
+							className="bdm-admin-module-card__icon-frame"
+							aria-hidden="true"
+						>
+							<span className={ getIconClass( module.icon ) } />
+						</span>
+					) }
+					<h3 className="bdm-admin-module-card__title">
+						{ module.label }
+					</h3>
+				</div>
+				<p className="bdm-admin-module-card__description">
+					{ module.description }
+				</p>
 			</div>
-
-			<h3 className="bdm-admin-module-card__title">{ module.label }</h3>
-			<p className="bdm-admin-module-card__description">
-				{ module.description }
-			</p>
 
 			<div className="bdm-admin-module-card__footer">
 				<button
 					type="button"
-					className={
-						'bdm-admin-module-card__settings-btn' +
-						( ! active ? ' is-disabled' : '' )
-					}
+					className="components-button is-secondary bdm-admin-module-card__settings-btn"
 					onClick={ handleSettings }
 					disabled={ ! active }
-					aria-label={
+					aria-label={ sprintf(
 						/* translators: %s: module label */
-						module.label + ' — ' + __( 'Settings', 'buddy-modules' )
-					}
+						__( '%s settings', 'buddy-modules' ),
+						module.label
+					) }
 				>
-					<span
-						className="dashicons dashicons-admin-generic"
+					<i
+						className="bb-icons-rl bb-icons-rl-gear-six"
 						aria-hidden="true"
 					/>
 					{ __( 'Settings', 'buddy-modules' ) }
@@ -310,13 +309,11 @@ export default function Dashboard( { navigate } ) {
 							setFilter( 'all' );
 						} }
 					>
-						{
+						{ sprintf(
 							/* translators: %d: total module count */
-							__( 'All', 'buddy-modules' ) +
-								' (' +
-								modules.length +
-								')'
-						}
+							__( 'All (%d)', 'buddy-modules' ),
+							modules.length
+						) }
 					</button>
 					<button
 						type="button"
@@ -328,13 +325,11 @@ export default function Dashboard( { navigate } ) {
 							setFilter( 'active' );
 						} }
 					>
-						{
+						{ sprintf(
 							/* translators: %d: active module count */
-							__( 'Active', 'buddy-modules' ) +
-								' (' +
-								activeCount +
-								')'
-						}
+							__( 'Active (%d)', 'buddy-modules' ),
+							activeCount
+						) }
 					</button>
 					<button
 						type="button"
@@ -346,13 +341,11 @@ export default function Dashboard( { navigate } ) {
 							setFilter( 'inactive' );
 						} }
 					>
-						{
+						{ sprintf(
 							/* translators: %d: inactive module count */
-							__( 'Inactive', 'buddy-modules' ) +
-								' (' +
-								inactiveCount +
-								')'
-						}
+							__( 'Inactive (%d)', 'buddy-modules' ),
+							inactiveCount
+						) }
 					</button>
 				</div>
 

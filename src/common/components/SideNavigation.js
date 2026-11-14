@@ -9,22 +9,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-
-/**
- * Icon class for a panel: 'dashicons-*' keeps Dashicons, anything else is a
- * BuddyBoss line icon name (bb-icons-rl-*).
- *
- * @since 2.0.0
- *
- * @param {string} icon Icon identifier from the panel schema.
- * @return {string} Class names for the icon element.
- */
-function getIconClass( icon ) {
-	if ( 0 === icon.indexOf( 'dashicons-' ) ) {
-		return 'dashicons ' + icon;
-	}
-	return 'bb-icons-rl ' + icon;
-}
+import { getIconClass } from '../utils/icons';
 
 /**
  * @since 2.0.0

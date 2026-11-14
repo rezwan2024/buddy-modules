@@ -843,8 +843,7 @@ export default function TabEditor( { route, onSaved, onCancel } ) {
 						</h4>
 						<Button
 							variant="secondary"
-							size="small"
-							className="bdm-admin-button-icon"
+							className="bdm-admin-button-icon bdm-admin-button-add"
 							onClick={ handleAddSubtab }
 							disabled={ !! subtabForm }
 						>

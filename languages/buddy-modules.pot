@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-14T00:10:22+00:00\n"
+"POT-Creation-Date: 2026-11-14T08:29:50+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: buddy-modules\n"
@@ -183,63 +183,69 @@ msgstr ""
 msgid "Another tab already uses the slug \"%s\". Please choose another slug."
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:50
+#: src/admin/screens/Dashboard.js:51
 msgid "General"
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:148
+#: src/admin/screens/Dashboard.js:149
 msgid "Module activated."
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:149
+#: src/admin/screens/Dashboard.js:150
 msgid "Module deactivated."
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:159
+#: src/admin/screens/Dashboard.js:160
 msgid "Could not update the module. Please try again."
 msgstr ""
 
 #. translators: %s: module label
-#: src/admin/screens/Dashboard.js:212
-#: src/admin/screens/Dashboard.js:219
+#: src/admin/screens/Dashboard.js:210
+#, js-format
+msgid "%s settings"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:218
 msgid "Settings"
 msgstr ""
 
 #. translators: %s: module label
-#: src/admin/screens/Dashboard.js:229
+#: src/admin/screens/Dashboard.js:228
 #, js-format
 msgid "Toggle %s"
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:301
+#: src/admin/screens/Dashboard.js:300
 msgid "Filter modules"
 msgstr ""
 
 #. translators: %d: total module count
-#: src/admin/screens/Dashboard.js:315
-#: src/admin/screens/Dashboard.js:372
-msgid "All"
+#: src/admin/screens/Dashboard.js:314
+#, js-format
+msgid "All (%d)"
 msgstr ""
 
 #. translators: %d: active module count
-#: src/admin/screens/Dashboard.js:333
-#: src/tab-creator/components/TabEditor.js:631
-#: src/tab-creator/components/TabsList.js:459
-msgid "Active"
+#: src/admin/screens/Dashboard.js:330
+#, js-format
+msgid "Active (%d)"
 msgstr ""
 
 #. translators: %d: inactive module count
-#: src/admin/screens/Dashboard.js:351
-#: src/tab-creator/components/TabEditor.js:635
-#: src/tab-creator/components/TabsList.js:463
-msgid "Inactive"
+#: src/admin/screens/Dashboard.js:346
+#, js-format
+msgid "Inactive (%d)"
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:366
+#: src/admin/screens/Dashboard.js:359
 msgid "Filter by category"
 msgstr ""
 
-#: src/admin/screens/Dashboard.js:414
+#: src/admin/screens/Dashboard.js:365
+msgid "All"
+msgstr ""
+
+#: src/admin/screens/Dashboard.js:407
 msgid "No modules match the current filter."
 msgstr ""
 
@@ -259,11 +265,11 @@ msgstr ""
 msgid "More options"
 msgstr ""
 
-#: src/common/components/SideNavigation.js:43
+#: src/common/components/SideNavigation.js:28
 msgid "Module panels"
 msgstr ""
 
-#: src/common/components/SideNavigation.js:54
+#: src/common/components/SideNavigation.js:39
 msgid "Back to Modules"
 msgstr ""
 
@@ -310,122 +316,122 @@ msgid "Reset \"%s\" to its default settings?"
 msgstr ""
 
 #: src/tab-creator/components/ExistingTabCreatorPanel.js:136
-#: src/tab-creator/components/ExistingTabEditor.js:302
-#: src/tab-creator/components/ExistingTabEditor.js:428
+#: src/tab-creator/components/ExistingTabEditor.js:306
+#: src/tab-creator/components/ExistingTabEditor.js:438
 #: src/tab-creator/components/TabCreatorPanel.js:139
-#: src/tab-creator/components/TabEditor.js:569
-#: src/tab-creator/components/TabEditor.js:959
-#: src/tab-creator/components/TabEditor.js:1029
+#: src/tab-creator/components/TabEditor.js:573
+#: src/tab-creator/components/TabEditor.js:971
+#: src/tab-creator/components/TabEditor.js:1041
 msgid "Cancel"
 msgstr ""
 
 #: src/tab-creator/components/ExistingTabCreatorPanel.js:145
-#: src/tab-creator/components/ExistingTabsList.js:329
+#: src/tab-creator/components/ExistingTabsList.js:337
 msgid "Reset"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:135
+#: src/tab-creator/components/ExistingTabEditor.js:137
 msgid "Failed to load tab settings."
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:212
+#: src/tab-creator/components/ExistingTabEditor.js:214
 msgid "Settings saved."
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:220
+#: src/tab-creator/components/ExistingTabEditor.js:222
 msgid "Could not save settings. Please try again."
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:241
-#: src/tab-creator/components/TabEditor.js:384
+#: src/tab-creator/components/ExistingTabEditor.js:245
+#: src/tab-creator/components/TabEditor.js:388
 msgid "Discard unsaved changes?"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:256
-#: src/tab-creator/components/TabEditor.js:523
+#: src/tab-creator/components/ExistingTabEditor.js:260
+#: src/tab-creator/components/TabEditor.js:527
 msgid "All Members"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:259
-#: src/tab-creator/components/TabEditor.js:526
+#: src/tab-creator/components/ExistingTabEditor.js:263
+#: src/tab-creator/components/TabEditor.js:530
 msgid "None (hide from everyone)"
-msgstr ""
-
-#: src/tab-creator/components/ExistingTabEditor.js:268
-#: src/tab-creator/components/TabEditor.js:535
-msgid "All Groups"
-msgstr ""
-
-#: src/tab-creator/components/ExistingTabEditor.js:269
-#: src/tab-creator/components/TabEditor.js:536
-msgid "Public Groups"
-msgstr ""
-
-#: src/tab-creator/components/ExistingTabEditor.js:270
-#: src/tab-creator/components/TabEditor.js:537
-msgid "Private Groups"
-msgstr ""
-
-#: src/tab-creator/components/ExistingTabEditor.js:271
-#: src/tab-creator/components/TabEditor.js:538
-msgid "Hidden Groups"
 msgstr ""
 
 #: src/tab-creator/components/ExistingTabEditor.js:272
 #: src/tab-creator/components/TabEditor.js:539
+msgid "All Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:273
+#: src/tab-creator/components/TabEditor.js:540
+msgid "Public Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:274
+#: src/tab-creator/components/TabEditor.js:541
+msgid "Private Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:275
+#: src/tab-creator/components/TabEditor.js:542
+msgid "Hidden Groups"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabEditor.js:276
+#: src/tab-creator/components/TabEditor.js:543
 msgid "None"
 msgstr ""
 
 #. translators: %s is the tab's default label.
-#: src/tab-creator/components/ExistingTabEditor.js:296
+#: src/tab-creator/components/ExistingTabEditor.js:300
 #, js-format
 msgid "Override: %s"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:310
-#: src/tab-creator/components/ExistingTabEditor.js:436
+#: src/tab-creator/components/ExistingTabEditor.js:314
+#: src/tab-creator/components/ExistingTabEditor.js:446
 msgid "Save Settings"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:324
+#: src/tab-creator/components/ExistingTabEditor.js:328
 msgid "Label Override"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:326
+#: src/tab-creator/components/ExistingTabEditor.js:330
 msgid "Leave blank to use the default label."
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:341
+#: src/tab-creator/components/ExistingTabEditor.js:345
 msgid "Hide Tab"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:343
+#: src/tab-creator/components/ExistingTabEditor.js:347
 msgid "Hide this tab from the navigation."
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:357
+#: src/tab-creator/components/ExistingTabEditor.js:361
 msgid "Availability Override"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:374
-#: src/tab-creator/components/TabEditor.js:761
+#: src/tab-creator/components/ExistingTabEditor.js:378
+#: src/tab-creator/components/TabEditor.js:768
 msgid "Enabled For"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:390
-#: src/tab-creator/components/TabEditor.js:781
+#: src/tab-creator/components/ExistingTabEditor.js:394
+#: src/tab-creator/components/TabEditor.js:788
 msgid "Associated Groups"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:398
-#: src/tab-creator/components/ExistingTabEditor.js:416
-#: src/tab-creator/components/TabEditor.js:793
-#: src/tab-creator/components/TabEditor.js:815
+#: src/tab-creator/components/ExistingTabEditor.js:405
+#: src/tab-creator/components/ExistingTabEditor.js:426
+#: src/tab-creator/components/TabEditor.js:803
+#: src/tab-creator/components/TabEditor.js:828
 msgid "Search groups…"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabEditor.js:408
-#: src/tab-creator/components/TabEditor.js:803
+#: src/tab-creator/components/ExistingTabEditor.js:415
+#: src/tab-creator/components/TabEditor.js:813
 msgid "Excluded Groups"
 msgstr ""
 
@@ -443,8 +449,8 @@ msgid "No built-in tabs found."
 msgstr ""
 
 #: src/tab-creator/components/ExistingTabsList.js:151
-#: src/tab-creator/components/TabEditor.js:592
-#: src/tab-creator/components/TabEditor.js:1000
+#: src/tab-creator/components/TabEditor.js:596
+#: src/tab-creator/components/TabEditor.js:1012
 #: src/tab-creator/components/TabsList.js:313
 msgid "Label"
 msgstr ""
@@ -458,7 +464,7 @@ msgid "Visibility"
 msgstr ""
 
 #: src/tab-creator/components/ExistingTabsList.js:160
-#: src/tab-creator/components/ExistingTabsList.js:286
+#: src/tab-creator/components/ExistingTabsList.js:294
 msgid "Default"
 msgstr ""
 
@@ -467,58 +473,67 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabsList.js:214
-#: src/tab-creator/components/TabsList.js:375
+#. translators: %s: tab label.
+#: src/tab-creator/components/ExistingTabsList.js:213
+#: src/tab-creator/components/TabsList.js:374
+#, js-format
+msgid "Reorder %s"
+msgstr ""
+
+#: src/tab-creator/components/ExistingTabsList.js:222
+#: src/tab-creator/components/TabsList.js:383
 msgid "Drag to reorder"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabsList.js:255
-#: src/tab-creator/components/TabsList.js:435
+#: src/tab-creator/components/ExistingTabsList.js:263
+#: src/tab-creator/components/TabsList.js:443
 msgid "Custom"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabsList.js:269
+#: src/tab-creator/components/ExistingTabsList.js:277
 msgid "Hidden"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabsList.js:276
+#: src/tab-creator/components/ExistingTabsList.js:284
 msgid "Visible"
 msgstr ""
 
 #. translators: %s is the tab label.
 #. translators: %s is the sub-tab label.
-#: src/tab-creator/components/ExistingTabsList.js:301
-#: src/tab-creator/components/TabEditor.js:889
-#: src/tab-creator/components/TabsList.js:479
+#: src/tab-creator/components/ExistingTabsList.js:309
+#: src/tab-creator/components/TabEditor.js:901
+#: src/tab-creator/components/TabsList.js:487
 #, js-format
 msgid "More options for %s"
 msgstr ""
 
-#: src/tab-creator/components/ExistingTabsList.js:310
-#: src/tab-creator/components/TabEditor.js:898
-#: src/tab-creator/components/TabsList.js:488
+#: src/tab-creator/components/ExistingTabsList.js:318
+#: src/tab-creator/components/TabEditor.js:910
+#: src/tab-creator/components/TabsList.js:496
 msgid "Edit"
 msgstr ""
 
-#: src/tab-creator/components/RoleSelect.js:48
+#: src/tab-creator/components/RoleSelect.js:49
 msgid "None selected"
 msgstr ""
 
 #. translators: %d is the number of selected roles/options.
-#: src/tab-creator/components/RoleSelect.js:58
+#: src/tab-creator/components/RoleSelect.js:59
 #, js-format
 msgid "%d selected"
 msgstr ""
 
-#: src/tab-creator/components/SearchSelect.js:134
-msgid "Remove"
+#. translators: %s: selected user or group name.
+#: src/tab-creator/components/SearchSelect.js:147
+#, js-format
+msgid "Remove %s"
 msgstr ""
 
-#: src/tab-creator/components/SearchSelect.js:157
+#: src/tab-creator/components/SearchSelect.js:169
 msgid "Search…"
 msgstr ""
 
-#: src/tab-creator/components/SearchSelect.js:189
+#: src/tab-creator/components/SearchSelect.js:203
 msgid "No results found."
 msgstr ""
 
@@ -550,155 +565,165 @@ msgid "Delete \"%s\"? This cannot be undone."
 msgstr ""
 
 #: src/tab-creator/components/TabCreatorPanel.js:148
-#: src/tab-creator/components/TabEditor.js:911
+#: src/tab-creator/components/TabEditor.js:923
 #: src/tab-creator/components/TabsList.js:259
-#: src/tab-creator/components/TabsList.js:504
+#: src/tab-creator/components/TabsList.js:512
 msgid "Delete"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:176
+#: src/tab-creator/components/TabEditor.js:178
 msgid "Failed to load tab."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:296
+#: src/tab-creator/components/TabEditor.js:298
 msgid "Label is required."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:351
+#: src/tab-creator/components/TabEditor.js:353
 msgid "Tab created."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:352
+#: src/tab-creator/components/TabEditor.js:354
 msgid "Tab saved."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:363
+#: src/tab-creator/components/TabEditor.js:365
 msgid "Could not save tab. Please try again."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:478
+#: src/tab-creator/components/TabEditor.js:482
 msgid "Subtab saved."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:481
+#: src/tab-creator/components/TabEditor.js:485
 msgid "Could not save subtab."
 msgstr ""
 
 #. translators: %s is the subtab label.
-#: src/tab-creator/components/TabEditor.js:493
+#: src/tab-creator/components/TabEditor.js:497
 #, js-format
 msgid "Delete \"%s\"?"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:508
+#: src/tab-creator/components/TabEditor.js:512
 msgid "Subtab deleted."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:512
+#: src/tab-creator/components/TabEditor.js:516
 msgid "Could not delete subtab."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:560
+#: src/tab-creator/components/TabEditor.js:564
 msgid "Add New Tab"
 msgstr ""
 
 #. translators: %s is the tab label.
-#: src/tab-creator/components/TabEditor.js:563
+#: src/tab-creator/components/TabEditor.js:567
 #, js-format
 msgid "Edit Tab: %s"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:577
-#: src/tab-creator/components/TabEditor.js:967
+#: src/tab-creator/components/TabEditor.js:581
+#: src/tab-creator/components/TabEditor.js:979
 msgid "Save Tab"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:604
-#: src/tab-creator/components/TabEditor.js:1005
+#: src/tab-creator/components/TabEditor.js:608
+#: src/tab-creator/components/TabEditor.js:1017
 msgid "Slug"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:606
+#: src/tab-creator/components/TabEditor.js:610
 msgid "URL-friendly identifier. Auto-generated from label; edit to override."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:619
+#: src/tab-creator/components/TabEditor.js:623
 #: src/tab-creator/components/TabsList.js:319
 msgid "Status"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:642
+#: src/tab-creator/components/TabEditor.js:635
+#: src/tab-creator/components/TabsList.js:467
+msgid "Active"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:639
+#: src/tab-creator/components/TabsList.js:471
+msgid "Inactive"
+msgstr ""
+
+#: src/tab-creator/components/TabEditor.js:646
 msgid "Content Source"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:654
+#: src/tab-creator/components/TabEditor.js:658
 msgid "Custom Content"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:658
-#: src/tab-creator/components/TabEditor.js:683
+#: src/tab-creator/components/TabEditor.js:662
+#: src/tab-creator/components/TabEditor.js:687
 msgid "External URL"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:666
-#: src/tab-creator/components/TabEditor.js:1015
+#: src/tab-creator/components/TabEditor.js:670
+#: src/tab-creator/components/TabEditor.js:1027
 msgid "Content"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:700
+#: src/tab-creator/components/TabEditor.js:704
 msgid "Open in New Tab"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:703
+#: src/tab-creator/components/TabEditor.js:707
 msgid "Open the external URL in a new browser tab."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:718
+#: src/tab-creator/components/TabEditor.js:722
 msgid "Availability"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:720
+#: src/tab-creator/components/TabEditor.js:724
 msgid "Control who can see this tab on a member's profile."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:738
+#: src/tab-creator/components/TabEditor.js:742
 msgid "Associated Users"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:740
+#: src/tab-creator/components/TabEditor.js:744
 msgid "The tab appears on these members' profiles only."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:750
+#: src/tab-creator/components/TabEditor.js:757
 msgid "Search users…"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:763
+#: src/tab-creator/components/TabEditor.js:770
 msgid "Enable this tab only for selected group types."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:783
+#: src/tab-creator/components/TabEditor.js:790
 msgid "Show the tab only in these groups."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:805
+#: src/tab-creator/components/TabEditor.js:815
 msgid "Hide the tab in these groups."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:829
+#: src/tab-creator/components/TabEditor.js:842
 #: src/tab-creator/components/TabsList.js:322
 msgid "Sub-tabs"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:842
+#: src/tab-creator/components/TabEditor.js:854
 msgid "Add Sub-tab"
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:848
+#: src/tab-creator/components/TabEditor.js:860
 msgid "No sub-tabs yet."
 msgstr ""
 
-#: src/tab-creator/components/TabEditor.js:1032
+#: src/tab-creator/components/TabEditor.js:1044
 msgid "Save"
 msgstr ""
 
@@ -751,7 +776,7 @@ msgid "Type"
 msgstr ""
 
 #. translators: %s is the tab label.
-#: src/tab-creator/components/TabsList.js:407
+#: src/tab-creator/components/TabsList.js:415
 #, js-format
 msgid "Select %s"
 msgstr ""

@@ -221,8 +221,8 @@ export default function TabsList( { route, title, openModal, refreshKey } ) {
 				<h2 className="bdm-admin-card__title">{ title }</h2>
 				<div className="bdm-admin-card__actions">
 					<Button
-						variant="primary"
-						className="bdm-admin-button-icon"
+						variant="secondary"
+						className="bdm-admin-button-icon bdm-admin-button-add"
 						onClick={ function () {
 							openModal( { view: 'add' } );
 						} }

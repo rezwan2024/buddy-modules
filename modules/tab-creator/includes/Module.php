@@ -50,7 +50,7 @@ class Module extends \BuddyModules\Modules\Module {
 	 * @since 2.0.0
 	 * @var string
 	 */
-	protected string $icon = 'dashicons-menu-alt';
+	protected string $icon = 'bb-icons-rl-tabs';
 
 	/**
 	 * Dashboard category.
