@@ -2,6 +2,8 @@
 
 Optional modules for BuddyBoss Platform sites. Turn each module on or off from **Buddy Modules** in wp-admin; every module has its own settings screen.
 
+![Buddy Modules screen in wp-admin: module cards with an on/off toggle and a Settings button](https://raw.githubusercontent.com/rezwan2024/buddy-modules/dev/docs/screenshots/dashboard.png)
+
 ## Download
 
 **[⬇ Download the latest version (buddy-modules.zip)](https://github.com/rezwan2024/buddy-modules/releases/latest/download/buddy-modules.zip)**
@@ -31,6 +33,8 @@ After installing, new versions appear on the **Plugins** and **Dashboard → Upd
 - Rename, hide and reorder the built-in BuddyBoss profile and group tabs.
 - Drag to reorder, bulk activate, deactivate or delete, and keep tabs as drafts.
 
+![Profile and Group Tab Creator settings: Profile Tabs list with type, status and sub-tab count, and the Group Tabs and Built-in Tabs sections in the side menu](https://raw.githubusercontent.com/rezwan2024/buddy-modules/dev/docs/screenshots/tab-creator.png)
+
 Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin. Your existing tabs, rules and built-in tab changes are copied over once; the legacy data is left untouched.
 
 ## Requirements
@@ -44,6 +48,10 @@ Buddy Modules 2.0 replaces the legacy "BuddyBoss Tab Creator" plugin. Your exist
 Update checks go through the Buddy Modules update service, which returns the latest release and counts active installs. Each check sends a one-way hash of your site address (not the address itself), the Buddy Modules, WordPress and PHP versions, and your site language. Nothing else is sent, and no cookies are set.
 
 ## Changelog
+
+### Version 2.0.5
+
+- **Readme:** screenshots of the Buddy Modules and Tab Creator screens. No functional changes.
 
 ### Version 2.0.4
 

@@ -4,7 +4,7 @@ Tags: buddyboss, profile tabs, group tabs, community
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,9 @@ The check goes through the Buddy Modules update service (a Cloudflare Worker), w
 No. Uninstalling Buddy Modules removes only its own tables and options.
 
 == Changelog ==
+
+= 2.0.5 =
+* Readme: screenshots of the Buddy Modules and Tab Creator screens. No functional changes.
 
 = 2.0.4 =
 * Clearer readme: download link at the top and an easier-to-read changelog. No functional changes.
