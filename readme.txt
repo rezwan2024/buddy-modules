@@ -4,7 +4,7 @@ Tags: buddyboss, profile tabs, group tabs, community
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ To check GitHub directly and send nothing, add this to a small plugin or your th
 No. Uninstalling Buddy Modules removes only its own tables and options.
 
 == Changelog ==
+
+= 2.0.2 =
+* Update checks now go through the Buddy Modules update service, which counts active installs by a one-way hash of the site address. See "What does the update check send?" in the FAQ. Opt out with the `bdm_send_update_stats` filter.
 
 = 2.0.1 =
 * Test release to check the update from GitHub releases on the WordPress Plugins screen. No functional changes.
